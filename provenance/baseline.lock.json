@@ -92,7 +92,7 @@
       "classification": "poison-modified",
       "mode": "100644",
       "path": ".gitignore",
-      "sha256": "1aef2cc6ade229f05bd3d5ae20635edbb31920e5158cb1129e5df2b939c7687b"
+      "sha256": "36fd20e6849aea69ab6676242bd741d395548c32c4364e91698b025feff7f5c0"
     },
     {
       "classification": "upstream",
@@ -54314,7 +54314,7 @@
       "classification": "poison-added",
       "mode": "100644",
       "path": "provenance/upstream-paths.json",
-      "sha256": "6a867d17dd1952012915cc93eb5c4c9beb06ea218b7addf4bda0645b17ff40ac"
+      "sha256": "a9d46399992d35d65322b2dd7eb931b957da461bb3c7c84d669d38b6e64eb549"
     },
     {
       "classification": "upstream",
@@ -56294,7 +56294,7 @@
       "classification": "poison-added",
       "mode": "100644",
       "path": "tools/tests/test_verify_baseline.py",
-      "sha256": "5b3a168f49bd82407501f3b8f63c9fa8c8efb681ea1165b9ac3cd111b0c441b5"
+      "sha256": "88e1c641095fc6e45da3ae6b2d16c72e0d9b6ddff2ca7a2ce1224f986e2c5bc8"
     },
     {
       "classification": "poison-added",
@@ -56312,5 +56312,5 @@
   "schema": "poison.baseline/v1",
   "sourcePath": "do_not_include/flipperzero-firmware",
   "upstream": "flipperdevices/flipperzero-firmware",
-  "upstreamTreeSha256": "fd4b4f45cca681b15e80d1f13131f1f63708952f77461e2b6734795abd94f47c"
+  "upstreamTreeSha256": "45936a82bcc3b18f0dba7982cf84829e45d70b02eb61e4e11f5b9a5b50e9e646"
 }

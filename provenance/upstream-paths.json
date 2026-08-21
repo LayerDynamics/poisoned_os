@@ -152,7 +152,7 @@
       ],
       "path": ".gitignore",
       "productMode": "100644",
-      "productSha256": "1aef2cc6ade229f05bd3d5ae20635edbb31920e5158cb1129e5df2b939c7687b",
+      "productSha256": "36fd20e6849aea69ab6676242bd741d395548c32c4364e91698b025feff7f5c0",
       "upstreamMode": "100644",
       "upstreamSha256": "55f8bcf7136f9ec8f9bf4c4e06ba725c63a9f430dd29d925a7a4737284078c0e"
     },
@@ -75152,7 +75152,7 @@
       "classification": "poison-added",
       "path": "tools/tests/test_verify_baseline.py",
       "productMode": "100644",
-      "productSha256": "5b3a168f49bd82407501f3b8f63c9fa8c8efb681ea1165b9ac3cd111b0c441b5"
+      "productSha256": "88e1c641095fc6e45da3ae6b2d16c72e0d9b6ddff2ca7a2ce1224f986e2c5bc8"
     },
     {
       "classification": "poison-added",

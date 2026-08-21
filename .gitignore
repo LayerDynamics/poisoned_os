@@ -6,7 +6,7 @@ build/
 dist/
 .fbt/
 .cache/
-toolchain/
+/toolchain/
 artifacts/**/*.tmp
 dashboard/node_modules/
 dashboard/.vite/

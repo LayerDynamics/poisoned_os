@@ -190,6 +190,46 @@ class RepositoryBaselineContractTests(unittest.TestCase):
         self.assertIn("docs/specs/SPEC-1-poisonedos-for-the-flipper-zero.md", poison_paths)
         self.assertIn("docs/plans/2026-08-21-m0-baseline-and-governance.md", poison_paths)
 
+    def test_every_locked_path_is_tracked_by_the_product_repository(self) -> None:
+        lock = json.loads(BASELINE_LOCK.read_text(encoding="utf-8"))
+        locked_paths = {entry["path"] for entry in lock["files"]}
+        tracked = set(
+            subprocess.check_output(
+                ["git", "-C", os.fspath(REPOSITORY_ROOT), "ls-files"], text=True
+            ).splitlines()
+        )
+        self.assertEqual(locked_paths - tracked, set())
+
+    def test_downloaded_toolchain_ignore_does_not_hide_source_scripts(self) -> None:
+        generated = subprocess.run(
+            [
+                "git",
+                "-C",
+                os.fspath(REPOSITORY_ROOT),
+                "check-ignore",
+                "--no-index",
+                "toolchain/arm64-darwin/VERSION",
+            ],
+            capture_output=True,
+            check=False,
+            text=True,
+        )
+        source = subprocess.run(
+            [
+                "git",
+                "-C",
+                os.fspath(REPOSITORY_ROOT),
+                "check-ignore",
+                "--no-index",
+                "scripts/toolchain/fbtenv.sh",
+            ],
+            capture_output=True,
+            check=False,
+            text=True,
+        )
+        self.assertEqual(generated.returncode, 0)
+        self.assertEqual(source.returncode, 1)
+
 
 if __name__ == "__main__":
     unittest.main()
