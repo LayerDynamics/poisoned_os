@@ -153,6 +153,8 @@ def is_ignored(path: str, lock_relative_path: str | None) -> bool:
     parts = PurePosixPath(path).parts
     if not parts:
         return True
+    if ".git" in parts:
+        return True
     if parts[0] in IGNORED_ROOT_PREFIXES:
         return True
     if "__pycache__" in parts or path.endswith((".pyc", ".pyo")):

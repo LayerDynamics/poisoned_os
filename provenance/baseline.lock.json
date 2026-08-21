@@ -17587,12 +17587,6 @@
     {
       "classification": "dependency",
       "mode": "100644",
-      "path": "assets/protobuf/.git",
-      "sha256": "f8fe9cca40368f61b5be01c65bd0f31bd05294d5f269f3646d1577bfc649a6d0"
-    },
-    {
-      "classification": "dependency",
-      "mode": "100644",
       "path": "assets/protobuf/.github/CODEOWNERS",
       "sha256": "0d9f3d290dc9d608eca60150398c026b2b8738d248c8f4b9279055890157712a"
     },
@@ -17967,12 +17961,6 @@
       "mode": "100644",
       "path": "documentation/doxygen/dev_tools.dox",
       "sha256": "ef7dfbdf4b35d5f11f01e41f625bdc5f24132519a303c55dd65604ad22e1da4a"
-    },
-    {
-      "classification": "dependency",
-      "mode": "100644",
-      "path": "documentation/doxygen/doxygen-awesome-css/.git",
-      "sha256": "31f4d1cb4d11542eed9c67dce91f917e7624faa947bdb99a10d4328edc35ea1a"
     },
     {
       "classification": "dependency",
@@ -18957,12 +18945,6 @@
       "mode": "100644",
       "path": "furi/furi.h",
       "sha256": "4a17ef6756cfb7f2541100f85d7339abc0db10d6ba81e215f9b392570827855d"
-    },
-    {
-      "classification": "dependency",
-      "mode": "100644",
-      "path": "lib/FreeRTOS-Kernel/.git",
-      "sha256": "8127570f36f2115908ccd0243c1d32796afafcb497edd5836cd985a286976cf3"
     },
     {
       "classification": "dependency",
@@ -22579,12 +22561,6 @@
     {
       "classification": "dependency",
       "mode": "100644",
-      "path": "lib/FreeRTOS-Kernel/portable/ThirdParty/Community-Supported-Ports/.git",
-      "sha256": "cb67058477c300c7054d8700583f241aa3ef389b9ad7f82ac1ced4ee9123236a"
-    },
-    {
-      "classification": "dependency",
-      "mode": "100644",
       "path": "lib/FreeRTOS-Kernel/portable/ThirdParty/Community-Supported-Ports/.github/CODE_OF_CONDUCT.md",
       "sha256": "34b6c98d5c23127ae6769e95e483e5bf6d3704ae1f0d3ae4e69d15f4ede118b6"
     },
@@ -23055,12 +23031,6 @@
       "mode": "100644",
       "path": "lib/FreeRTOS-Kernel/portable/ThirdParty/KnownIssues.md",
       "sha256": "9c26ad3b3550b172044c3fac3f05636f536237826a88107492b8bccb1a712f6e"
-    },
-    {
-      "classification": "dependency",
-      "mode": "100644",
-      "path": "lib/FreeRTOS-Kernel/portable/ThirdParty/Partner-Supported-Ports/.git",
-      "sha256": "7cec02e6c0487d8b37063c505b7cbd7ae597785073acc007e050835972772ac1"
     },
     {
       "classification": "dependency",
@@ -23937,12 +23907,6 @@
       "mode": "100644",
       "path": "lib/heatshrink.scons",
       "sha256": "c8eae3b2637c548240bff05903a8d3db49c5fe50c009999be48da531ba242034"
-    },
-    {
-      "classification": "dependency",
-      "mode": "100644",
-      "path": "lib/heatshrink/.git",
-      "sha256": "89a037b3042ae1f8e94258805f5d178003bd87deb20118e26bab8efe31315b45"
     },
     {
       "classification": "dependency",
@@ -25117,12 +25081,6 @@
     {
       "classification": "dependency",
       "mode": "100644",
-      "path": "lib/libusb_stm32/.git",
-      "sha256": "d3ec7a9a0a9331053b5163d3d26d764fee34e2cb7f2530730fba6c366e9b9fbb"
-    },
-    {
-      "classification": "dependency",
-      "mode": "100644",
       "path": "lib/libusb_stm32/.gitattributes",
       "sha256": "256ef0b7c5fb8543d41bbd8368d4582a9ab8c0a7cef5b0e2d592df880640cc5e"
     },
@@ -25593,12 +25551,6 @@
       "mode": "100644",
       "path": "lib/mbedtls.scons",
       "sha256": "cfc58e03bc2c10a1603df4b548a9e1b834d309fdd646bf8ca2b58172ae41f14e"
-    },
-    {
-      "classification": "dependency",
-      "mode": "100644",
-      "path": "lib/mbedtls/.git",
-      "sha256": "37ea12ee5a38fa0c1f0a0d31192c10a373a3f58f99d9cc0acab9a9c4d44a924e"
     },
     {
       "classification": "dependency",
@@ -26379,12 +26331,6 @@
       "mode": "100644",
       "path": "lib/mbedtls/doxygen/mbedtls.doxyfile",
       "sha256": "3e1fb7969d6b90a98b7ecfd1ea959a5d9cba2065345c5aff85478d7604649d31"
-    },
-    {
-      "classification": "dependency",
-      "mode": "100644",
-      "path": "lib/mbedtls/framework/.git",
-      "sha256": "c3540ff863d4f343b91cebdc93280f300376702e759c94c792ada2612c809931"
     },
     {
       "classification": "dependency",
@@ -36757,12 +36703,6 @@
     {
       "classification": "dependency",
       "mode": "100644",
-      "path": "lib/microtar/.git",
-      "sha256": "1aa03f952c5a2cbe8a895f30f8c2ae0d7b6e9e64a30a43a2633c78543fb3e3d5"
-    },
-    {
-      "classification": "dependency",
-      "mode": "100644",
       "path": "lib/microtar/.gitignore",
       "sha256": "145da7f65543985411b9bfa27fb22a4f3b884f058676025e913b44dbea25392c"
     },
@@ -37245,12 +37185,6 @@
       "mode": "100644",
       "path": "lib/mlib.scons",
       "sha256": "7c4de7a0f913899a4acb7f62b2b72a0be47f8fe50898a4b599e16ee123fca240"
-    },
-    {
-      "classification": "dependency",
-      "mode": "100644",
-      "path": "lib/mlib/.git",
-      "sha256": "7a23039dae0f5ae3829983692cb07e952c8240dfbda420a31475999dc2b2d084"
     },
     {
       "classification": "dependency",
@@ -38325,12 +38259,6 @@
       "mode": "100644",
       "path": "lib/nanopb.scons",
       "sha256": "7e3f21416370878abcf31d15e1b1a8f3ae98285764c1da13109e9c79fb60fce4"
-    },
-    {
-      "classification": "dependency",
-      "mode": "100644",
-      "path": "lib/nanopb/.git",
-      "sha256": "98c11551b04894d2b7217464e3b54c6a5228ec54cbcbaea04be1c0d4fb926634"
     },
     {
       "classification": "dependency",
@@ -43201,12 +43129,6 @@
     {
       "classification": "dependency",
       "mode": "100644",
-      "path": "lib/stm32wb_cmsis/.git",
-      "sha256": "32706960f57fbfca4b36d18aace28db1bcd735b757b0545c267780168c71daf9"
-    },
-    {
-      "classification": "dependency",
-      "mode": "100644",
       "path": "lib/stm32wb_cmsis/.github/ISSUE_TEMPLATE/bug_report.md",
       "sha256": "a919ebdb73abf1d94a457454757568d6dfd3b8e70156893f719f9c4233e4cb5c"
     },
@@ -43687,12 +43609,6 @@
     {
       "classification": "dependency",
       "mode": "100644",
-      "path": "lib/stm32wb_copro/.git",
-      "sha256": "5e41a033e05231bc975e27204cc985d81a7cc622468060628c55acaf171384d0"
-    },
-    {
-      "classification": "dependency",
-      "mode": "100644",
       "path": "lib/stm32wb_copro/.gitmodules",
       "sha256": "4c694bbdaea91aa721ec7b94d8128db20a15a4b3eccff54ef03b9df072a2f1aa"
     },
@@ -43935,12 +43851,6 @@
       "mode": "100644",
       "path": "lib/stm32wb_copro/firmware/stm32wb5x_Zigbee_RFD_fw.bin",
       "sha256": "d48d74f41b71066f11cd7ac6044843ddd656636d0de4ece96804d52ff785ad27"
-    },
-    {
-      "classification": "dependency",
-      "mode": "100644",
-      "path": "lib/stm32wb_copro/scripts/.git",
-      "sha256": "6b595834dce4e03f3ffb74080d152fe4bb4a4bdfacd3a8dae6681f21f84f4305"
     },
     {
       "classification": "dependency",
@@ -51691,12 +51601,6 @@
     {
       "classification": "dependency",
       "mode": "100644",
-      "path": "lib/stm32wb_hal/.git",
-      "sha256": "48235ba6c9f33f2aaa8298fcb30c0efcfc2446a6b9b9df679af73b6c0d2a5063"
-    },
-    {
-      "classification": "dependency",
-      "mode": "100644",
       "path": "lib/stm32wb_hal/.github/ISSUE_TEMPLATE/bug_report.md",
       "sha256": "10fd557d289a75080a227622115152d20137780828b2474613651cd882b05d0b"
     },
@@ -54410,7 +54314,7 @@
       "classification": "poison-added",
       "mode": "100644",
       "path": "provenance/upstream-paths.json",
-      "sha256": "a9caec4810ae3fef660efc87f652fd80af9c5a4449566a12386d13203b4a7bbd"
+      "sha256": "6a867d17dd1952012915cc93eb5c4c9beb06ea218b7addf4bda0645b17ff40ac"
     },
     {
       "classification": "upstream",
@@ -56384,19 +56288,19 @@
       "classification": "poison-added",
       "mode": "100644",
       "path": "tools/tests/test_compare_upstream.py",
-      "sha256": "a215542d076737031c86cc93e9ae4b1ada1cf154a6af7592bb1fab9d28e72705"
+      "sha256": "96a10a4e35439f80ec5dc6c8af4a3eae77b025b50d2d61434a79daa082f6aedd"
     },
     {
       "classification": "poison-added",
       "mode": "100644",
       "path": "tools/tests/test_verify_baseline.py",
-      "sha256": "3092fad4f2954d50660c9cd776c2132e222676147c3756d83eebc5d2991d8f4b"
+      "sha256": "5b3a168f49bd82407501f3b8f63c9fa8c8efb681ea1165b9ac3cd111b0c441b5"
     },
     {
       "classification": "poison-added",
       "mode": "100644",
       "path": "tools/verify_baseline.py",
-      "sha256": "e09ddaa321bb89ca07ac4f43572dddbbaaffa0d3743002c762ffcfb921b835ee"
+      "sha256": "46a65d6c1673eb128ff39d7697fcd6c49fb8cdbb1fe3e04a80d5894250c89f95"
     },
     {
       "classification": "upstream",
@@ -56408,5 +56312,5 @@
   "schema": "poison.baseline/v1",
   "sourcePath": "do_not_include/flipperzero-firmware",
   "upstream": "flipperdevices/flipperzero-firmware",
-  "upstreamTreeSha256": "295448daa1e6c444f3f0e0b45b65c0d6eda790aa6a864685bb7bdaae56e2fb68"
+  "upstreamTreeSha256": "fd4b4f45cca681b15e80d1f13131f1f63708952f77461e2b6734795abd94f47c"
 }

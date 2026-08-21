@@ -148,6 +148,13 @@ class VerifyBaselineTests(unittest.TestCase):
         result = self.verify()
         self.assertEqual(result.returncode, 0, result.stderr)
 
+    def test_ignores_nested_git_pointer_files(self) -> None:
+        git_pointer = self.fixture.root / "src" / "dependency" / ".git"
+        git_pointer.parent.mkdir(parents=True)
+        git_pointer.write_bytes(b"gitdir: /comparison/repository\n")
+        result = self.verify()
+        self.assertEqual(result.returncode, 0, result.stderr)
+
     def test_rejects_changed_mode(self) -> None:
         (self.fixture.root / "run.sh").chmod(0o644)
         self.assert_rejected("mode mismatch: run.sh")

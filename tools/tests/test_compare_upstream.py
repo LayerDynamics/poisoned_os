@@ -135,6 +135,10 @@ class CompareUpstreamTests(unittest.TestCase):
         self.fixture.write_product("provenance/baseline.lock.json", b"{}\n")
         self.assertNotIn("provenance/baseline.lock.json", self.entries())
 
+    def test_excludes_nested_git_pointer_files(self) -> None:
+        self.fixture.write_product("deps/lib/.git", b"gitdir: /comparison/repository\n")
+        self.assertNotIn("deps/lib/.git", self.entries())
+
 
 if __name__ == "__main__":
     unittest.main()
