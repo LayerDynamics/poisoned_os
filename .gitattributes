@@ -1,0 +1,18 @@
+* text=auto eol=lf
+*.bat eol=crlf
+*.ps1 eol=crlf
+*.cmd eol=crlf
+
+# Fully vendored dependencies retain byte-for-byte source materialization.
+assets/protobuf/** -text
+documentation/doxygen/doxygen-awesome-css/** -text
+lib/FreeRTOS-Kernel/** -text
+lib/heatshrink/** -text
+lib/libusb_stm32/** -text
+lib/mbedtls/** -text
+lib/microtar/** -text
+lib/mlib/** -text
+lib/nanopb/** -text
+lib/stm32wb_cmsis/** -text
+lib/stm32wb_copro/** -text
+lib/stm32wb_hal/** -text

@@ -1,0 +1,5 @@
+# Classify all '.function' files as C for syntax highlighting purposes
+*.function linguist-language=C
+
+# PoisonedOS vendors this dependency and preserves its locked bytes.
+* -text

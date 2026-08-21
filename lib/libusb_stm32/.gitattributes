@@ -1,0 +1,4 @@
+* text=auto
+
+# PoisonedOS vendors this dependency and preserves its locked bytes.
+* -text

@@ -1,0 +1,45 @@
+# Read-only upstream and implementation-reference checkouts
+do_not_include/
+
+# Firmware, dashboard, bridge, and documentation build output
+build/
+dist/
+.fbt/
+.cache/
+toolchain/
+artifacts/**/*.tmp
+dashboard/node_modules/
+dashboard/.vite/
+dashboard/coverage/
+bridge/target/
+tools/protocol/target/
+rust/target/
+
+# Generated signing material and local secrets
+keys/
+release/keys/
+tools/signing/keys/
+*.private.key
+*.private.pem
+*.p12
+*.pfx
+.env
+.env.local
+
+# Physical hardware inventory and local test state
+tools/hil/inventory.json
+tools/hil/results/
+*.hil.local.json
+
+# Host-language caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+
+# Editor and operating-system state
+.DS_Store
+.idea/
+.vscode/*.local.*
+*.swp
+*~
