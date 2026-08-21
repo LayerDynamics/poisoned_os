@@ -92,7 +92,7 @@
       "classification": "poison-modified",
       "mode": "100644",
       "path": ".gitignore",
-      "sha256": "36fd20e6849aea69ab6676242bd741d395548c32c4364e91698b025feff7f5c0"
+      "sha256": "bc64e4ef45c417e0f003ebf050dc90d22bf47db729a4fcbee1be7987d8db2a43"
     },
     {
       "classification": "upstream",
@@ -9533,6 +9533,12 @@
       "sha256": "1656c0c8375114a0c6100efb91422001a843e88526e30475541395ab873d679f"
     },
     {
+      "classification": "poison-added",
+      "mode": "100644",
+      "path": "artifacts/sbom/.gitkeep",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
       "classification": "upstream",
       "mode": "100644",
       "path": "assets/.gitignore",
@@ -17798,7 +17804,7 @@
       "classification": "poison-added",
       "mode": "100644",
       "path": "docs/specs/SPEC-1-poisonedos-for-the-flipper-zero.md",
-      "sha256": "8cf504fdc960bc9b5137ff4b1cd4cc80eb54f965cf10906fc405fcf067d2a25f"
+      "sha256": "c3418dd5d4cfe7ff5f292f8d06e3e20c2b5092d603678466a3cf03834e856656"
     },
     {
       "classification": "upstream",
@@ -54308,13 +54314,25 @@
       "classification": "poison-added",
       "mode": "100644",
       "path": "provenance/README.md",
-      "sha256": "170d65044b013db97436077d2577b8e4474a9c65be4bd172ca8cd8c81c00c865"
+      "sha256": "fcaf9dada4a313d3d4199eab55e1626d8c0fb9a65423e676bfbe8bff9402f9de"
+    },
+    {
+      "classification": "poison-added",
+      "mode": "100644",
+      "path": "provenance/components.json",
+      "sha256": "1423750f37d6f530608ec67bbb772f91f7ad1f63727561b6bbe9b9a17610bac8"
+    },
+    {
+      "classification": "poison-added",
+      "mode": "100644",
+      "path": "provenance/licenses.json",
+      "sha256": "7b78cefba485d73b4db25e0b9bc3bcf6513884ad28ae2c725df99c8f8ca8350d"
     },
     {
       "classification": "poison-added",
       "mode": "100644",
       "path": "provenance/upstream-paths.json",
-      "sha256": "a9d46399992d35d65322b2dd7eb931b957da461bb3c7c84d669d38b6e64eb549"
+      "sha256": "62ebf697f589852d3e596634d03d327c5a2a0edb86e959e352624f56dbbd3d52"
     },
     {
       "classification": "upstream",
@@ -56287,20 +56305,32 @@
     {
       "classification": "poison-added",
       "mode": "100644",
+      "path": "tools/generate_sbom.py",
+      "sha256": "fd1099cd80334512c7b5ed24ac94bd04888c2373f602a598f96560e382c050c5"
+    },
+    {
+      "classification": "poison-added",
+      "mode": "100644",
       "path": "tools/tests/test_compare_upstream.py",
       "sha256": "96a10a4e35439f80ec5dc6c8af4a3eae77b025b50d2d61434a79daa082f6aedd"
     },
     {
       "classification": "poison-added",
       "mode": "100644",
+      "path": "tools/tests/test_generate_sbom.py",
+      "sha256": "0de7dd144fa697a87be9db1c4d83565d598f5cb3b01dee1232d99e36e51826c6"
+    },
+    {
+      "classification": "poison-added",
+      "mode": "100644",
       "path": "tools/tests/test_verify_baseline.py",
-      "sha256": "88e1c641095fc6e45da3ae6b2d16c72e0d9b6ddff2ca7a2ce1224f986e2c5bc8"
+      "sha256": "541a6dddcb42bce8555d07739b302a5198b22fede3b9f35624164db59632697d"
     },
     {
       "classification": "poison-added",
       "mode": "100644",
       "path": "tools/verify_baseline.py",
-      "sha256": "46a65d6c1673eb128ff39d7697fcd6c49fb8cdbb1fe3e04a80d5894250c89f95"
+      "sha256": "7534116eb82b4c825dcba4b711981d9507de25bae20ee6d0c58a26cc32602fb0"
     },
     {
       "classification": "upstream",
@@ -56312,5 +56342,5 @@
   "schema": "poison.baseline/v1",
   "sourcePath": "do_not_include/flipperzero-firmware",
   "upstream": "flipperdevices/flipperzero-firmware",
-  "upstreamTreeSha256": "45936a82bcc3b18f0dba7982cf84829e45d70b02eb61e4e11f5b9a5b50e9e646"
+  "upstreamTreeSha256": "354e3b2b0e5911626d5d5b58aa6c32023f6fd1d0809c6a1c3f7504047a338bd7"
 }

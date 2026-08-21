@@ -159,6 +159,8 @@ def is_ignored(path: str, lock_relative_path: str | None) -> bool:
         return True
     if "__pycache__" in parts or path.endswith((".pyc", ".pyo")):
         return True
+    if path.startswith("artifacts/sbom/") and path.endswith(".json"):
+        return True
     if path in IGNORED_EXACT_PATHS:
         return True
     return any(path == prefix or path.startswith(f"{prefix}/") for prefix in IGNORED_PATH_PREFIXES)

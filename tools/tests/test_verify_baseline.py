@@ -148,6 +148,13 @@ class VerifyBaselineTests(unittest.TestCase):
         result = self.verify()
         self.assertEqual(result.returncode, 0, result.stderr)
 
+    def test_ignores_generated_sbom_json(self) -> None:
+        sbom = self.fixture.root / "artifacts" / "sbom" / "poisonedos.spdx.json"
+        sbom.parent.mkdir(parents=True)
+        sbom.write_bytes(b"{}\n")
+        result = self.verify()
+        self.assertEqual(result.returncode, 0, result.stderr)
+
     def test_ignores_nested_git_pointer_files(self) -> None:
         git_pointer = self.fixture.root / "src" / "dependency" / ".git"
         git_pointer.parent.mkdir(parents=True)

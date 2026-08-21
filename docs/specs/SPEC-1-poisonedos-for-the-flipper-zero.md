@@ -240,7 +240,7 @@ The opportunity is to combine capabilities that currently exist separately—por
 - Native code on this MCU has no general-purpose process isolation.
 - SD cards can be removed, corrupted, or replaced while the device is running.
 - Core operation must not depend on continuous internet access.
-- The upstream firmware snapshot is GPLv3, as verified in `do_not_include/flipperzero-firmware/LICENSE:1-16`; the root PoisonedOS copy currently lacks its own root license file. Restoring complete license and notice material is a release-blocking provenance task.
+- The upstream firmware snapshot and PoisonedOS root code are GPLv3-only, and the exact GPLv3 text has been restored at the workspace root. The component audit currently records two distribution blockers: the pinned `flipperzero-protobuf` snapshot has no published license grant, and GPLv2-only mJS is linked into the GPLv3-only firmware without a documented compatible commercial grant. PoisonedOS MUST NOT be distributed until both are resolved.
 - The final commercial model is undecided; architecture must support open-source, self-hosted, and managed variants without weakening local ownership.
 
 ### 2.4 Explicit Non-Goals

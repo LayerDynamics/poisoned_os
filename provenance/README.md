@@ -40,11 +40,21 @@ python3 tools/verify_baseline.py
 
 ## Licensing State
 
-The locked official source and the materialized firmware are GPLv3 derivatives.
-The workspace root contains the authoritative GPLv3 `LICENSE` and the upstream
-build/contribution policy surface restored from the locked source. The root
-`.gitattributes` and two dependency attribute files carry the ADR-0003 vendor
+The PoisonedOS-authored and upstream root firmware code is GPLv3-only; the
+materialized tree also contains the separately licensed components inventoried
+below. The workspace root contains the authoritative GPLv3 `LICENSE` and the
+upstream build/contribution policy surface restored from the locked source. The
+root `.gitattributes` and two dependency attribute files carry the ADR-0003 vendor
 adaptation that prevents Git from changing locked dependency line endings;
 all other restored Task 4 files remain byte-identical to OFW. Component-specific
-notices still require the M0 component inventory and SBOM gate before a release
-can be declared legally complete.
+license evidence is recorded in `components.json` and `licenses.json`, and the
+deterministic SPDX/CycloneDX gate reports no unidentified license IDs and emits
+explicit release-blocker metadata. Two component blockers remain:
+
+- `flipperzero-protobuf` publishes no license grant at its pinned commit, so it
+  is recorded as non-redistributable pending a rights-holder grant.
+- mJS is GPL-2.0-only unless covered by a separate Cesanta commercial license,
+  but the firmware build links it into the GPL-3.0-only program. Distribution is
+  blocked until compatible rights are documented or mJS is replaced.
+
+PoisonedOS is therefore not yet legally complete or distributable.

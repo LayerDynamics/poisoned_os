@@ -8,6 +8,8 @@ dist/
 .cache/
 /toolchain/
 artifacts/**/*.tmp
+artifacts/sbom/*.json
+!artifacts/sbom/.gitkeep
 dashboard/node_modules/
 dashboard/.vite/
 dashboard/coverage/

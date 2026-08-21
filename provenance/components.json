@@ -1,0 +1,261 @@
+{
+  "components": [
+    {
+      "licenseExpression": "GPL-3.0-only",
+      "licenseIds": [
+        "GPL-3.0-only"
+      ],
+      "modificationStatus": "poison-modified",
+      "name": "PoisonedOS",
+      "path": ".",
+      "sha256": "65471172eb0b0451e82516312ec25e3506ffb00f7183b92195547569b68266d7",
+      "sourceUrl": "https://github.com/flipperdevices/flipperzero-firmware/tree/a55e39395ff31bd5fdf3929c70720a7fb76e5968",
+      "version": "c5934ab83766019600619327710637a8414abb69",
+      "digestExcludes": [
+        "artifacts",
+        "docs",
+        "provenance",
+        "tools",
+        "do_not_include",
+        "toolchain"
+      ]
+    },
+    {
+      "licenseExpression": "LicenseRef-Flipper-Protobuf-Unlicensed",
+      "licenseIds": [
+        "LicenseRef-Flipper-Protobuf-Unlicensed"
+      ],
+      "modificationStatus": "vendored-unmodified",
+      "name": "flipperzero-protobuf",
+      "path": "assets/protobuf",
+      "sha256": "031e276fd0678cc6b56cc9f3163ce6deaabb213a43a76e137b5022c17370843f",
+      "sourceUrl": "https://github.com/flipperdevices/flipperzero-protobuf",
+      "version": "1c84fa48919cbb71d1cc65236fc0ee36740e24c6"
+    },
+    {
+      "licenseExpression": "MIT",
+      "licenseIds": [
+        "MIT"
+      ],
+      "modificationStatus": "vendored-unmodified",
+      "name": "doxygen-awesome-css",
+      "path": "documentation/doxygen/doxygen-awesome-css",
+      "sha256": "1aeaa072c26de999ab016159314d5fd7f896ca3726d6d6be9530a8bc9976bb23",
+      "sourceUrl": "https://github.com/jothepro/doxygen-awesome-css",
+      "version": "df88fe4fdd97714fadfd3ef17de0b4401f804052"
+    },
+    {
+      "licenseExpression": "MIT AND BSD-3-Clause",
+      "licenseIds": [
+        "MIT",
+        "BSD-3-Clause"
+      ],
+      "modificationStatus": "vendored-unmodified",
+      "name": "FreeRTOS-Kernel",
+      "path": "lib/FreeRTOS-Kernel",
+      "sha256": "8a6771ada16a51b9fd0daf501e3402bb59a1d815ac5cc1ef501bbabb9c3d6a27",
+      "sourceUrl": "https://github.com/FreeRTOS/FreeRTOS-Kernel",
+      "version": "def7d2df2b0506d3d249334974f51e427c17a41c"
+    },
+    {
+      "licenseExpression": "ISC",
+      "licenseIds": [
+        "ISC"
+      ],
+      "modificationStatus": "vendored-unmodified",
+      "name": "heatshrink",
+      "path": "lib/heatshrink",
+      "sha256": "ee5d14190d0fbe167d473ed065b3a98ce86f040c9446e2e0190c1b8cfd6b94a0",
+      "sourceUrl": "https://github.com/flipperdevices/heatshrink",
+      "version": "7398ccc91652a33483245200cfa1a83b073bc206"
+    },
+    {
+      "licenseExpression": "Apache-2.0",
+      "licenseIds": [
+        "Apache-2.0"
+      ],
+      "modificationStatus": "vendor-metadata-adapted",
+      "name": "libusb_stm32",
+      "path": "lib/libusb_stm32",
+      "sha256": "7e18e1f57f19fb5781ad0512e4af5ba14dbb30de4d74ae67aeddc86c5b832600",
+      "sourceUrl": "https://github.com/flipperdevices/libusb_stm32",
+      "version": "6ca2857519f996244f7b324dd227fdf0a075fffb"
+    },
+    {
+      "licenseExpression": "Apache-2.0 OR GPL-2.0-or-later",
+      "licenseIds": [
+        "Apache-2.0",
+        "GPL-2.0-or-later"
+      ],
+      "modificationStatus": "vendor-metadata-adapted",
+      "name": "Mbed TLS",
+      "path": "lib/mbedtls",
+      "sha256": "3ecbca146f893bb4179b89c3da38373bcc30fa9d96ff1ad36bdbe82a4e1fb055",
+      "sourceUrl": "https://github.com/Mbed-TLS/mbedtls",
+      "version": "107ea89daaefb9867ea9121002fbbdf926780e98"
+    },
+    {
+      "licenseExpression": "MIT",
+      "licenseIds": [
+        "MIT"
+      ],
+      "modificationStatus": "vendored-unmodified",
+      "name": "microtar",
+      "path": "lib/microtar",
+      "sha256": "d61ed23a3b8218bcaf63f94b7285556918840ee41ed9264bf72f1be2b19a6679",
+      "sourceUrl": "https://github.com/amachronic/microtar",
+      "version": "1e921369b2c92bb219fcef84a37d4d2347794c0f"
+    },
+    {
+      "licenseExpression": "BSD-2-Clause",
+      "licenseIds": [
+        "BSD-2-Clause"
+      ],
+      "modificationStatus": "vendored-unmodified",
+      "name": "M-LIB",
+      "path": "lib/mlib",
+      "sha256": "967a12a5e28f92b07bcb477311d1f30bac28304e79b47ae6bfa1f4b724e3bbe5",
+      "sourceUrl": "https://github.com/P-p-H-d/mlib",
+      "version": "62c8ac3e5d4a7a4f8757328e7a80286fde2686b6"
+    },
+    {
+      "licenseExpression": "Zlib",
+      "licenseIds": [
+        "Zlib"
+      ],
+      "modificationStatus": "vendored-unmodified",
+      "name": "nanopb",
+      "path": "lib/nanopb",
+      "sha256": "69e5d1b2b36136e06a7b556048dca0d76cb8ff7ecccf4bbec2fabc02a2bc4a6b",
+      "sourceUrl": "https://github.com/nanopb/nanopb",
+      "version": "6cfe48d6f1593f8fa5c0f90437f5e6522587745e"
+    },
+    {
+      "licenseExpression": "Apache-2.0",
+      "licenseIds": [
+        "Apache-2.0"
+      ],
+      "modificationStatus": "vendored-unmodified",
+      "name": "STM32WB CMSIS device",
+      "path": "lib/stm32wb_cmsis",
+      "sha256": "c737cc06f59c6d32060a130e0e4faafea2423ed233e3cdf0fd014eb22cdc3abe",
+      "sourceUrl": "https://github.com/STMicroelectronics/cmsis_device_wb",
+      "version": "d1b860584dfe24d40d455ae624ed14600dfa93c9"
+    },
+    {
+      "licenseExpression": "LicenseRef-STMicroelectronics-SLA0044 AND BSD-3-Clause AND (Apache-2.0 OR GPL-2.0-or-later)",
+      "licenseIds": [
+        "LicenseRef-STMicroelectronics-SLA0044",
+        "BSD-3-Clause",
+        "Apache-2.0",
+        "GPL-2.0-or-later"
+      ],
+      "modificationStatus": "vendored-unmodified",
+      "name": "STM32WB coprocessor",
+      "path": "lib/stm32wb_copro",
+      "sha256": "86b21106ae486be70e291739cf8068ec89de08c46af74668c921ad5c105243cb",
+      "sourceUrl": "https://github.com/flipperdevices/stm32wb_copro",
+      "version": "133182d5583e998bb263cd947105be4df9c29cb3"
+    },
+    {
+      "licenseExpression": "BSD-3-Clause",
+      "licenseIds": [
+        "BSD-3-Clause"
+      ],
+      "modificationStatus": "vendored-unmodified",
+      "name": "STM32WB HAL driver",
+      "path": "lib/stm32wb_hal",
+      "sha256": "dacb81454b56a6c1ffeaa50b14fb3a789bf6e8caaf12ebde47701ff1e6abfc71",
+      "sourceUrl": "https://github.com/STMicroelectronics/stm32wbxx_hal_driver",
+      "version": "cfd0dd258cb031c95b2b2d6d04c19f9f625fe3e8"
+    },
+    {
+      "licenseExpression": "Apache-2.0",
+      "licenseIds": [
+        "Apache-2.0"
+      ],
+      "modificationStatus": "vendored-unmodified",
+      "name": "CMSIS Core",
+      "path": "lib/cmsis_core",
+      "sha256": "3c7beb28cf4fe4fc7d22bf74e9844ceb797ff2b845360a8adeb522e451fee0fa",
+      "sourceUrl": "https://github.com/ARM-software/CMSIS_5",
+      "version": "ofw-a55e39395ff31bd5fdf3929c70720a7fb76e5968"
+    },
+    {
+      "licenseExpression": "LicenseRef-FatFs",
+      "licenseIds": [
+        "LicenseRef-FatFs"
+      ],
+      "modificationStatus": "vendored-unmodified",
+      "name": "FatFs",
+      "path": "lib/fatfs",
+      "sha256": "95a16416a52ccb9a4387203cbf0b0f487eb750012fe011ac4b45958014542c0f",
+      "sourceUrl": "https://elm-chan.org/fsw/ff/",
+      "version": "R0.12c"
+    },
+    {
+      "licenseExpression": "GPL-2.0-only",
+      "licenseIds": [
+        "GPL-2.0-only"
+      ],
+      "modificationStatus": "vendored-unmodified",
+      "name": "mJS",
+      "path": "lib/mjs",
+      "releaseBlocked": true,
+      "releaseBlockerReason": "mJS is GPL-2.0-only unless covered by a separate Cesanta commercial license, but it is compiled into the GPL-3.0-only firmware. Distribution of that combined work is blocked until compatible rights are documented or mJS is replaced.",
+      "sha256": "029e0e22632ee672c185fa3159058a8343b241eb1a504da24ef79b0788e19088",
+      "sourceUrl": "https://github.com/cesanta/mjs",
+      "version": "ofw-a55e39395ff31bd5fdf3929c70720a7fb76e5968"
+    },
+    {
+      "licenseExpression": "MIT",
+      "licenseIds": [
+        "MIT"
+      ],
+      "modificationStatus": "vendored-unmodified",
+      "name": "mpaland printf",
+      "path": "lib/print",
+      "sha256": "42a9d2ca1f49e0249c3c476343c710dd4bfdff222922a0e7f90303224b87acab",
+      "sourceUrl": "https://github.com/mpaland/printf",
+      "version": "ofw-a55e39395ff31bd5fdf3929c70720a7fb76e5968"
+    },
+    {
+      "licenseExpression": "BSD-3-Clause AND OFL-1.1",
+      "licenseIds": [
+        "BSD-3-Clause",
+        "OFL-1.1"
+      ],
+      "modificationStatus": "vendored-unmodified",
+      "name": "u8g2",
+      "path": "lib/u8g2",
+      "sha256": "799664e048128655fcb984a6771d0d3ec16614332fe3c99ed2b038e008bfcff3",
+      "sourceUrl": "https://github.com/olikraus/u8g2",
+      "version": "ofw-a55e39395ff31bd5fdf3929c70720a7fb76e5968"
+    },
+    {
+      "licenseExpression": "GPL-2.0-only",
+      "licenseIds": [
+        "GPL-2.0-only"
+      ],
+      "modificationStatus": "vendored-unmodified",
+      "name": "FreeRTOS-GDB",
+      "path": "scripts/debug/FreeRTOS",
+      "sha256": "34f246e94bc148c3c19a7c1560221adc155e16d1fb39e4afa9c3ab00a3ee3d00",
+      "sourceUrl": "https://github.com/flipperdevices/flipperzero-firmware/tree/a55e39395ff31bd5fdf3929c70720a7fb76e5968/scripts/debug/FreeRTOS",
+      "version": "ofw-a55e39395ff31bd5fdf3929c70720a7fb76e5968"
+    },
+    {
+      "licenseExpression": "GPL-3.0-only",
+      "licenseIds": [
+        "GPL-3.0-only"
+      ],
+      "modificationStatus": "vendored-unmodified",
+      "name": "PyCortexMDebug",
+      "path": "scripts/debug/PyCortexMDebug",
+      "sha256": "b39db382d86498911d40467834ae8452af1de825323a8c15580b6f86d38b0c57",
+      "sourceUrl": "https://github.com/flipperdevices/flipperzero-firmware/tree/a55e39395ff31bd5fdf3929c70720a7fb76e5968/scripts/debug/PyCortexMDebug",
+      "version": "ofw-a55e39395ff31bd5fdf3929c70720a7fb76e5968"
+    }
+  ],
+  "schema": "poison.components/v1"
+}
