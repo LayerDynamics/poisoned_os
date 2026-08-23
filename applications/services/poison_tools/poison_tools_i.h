@@ -2,6 +2,7 @@
 
 #include "poison_tools.h"
 #include "poison_tool_adapters.h"
+#include "poison_infrared_adapter.h"
 
 #include <stddef.h>
 
@@ -17,3 +18,9 @@ bool poison_tool_adapter_for_tool(
     const char* tool_id,
     const char* family,
     PoisonToolAdapter* adapter);
+
+bool poison_infrared_load_result(
+    PoisonInfraredHandle* handle,
+    const PoisonInfraredResult* result,
+    size_t maximum_timings);
+bool poison_infrared_transmit_once(PoisonInfraredHandle* handle);

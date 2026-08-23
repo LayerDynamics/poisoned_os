@@ -6,7 +6,7 @@
 DEFAULT_SCRIPT_PATH="$(pwd -P)";
 FBT_TOOLCHAIN_VERSION="${FBT_TOOLCHAIN_VERSION:-"39"}";
 FBT_TOOLCHAIN_VERSION_LOCKED="39";
-FBT_TOOLCHAIN_ARCHIVE_SHA256="d6c6fc35607af9aa357d549d29f230799c91b973b938ce776e55e1a8b99daea0";
+FBT_TOOLCHAIN_ARCHIVE_SHA256="";
 FBT_PRESERVE_TAR="${FBT_PRESERVE_TAR:-"1"}";
 
 if [ -z ${FBT_TOOLCHAIN_PATH+x} ] ; then
@@ -158,6 +158,21 @@ fbtenv_get_kernel_type()
     fi
     TOOLCHAIN_ARCH_DIR="$FBT_TOOLCHAIN_PATH/toolchain/$ARCH_TYPE-$SYS_TYPE";
     TOOLCHAIN_URL="https://update.flipperzero.one/builds/toolchain/gcc-arm-none-eabi-12.3-$ARCH_TYPE-$SYS_TYPE-flipper-$FBT_TOOLCHAIN_VERSION.tar.gz";
+    case "$ARCH_TYPE-$SYS_TYPE" in
+        arm64-darwin)
+            FBT_TOOLCHAIN_ARCHIVE_SHA256="d6c6fc35607af9aa357d549d29f230799c91b973b938ce776e55e1a8b99daea0";
+            ;;
+        x86_64-linux)
+            FBT_TOOLCHAIN_ARCHIVE_SHA256="c044c59233f66f6efcf854affe2d5e09dbad04d68709d513bc760b1d98895853";
+            ;;
+        aarch64-linux)
+            FBT_TOOLCHAIN_ARCHIVE_SHA256="d06c4b00233b39c3b45c1e14fed663d45ed6314a09f20c2af6ed179e2dce3849";
+            ;;
+        *)
+            echo "PoisonedOS does not have a pinned FBT toolchain for $ARCH_TYPE-$SYS_TYPE" >&2;
+            return 1;
+            ;;
+    esac
     return 0;
 }
 

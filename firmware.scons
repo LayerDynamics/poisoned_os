@@ -269,9 +269,20 @@ if env["IS_BASE_FIRMWARE"]:
 # Produce extra firmware files
 fwhex = fwenv["FW_HEX"] = fwenv.HEXBuilder("${FIRMWARE_BUILD_CFG}")
 fwbin = fwenv["FW_BIN"] = fwenv.BINBuilder("${FIRMWARE_BUILD_CFG}")
+bin_size_arguments = ["bin", "${TARGET}"]
+if env["IS_BASE_FIRMWARE"]:
+    bin_size_arguments.extend(
+        [
+            "--radio",
+            "${ROOT_DIR.abspath}/${COPRO_STACK_BIN_DIR}/${COPRO_STACK_BIN}",
+            "--image-base",
+            "${IMAGE_BASE_ADDRESS}",
+            "--reserve-pages", "1",
+        ]
+    )
 AddPostAction(
     fwbin,
-    Action([["@${PYTHON3}", "${BIN_SIZE_SCRIPT}", "bin", "${TARGET}"]]),
+    Action([["@${PYTHON3}", "${BIN_SIZE_SCRIPT}", *bin_size_arguments]]),
 )
 
 fwdfu = fwenv["FW_DFU"] = fwenv.DFUBuilder("${FIRMWARE_BUILD_CFG}")

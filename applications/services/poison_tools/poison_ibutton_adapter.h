@@ -6,6 +6,8 @@
 #include <ibutton_key.h>
 #include <ibutton_protocols.h>
 
+#define POISON_IBUTTON_DATA_MAX (256u)
+
 typedef struct {
     iButtonProtocols* protocols;
     iButtonKey* key;
@@ -14,6 +16,10 @@ typedef struct {
 
 typedef struct {
     iButtonProtocolId protocol;
+    char protocol_name[33];
+    uint8_t data[POISON_IBUTTON_DATA_MAX];
+    size_t data_size;
+    bool valid;
     size_t rendered_size;
     char rendered[192];
 } PoisonIbuttonReadResult;

@@ -11,9 +11,15 @@
 #include "poison_storage_adapter.h"
 #include "poison_subghz_adapter.h"
 #include "poison_usb_hid_adapter.h"
+#include "adapters/poison_tool_nfc.h"
+#include "adapters/poison_tool_lfrfid.h"
+#include "adapters/poison_tool_ibutton.h"
+#include "adapters/poison_tool_infrared.h"
+#include "adapters/poison_tool_subghz.h"
 
 #include "../poison_app/poison_app.h"
 #include "../poison_evidence/poison_evidence_i.h"
+#include "../poison_profiles/poison_profiles_i.h"
 #include "poison_tools_i.h"
 
 #include <stdio.h>
@@ -21,6 +27,7 @@
 #include <string.h>
 
 #include <furi.h>
+#include <furi_hal_region.h>
 #include <applications/drivers/esp32marauder/esp32_marauder_driver.h>
 
 #define POISON_TOOLS_APP_ID          "org.poison.tools"
@@ -44,6 +51,8 @@ typedef struct {
     bool cancelled;
     bool work_pending;
     bool worker_busy;
+    PoisonInfraredResult* infrared_capture;
+    PoisonSubGhzResult* subghz_capture;
 } PoisonToolsService;
 
 static PoisonToolsService* poison_tools_service;
@@ -212,6 +221,20 @@ static bool poison_tools_json_uint(
     return true;
 }
 
+static bool poison_tools_json_bool(const char* json, const char* key, bool* output) {
+    const char* value = poison_tools_json_value(json, key);
+    if(!value || !output) return false;
+    if(strncmp(value, "true", 4u) == 0 && poison_tools_json_value_terminated(value + 4u)) {
+        *output = true;
+        return true;
+    }
+    if(strncmp(value, "false", 5u) == 0 && poison_tools_json_value_terminated(value + 5u)) {
+        *output = false;
+        return true;
+    }
+    return false;
+}
+
 static bool
     poison_tools_json_string(const char* json, const char* key, char* output, size_t capacity) {
     const char* value = poison_tools_json_value(json, key);
@@ -272,10 +295,15 @@ bool poison_tools_json_escape_string(const char* input, char* output, size_t cap
     return true;
 }
 
-static bool poison_tools_publish_result(bool success, const char* message) {
+static bool poison_tools_publish_result_with_evidence(
+    bool success,
+    const char* message,
+    const uint8_t* evidence_data,
+    size_t evidence_size,
+    bool evidence_derived) {
     PoisonToolsService* service = poison_tools_service;
     if(!service || poison_tools_is_cancelled() || !message ||
-       strlen(message) >= POISON_APP_MAX_MESSAGE)
+       strlen(message) >= POISON_APP_MAX_MESSAGE || !evidence_data || evidence_size == 0u)
         return false;
     char evidence_id[65];
     const int evidence_length = snprintf(
@@ -285,9 +313,9 @@ static bool poison_tools_publish_result(bool success, const char* message) {
        !poison_evidence_capture_global(
            evidence_id,
            service->case_id,
-           (const uint8_t*)message,
-           strlen(message),
-           false,
+           evidence_data,
+           evidence_size,
+           evidence_derived,
            previous_audit)) {
         return false;
     }
@@ -305,143 +333,411 @@ static bool poison_tools_publish_result(bool success, const char* message) {
     return true;
 }
 
+static bool poison_tools_publish_result(bool success, const char* message) {
+    return message && poison_tools_publish_result_with_evidence(
+                          success, message, (const uint8_t*)message, strlen(message), true);
+}
+
+static bool poison_tools_publish_derived_artifact(
+    const char* kind,
+    const uint8_t* evidence_data,
+    size_t evidence_size) {
+    PoisonToolsService* service = poison_tools_service;
+    if(!service || poison_tools_is_cancelled() || !kind || !evidence_data || evidence_size == 0u)
+        return false;
+    char evidence_id[65];
+    const int evidence_length = snprintf(
+        evidence_id,
+        sizeof(evidence_id),
+        "%.32s-%llu-derived",
+        service->run_id,
+        service->event_sequence);
+    const uint8_t previous_audit[32] = {0};
+    if(evidence_length <= 0 || (size_t)evidence_length >= sizeof(evidence_id) ||
+       !poison_evidence_capture_global(
+           evidence_id, service->case_id, evidence_data, evidence_size, true, previous_audit)) {
+        return false;
+    }
+    PoisonAppEvent event = {
+        .sequence = service->event_sequence,
+        .kind = PoisonAppEventArtifact,
+        .success = true,
+    };
+    strcpy(event.app_id, POISON_TOOLS_APP_ID);
+    strcpy(event.run_id, service->run_id);
+    strcpy(event.event_id, evidence_id);
+    if(snprintf(
+           event.message,
+           sizeof(event.message),
+           "{\"kind\":\"%s\",\"redacted\":true,\"bytes\":%lu}",
+           kind,
+           (unsigned long)evidence_size) <= 0 ||
+       !poison_app_publish_event(&event)) {
+        return false;
+    }
+    service->event_sequence++;
+    return true;
+}
+
 static bool poison_tools_execute_nfc(const char* payload) {
     uint32_t timeout = 0u;
     if(!poison_tools_json_uint(payload, "timeout_ms", 1u, 5000u, &timeout)) return false;
-    PoisonNfcSession* session = poison_nfc_session_alloc();
-    if(!session) return poison_tools_publish_result(false, "{\"error\":\"nfc-busy\"}");
-    PoisonNfcDetection detection;
-    bool detected = false;
-    uint32_t remaining = timeout;
-    const bool started = poison_nfc_session_start(session);
-    while(started && remaining && !poison_tools_is_cancelled() && !detected) {
-        const uint32_t slice = poison_tools_wait_slice(remaining);
-        detected = poison_nfc_session_wait(session, slice, &detection);
-        remaining -= slice;
-    }
+    const PoisonToolNfcRequest request = {
+        .operation = PoisonToolNfcOperationDetect,
+        .timeout_ms = timeout,
+        .maximum_capture_bytes = 0u,
+        .exact_confirmation = false,
+    };
     char message[POISON_APP_MAX_MESSAGE];
-    if(detected) {
-        size_t used = (size_t)snprintf(message, sizeof(message), "{\"protocols\":[");
-        for(size_t index = 0u; index < detection.protocol_count && used < sizeof(message);
-            index++) {
-            const char* name = poison_nfc_protocol_name(detection.protocols[index]);
-            if(!name) continue;
-            used += (size_t)snprintf(
-                message + used, sizeof(message) - used, "%s\"%s\"", index ? "," : "", name);
-        }
-        snprintf(message + used, sizeof(message) - used, "]}");
-    } else {
-        strcpy(message, "{\"error\":\"nfc-timeout\"}");
+    const PoisonToolNfcRunResult result = poison_tool_nfc_detect(
+        &request,
+        PoisonToolNfcCapabilityRead,
+        poison_tools_storage_cancelled,
+        NULL,
+        message,
+        sizeof(message));
+    if(result != PoisonToolNfcRunOk) {
+        const char* error = poison_tool_nfc_run_result_name(result);
+        if(!error || snprintf(message, sizeof(message), "{\"error\":\"%s\"}", error) <= 0)
+            return false;
     }
-    poison_nfc_session_free(session);
-    return poison_tools_publish_result(detected, message);
+    return poison_tools_publish_result(result == PoisonToolNfcRunOk, message);
 }
 
 static bool poison_tools_execute_lfrfid(const char* payload) {
     uint32_t timeout = 0u;
     if(!poison_tools_json_uint(payload, "timeout_ms", 1u, 5000u, &timeout)) return false;
-    PoisonLfRfidSession* session = poison_lfrfid_session_alloc();
-    if(!session) return poison_tools_publish_result(false, "{\"error\":\"lf-rfid-busy\"}");
-    PoisonLfRfidDetection detection;
-    bool detected = false;
-    uint32_t remaining = timeout;
-    const bool started = poison_lfrfid_session_start(session);
-    while(started && remaining && !poison_tools_is_cancelled() && !detected) {
-        const uint32_t slice = poison_tools_wait_slice(remaining);
-        detected = poison_lfrfid_session_wait(session, slice, &detection);
-        remaining -= slice;
-    }
+    const PoisonToolLfRfidRequest request = {
+        .operation = PoisonToolLfRfidOperationRead,
+        .timeout_ms = timeout,
+        .exact_confirmation = false,
+    };
     char message[POISON_APP_MAX_MESSAGE];
-    if(detected) {
-        size_t used = (size_t)snprintf(
-            message, sizeof(message), "{\"protocol\":\"%s\",\"data\":\"", detection.protocol);
-        for(size_t index = 0u; index < detection.data_size && used + 2u < sizeof(message); index++)
-            used += (size_t)snprintf(
-                message + used, sizeof(message) - used, "%02x", detection.data[index]);
-        snprintf(message + used, sizeof(message) - used, "\"}");
-    } else {
-        strcpy(message, "{\"error\":\"lf-rfid-timeout\"}");
+    const PoisonToolLfRfidRunResult result = poison_tool_lfrfid_read(
+        &request,
+        PoisonToolLfRfidCapabilityRead,
+        poison_tools_storage_cancelled,
+        NULL,
+        message,
+        sizeof(message));
+    if(result != PoisonToolLfRfidRunOk) {
+        const char* error = poison_tool_lfrfid_run_result_name(result);
+        if(!error || snprintf(message, sizeof(message), "{\"error\":\"%s\"}", error) <= 0)
+            return false;
     }
-    poison_lfrfid_session_free(session);
-    return poison_tools_publish_result(detected, message);
+    return poison_tools_publish_result(result == PoisonToolLfRfidRunOk, message);
 }
 
 static bool poison_tools_execute_ibutton(const char* payload) {
     if(!poison_tools_json_object(payload)) return false;
-    PoisonIbuttonHandle* handle = poison_ibutton_open();
-    PoisonIbuttonReadResult result;
-    const bool read = handle && poison_ibutton_read(handle, &result);
-    char escaped[POISON_APP_MAX_MESSAGE];
-    const bool encoded =
-        read && poison_tools_json_escape_string(result.rendered, escaped, sizeof(escaped));
-    char message[POISON_APP_MAX_MESSAGE];
-    snprintf(
-        message,
-        sizeof(message),
-        encoded ? "{\"protocol\":%u,\"value\":\"%s\"}" : "{\"error\":\"ibutton-read-failed\"}",
-        encoded ? (unsigned int)result.protocol : 0u,
-        encoded ? escaped : "");
-    poison_ibutton_close(handle);
-    return poison_tools_publish_result(encoded, message);
-}
-
-static bool poison_tools_execute_infrared(const char* payload) {
-    uint32_t timeout = 0u;
-    if(!poison_tools_json_uint(payload, "timeout_ms", 1u, 5000u, &timeout)) return false;
-    PoisonInfraredHandle* handle = poison_infrared_open();
-    PoisonInfraredResult result;
-    bool received = false;
-    uint32_t remaining = timeout;
-    while(handle && remaining && !poison_tools_is_cancelled() && !received) {
-        const uint32_t slice = poison_tools_wait_slice(remaining);
-        received = poison_infrared_receive(handle, slice, &result);
-        remaining -= slice;
-    }
-    char message[256];
-    snprintf(
-        message,
-        sizeof(message),
-        received ? "{\"decoded\":%s,\"timings\":%u,\"frequency\":%lu,\"duty_cycle_milli\":%lu}" :
-                   "{\"error\":\"infrared-timeout\"}",
-        received && result.decoded ? "true" : "false",
-        received ? (unsigned int)result.timings : 0u,
-        received ? (unsigned long)result.frequency : 0ul,
-        received ? (unsigned long)(result.duty_cycle * 1000.0f) : 0ul);
-    poison_infrared_close(handle);
-    return poison_tools_publish_result(received, message);
-}
-
-static bool poison_tools_execute_subghz(const char* payload) {
-    uint32_t frequency = 0u;
-    uint32_t timeout = 0u;
-    if(!poison_tools_json_uint(payload, "frequency_hz", 1u, 1000000000u, &frequency) ||
+    uint32_t timeout = 5000u;
+    if(strcmp(payload, "{}") != 0 &&
        !poison_tools_json_uint(payload, "timeout_ms", 1u, 5000u, &timeout)) {
         return false;
     }
-    PoisonSubGhzHandle* handle = poison_subghz_open(frequency);
-    PoisonSubGhzResult result;
-    bool received = false;
-    uint32_t remaining = timeout;
-    while(handle && remaining && !poison_tools_is_cancelled() && !received) {
-        const uint32_t slice = poison_tools_wait_slice(remaining);
-        received = poison_subghz_receive(handle, slice, &result);
-        remaining -= slice;
-    }
-    char escaped[POISON_APP_MAX_MESSAGE];
-    const bool encoded = received &&
-                         poison_tools_json_escape_string(result.decoded, escaped, sizeof(escaped));
+    const PoisonToolIButtonRequest request = {
+        .operation = PoisonToolIButtonOperationRead,
+        .timeout_ms = timeout,
+        .exact_confirmation = false,
+    };
+    PoisonIbuttonReadResult evidence;
     char message[POISON_APP_MAX_MESSAGE];
-    snprintf(
+    const PoisonToolIButtonRunResult result = poison_tool_ibutton_read(
+        &request,
+        PoisonToolIButtonCapabilityRead,
+        poison_tools_storage_cancelled,
+        NULL,
+        &evidence,
         message,
-        sizeof(message),
-        encoded ? "{\"frequency_hz\":%lu,\"rssi_milli\":%ld,\"lqi\":%u,\"decoded\":\"%s\"}" :
-                  "{\"error\":\"sub-ghz-receive-failed\"}",
-        encoded ? (unsigned long)result.frequency : 0ul,
-        encoded ? (long)(result.rssi * 1000.0f) : 0l,
-        encoded ? result.lqi : 0u,
-        encoded ? escaped : "");
-    poison_subghz_close(handle);
-    return poison_tools_publish_result(encoded, message);
+        sizeof(message));
+    bool published = false;
+    if(result == PoisonToolIButtonRunOk) {
+        published = poison_tools_publish_result_with_evidence(
+            true, message, evidence.data, evidence.data_size, false);
+    } else {
+        const char* error = poison_tool_ibutton_run_result_name(result);
+        if(error && snprintf(message, sizeof(message), "{\"error\":\"%s\"}", error) > 0)
+            published = poison_tools_publish_result(false, message);
+    }
+    memset(&evidence, 0, sizeof(evidence));
+    return published;
+}
+
+static void poison_tools_infrared_capture_clear(PoisonToolsService* service) {
+    if(!service || !service->infrared_capture) return;
+    memset(service->infrared_capture, 0, sizeof(*service->infrared_capture));
+    free(service->infrared_capture);
+    service->infrared_capture = NULL;
+}
+
+static bool
+    poison_tools_execute_infrared_receive(PoisonToolsService* service, const char* payload) {
+    if(!service) return false;
+    uint32_t timeout = 0u;
+    uint32_t maximum_timings = 0u;
+    if(!poison_tools_json_uint(payload, "timeout_ms", 1u, 5000u, &timeout) ||
+       !poison_tools_json_uint(
+           payload, "maximum_timings", 1u, MAX_TIMINGS_AMOUNT, &maximum_timings)) {
+        return false;
+    }
+    const PoisonToolInfraredRequest request = {
+        .operation = PoisonToolInfraredOperationReceive,
+        .timeout_ms = timeout,
+        .maximum_timings = maximum_timings,
+        .exact_confirmation = false,
+    };
+    poison_tools_infrared_capture_clear(service);
+    PoisonInfraredResult* result = malloc(sizeof(*result));
+    uint8_t* evidence = malloc(POISON_TOOL_INFRARED_EVIDENCE_MAX);
+    if(!result || !evidence) {
+        free(result);
+        free(evidence);
+        return poison_tools_publish_result(false, "{\"error\":\"infrared-memory\"}");
+    }
+    size_t evidence_size = 0u;
+    char message[POISON_APP_MAX_MESSAGE];
+    const PoisonToolInfraredRunResult run_result = poison_tool_infrared_receive(
+        &request,
+        PoisonToolInfraredCapabilityReceive,
+        poison_tools_storage_cancelled,
+        NULL,
+        result,
+        evidence,
+        POISON_TOOL_INFRARED_EVIDENCE_MAX,
+        &evidence_size,
+        message,
+        sizeof(message));
+    bool published = false;
+    if(run_result == PoisonToolInfraredRunOk) {
+        published = poison_tools_publish_result_with_evidence(
+            true, message, evidence, evidence_size, false);
+    } else {
+        const char* error = poison_tool_infrared_run_result_name(run_result);
+        if(error && snprintf(message, sizeof(message), "{\"error\":\"%s\"}", error) > 0)
+            published = poison_tools_publish_result(false, message);
+    }
+    if(run_result == PoisonToolInfraredRunOk && published) {
+        service->infrared_capture = result;
+        result = NULL;
+    }
+    if(result) memset(result, 0, sizeof(*result));
+    memset(evidence, 0, POISON_TOOL_INFRARED_EVIDENCE_MAX);
+    free(result);
+    free(evidence);
+    return published;
+}
+
+static bool
+    poison_tools_execute_infrared_transmit(PoisonToolsService* service, const char* payload) {
+    bool exact_confirmation = false;
+    if(!service || !service->infrared_capture) {
+        return poison_tools_publish_result(false, "{\"error\":\"infrared-no-capture\"}");
+    }
+    if(!poison_tools_json_bool(payload, "exact_confirmation", &exact_confirmation))
+        return poison_tools_publish_result(false, "{\"error\":\"infrared-invalid-request\"}");
+    const PoisonCapability granted = poison_policy_role_capabilities(service->role);
+    if((granted & POISON_CAPABILITY_DESTRUCTIVE) == 0u) {
+        return poison_tools_publish_result(
+            false, "{\"error\":\"infrared-transmit-not-authorized\"}");
+    }
+    const PoisonToolInfraredRequest request = {
+        .operation = PoisonToolInfraredOperationTransmit,
+        .timeout_ms = 5000u,
+        .maximum_timings = MAX_TIMINGS_AMOUNT,
+        .exact_confirmation = exact_confirmation,
+    };
+    uint8_t* evidence = malloc(POISON_TOOL_INFRARED_EVIDENCE_MAX);
+    if(!evidence) return poison_tools_publish_result(false, "{\"error\":\"infrared-memory\"}");
+    size_t evidence_size = 0u;
+    char message[POISON_APP_MAX_MESSAGE];
+    const PoisonToolInfraredRunResult run_result = poison_tool_infrared_transmit(
+        &request,
+        PoisonToolInfraredCapabilityTransmit,
+        poison_tools_storage_cancelled,
+        NULL,
+        service->infrared_capture,
+        evidence,
+        POISON_TOOL_INFRARED_EVIDENCE_MAX,
+        &evidence_size,
+        message,
+        sizeof(message));
+    bool published = false;
+    if(run_result == PoisonToolInfraredRunOk) {
+        published = poison_tools_publish_result_with_evidence(
+            true, message, evidence, evidence_size, false);
+    } else {
+        const char* error = poison_tool_infrared_run_result_name(run_result);
+        if(error && snprintf(message, sizeof(message), "{\"error\":\"%s\"}", error) > 0)
+            published = poison_tools_publish_result(false, message);
+    }
+    memset(evidence, 0, POISON_TOOL_INFRARED_EVIDENCE_MAX);
+    free(evidence);
+    return published;
+}
+
+static void poison_tools_subghz_capture_clear(PoisonToolsService* service) {
+    if(!service || !service->subghz_capture) return;
+    memset(service->subghz_capture, 0, sizeof(*service->subghz_capture));
+    free(service->subghz_capture);
+    service->subghz_capture = NULL;
+}
+
+static bool poison_tools_profile_enables_tool(const PoisonProfile* profile, const char* tool_id) {
+    if(!profile || !tool_id) return false;
+    if(profile->enabled_tools_count == 0u) return true;
+    for(size_t index = 0u; index < profile->enabled_tools_count; ++index) {
+        if(strcmp(profile->enabled_tools[index], tool_id) == 0) return true;
+    }
+    return false;
+}
+
+static bool poison_tools_subghz_policy_snapshot(
+    const PoisonToolSubGhzRequest* request,
+    PoisonToolSubGhzPolicySnapshot* snapshot,
+    void* context) {
+    PoisonToolsService* service = context;
+    if(!request || !snapshot || !service) return false;
+    PoisonProfile* active = malloc(sizeof(*active));
+    if(!active) return false;
+    if(!poison_profiles_copy_global(active, NULL, NULL)) {
+        memset(active, 0, sizeof(*active));
+        free(active);
+        return false;
+    }
+    const char* region_name = furi_hal_region_get_name();
+    snapshot->region_provisioned = furi_hal_region_is_provisioned();
+    snapshot->region_frequency_allowed =
+        furi_hal_region_is_frequency_allowed(request->frequency_hz);
+    snapshot->profile_region_matches =
+        strcmp(active->radio_region, "device") == 0 ||
+        (region_name && strcmp(active->radio_region, region_name) == 0);
+    snapshot->tool_enabled = poison_tools_profile_enables_tool(active, "sub-ghz.receive");
+    snapshot->classroom_restricted = active->classroom_restricted;
+    snapshot->classroom_instructor = strcmp(active->classroom_policy, "instructor") == 0;
+    snapshot->role_capabilities = poison_policy_role_capabilities(service->role);
+    snapshot->profile_capabilities = (PoisonCapability)active->capability_mask;
+    memset(active, 0, sizeof(*active));
+    free(active);
+    return true;
+}
+
+static bool poison_tools_execute_subghz_receive(
+    PoisonToolsService* service,
+    const char* payload,
+    PoisonToolSubGhzOperation operation) {
+    if(!service || (operation != PoisonToolSubGhzOperationReceive &&
+                    operation != PoisonToolSubGhzOperationAnalyze)) {
+        return false;
+    }
+    uint32_t frequency = 0u;
+    uint32_t timeout = 0u;
+    uint32_t maximum_timings = 0u;
+    if(!poison_tools_json_uint(payload, "frequency_hz", 1u, 1000000000u, &frequency) ||
+       !poison_tools_json_uint(payload, "timeout_ms", 1u, 60000u, &timeout) ||
+       !poison_tools_json_uint(
+           payload, "maximum_timings", 1u, POISON_SUBGHZ_RAW_TIMINGS_MAX, &maximum_timings)) {
+        return false;
+    }
+    poison_tools_subghz_capture_clear(service);
+    const PoisonToolSubGhzRequest request = {
+        .operation = operation,
+        .frequency_hz = frequency,
+        .timeout_ms = timeout,
+        .maximum_timings = maximum_timings,
+        .exact_confirmation = false,
+    };
+    PoisonSubGhzResult* result = malloc(sizeof(*result));
+    uint8_t* evidence = malloc(POISON_TOOL_SUBGHZ_EVIDENCE_MAX);
+    if(!result || !evidence) {
+        free(result);
+        free(evidence);
+        return poison_tools_publish_result(false, "{\"error\":\"sub-ghz-memory\"}");
+    }
+    size_t evidence_size = 0u;
+    char message[POISON_APP_MAX_MESSAGE];
+    const uint32_t capability = operation == PoisonToolSubGhzOperationAnalyze ?
+                                    PoisonToolSubGhzCapabilityAnalyze :
+                                    PoisonToolSubGhzCapabilityReceive;
+    const PoisonToolSubGhzRunResult run_result = poison_tool_subghz_receive(
+        &request,
+        capability,
+        poison_tools_subghz_policy_snapshot,
+        service,
+        poison_tools_storage_cancelled,
+        NULL,
+        result,
+        evidence,
+        POISON_TOOL_SUBGHZ_EVIDENCE_MAX,
+        &evidence_size,
+        message,
+        sizeof(message));
+    bool published = false;
+    if(run_result == PoisonToolSubGhzRunOk) {
+        published = poison_tools_publish_result_with_evidence(
+            true, message, evidence, evidence_size, false);
+        if(published && result->decoded_valid) {
+            published = poison_tools_publish_derived_artifact(
+                "sub-ghz.decoded", (const uint8_t*)result->decoded, strlen(result->decoded));
+        }
+    } else {
+        const char* error = poison_tool_subghz_run_result_name(run_result);
+        if(error && snprintf(message, sizeof(message), "{\"error\":\"%s\"}", error) > 0)
+            published = poison_tools_publish_result(false, message);
+    }
+    if(run_result == PoisonToolSubGhzRunOk && published) {
+        service->subghz_capture = result;
+        result = NULL;
+    }
+    if(result) memset(result, 0, sizeof(*result));
+    memset(evidence, 0, POISON_TOOL_SUBGHZ_EVIDENCE_MAX);
+    free(result);
+    free(evidence);
+    return published;
+}
+
+static bool
+    poison_tools_execute_subghz_transmit(PoisonToolsService* service, const char* payload) {
+    if(!service || !service->subghz_capture)
+        return poison_tools_publish_result(false, "{\"error\":\"sub-ghz-no-capture\"}");
+    bool exact_confirmation = false;
+    if(!poison_tools_json_bool(payload, "exact_confirmation", &exact_confirmation))
+        return poison_tools_publish_result(false, "{\"error\":\"sub-ghz-invalid-request\"}");
+    const PoisonToolSubGhzRequest request = {
+        .operation = PoisonToolSubGhzOperationTransmit,
+        .frequency_hz = service->subghz_capture->frequency,
+        .timeout_ms = 5000u,
+        .maximum_timings = service->subghz_capture->raw_count,
+        .exact_confirmation = exact_confirmation,
+    };
+    uint8_t* evidence = malloc(POISON_TOOL_SUBGHZ_EVIDENCE_MAX);
+    if(!evidence) return poison_tools_publish_result(false, "{\"error\":\"sub-ghz-memory\"}");
+    size_t evidence_size = 0u;
+    char message[POISON_APP_MAX_MESSAGE];
+    const PoisonToolSubGhzRunResult run_result = poison_tool_subghz_transmit(
+        &request,
+        PoisonToolSubGhzCapabilityTransmit,
+        poison_tools_subghz_policy_snapshot,
+        service,
+        poison_tools_storage_cancelled,
+        NULL,
+        service->subghz_capture,
+        evidence,
+        POISON_TOOL_SUBGHZ_EVIDENCE_MAX,
+        &evidence_size,
+        message,
+        sizeof(message));
+    bool published = false;
+    if(run_result == PoisonToolSubGhzRunOk) {
+        published = poison_tools_publish_result_with_evidence(
+            true, message, evidence, evidence_size, false);
+    } else {
+        const char* error = poison_tool_subghz_run_result_name(run_result);
+        if(error && snprintf(message, sizeof(message), "{\"error\":\"%s\"}", error) > 0)
+            published = poison_tools_publish_result(false, message);
+    }
+    memset(evidence, 0, POISON_TOOL_SUBGHZ_EVIDENCE_MAX);
+    free(evidence);
+    return published;
 }
 
 static bool poison_tools_execute_gpio(const char* payload) {
@@ -645,10 +941,20 @@ static bool poison_tools_execute_pending(PoisonToolsService* service) {
         return poison_tools_execute_lfrfid(command.payload_json);
     if(strcmp(service->tool_id, "ibutton.read") == 0)
         return poison_tools_execute_ibutton(command.payload_json);
-    if(strcmp(service->tool_id, "infrared.receive") == 0)
-        return poison_tools_execute_infrared(command.payload_json);
-    if(strcmp(service->tool_id, "sub-ghz.receive") == 0)
-        return poison_tools_execute_subghz(command.payload_json);
+    if(strcmp(service->tool_id, "infrared.receive") == 0) {
+        if(strcmp(command.command_id, "infrared.transmit") == 0)
+            return poison_tools_execute_infrared_transmit(service, command.payload_json);
+        return poison_tools_execute_infrared_receive(service, command.payload_json);
+    }
+    if(strcmp(service->tool_id, "sub-ghz.receive") == 0) {
+        if(strcmp(command.command_id, "sub-ghz.transmit") == 0)
+            return poison_tools_execute_subghz_transmit(service, command.payload_json);
+        return poison_tools_execute_subghz_receive(
+            service,
+            command.payload_json,
+            strcmp(command.command_id, "sub-ghz.analyze") == 0 ? PoisonToolSubGhzOperationAnalyze :
+                                                                 PoisonToolSubGhzOperationReceive);
+    }
     if(strcmp(service->tool_id, "gpio.inspect") == 0)
         return poison_tools_execute_gpio(command.payload_json);
     if(strcmp(service->tool_id, "usb-hid.inspect") == 0)
@@ -692,8 +998,16 @@ static bool poison_tools_command(const PoisonAppCommand* command, void* context)
     if(!service || !command) return false;
     furi_check(furi_mutex_acquire(service->mutex, FuriWaitForever) == FuriStatusOk);
     const PoisonToolDefinition* definition = poison_tool_definition_find(service->tool_id);
+    const bool infrared_transmit = definition &&
+                                   strcmp(definition->tool_id, "infrared.receive") == 0 &&
+                                   strcmp(command->command_id, "infrared.transmit") == 0;
+    const bool subghz_extended = definition &&
+                                 strcmp(definition->tool_id, "sub-ghz.receive") == 0 &&
+                                 (strcmp(command->command_id, "sub-ghz.analyze") == 0 ||
+                                  strcmp(command->command_id, "sub-ghz.transmit") == 0);
     bool accepted = service->active && definition &&
-                    strcmp(command->command_id, definition->command_id) == 0;
+                    (strcmp(command->command_id, definition->command_id) == 0 ||
+                     infrared_transmit || subghz_extended);
     bool queued = false;
     if(accepted && command->cancel) {
         accepted = !service->cancelled;
@@ -777,6 +1091,8 @@ bool poison_tools_run_stop(const char* run_id) {
     if(stopped) {
         poison_tools_service->active = false;
         poison_app_endpoint_unregister(poison_tools_service);
+        poison_tools_infrared_capture_clear(poison_tools_service);
+        poison_tools_subghz_capture_clear(poison_tools_service);
         memset(poison_tools_service->tool_id, 0, sizeof(poison_tools_service->tool_id));
         memset(poison_tools_service->run_id, 0, sizeof(poison_tools_service->run_id));
         memset(poison_tools_service->case_id, 0, sizeof(poison_tools_service->case_id));

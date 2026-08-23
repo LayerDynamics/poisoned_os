@@ -17,12 +17,28 @@ App(
         "js_thread.c",
         "js_value.c",
         "plugin_api/app_api_table.cpp",
-        "views/console_view.c",
         "modules/js_flipper.c",
         "modules/js_poison_device.c",
         "modules/js_poison_evidence.c",
         "modules/js_poison_storage.c",
         "modules/js_tests.c",
+    ],
+)
+
+App(
+    appid="js_runner",
+    name="Poison JS Runner",
+    apptype=FlipperAppType.EXTERNAL,
+    fap_icon="icon.png",
+    fap_icon_assets="../../../assets/icons/Archive",
+    fap_category="Scripts",
+    entry_point="js_app",
+    stack_size=2 * 1024,
+    resources="examples",
+    requires=["js_app"],
+    sources=[
+        "js_runner.c",
+        "views/console_view.c",
     ],
 )
 

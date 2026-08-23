@@ -27,6 +27,11 @@ App(
     sources=[
         "tests/common/*.c",
         "tests/rpc/*.c",
+        "tests/tools/poison_tool_nfc_test.c",
+        "tests/tools/poison_tool_lfrfid_test.c",
+        "tests/tools/poison_tool_ibutton_test.c",
+        "tests/tools/poison_tool_infrared_test.c",
+        "tests/tools/poison_tool_subghz_test.c",
         "tests/tools/poison_tool_gpio_test.c",
         "tests/apps/poison_safe_sample_test.c",
         "tests/storage/poison_file_contract_test.c",

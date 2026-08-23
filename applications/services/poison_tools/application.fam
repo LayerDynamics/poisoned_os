@@ -7,6 +7,7 @@ App(
         "esp32_marauder_driver",
         "poison_app",
         "poison_evidence",
+        "poison_profiles",
         "poison_vfs_start",
         "storage",
     ],

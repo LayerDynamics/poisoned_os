@@ -6,6 +6,46 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class JavascriptRuntimeBuildTests(unittest.TestCase):
+    def test_runner_ui_is_external_but_core_runtime_and_browser_adapter_remain_internal(
+        self,
+    ) -> None:
+        manifest = (
+            ROOT / "applications/system/js_app/application.fam"
+        ).read_text(encoding="utf-8")
+        source = (ROOT / "applications/system/js_app/js_app.c").read_text(
+            encoding="utf-8"
+        )
+        workload_manifest = (
+            ROOT / "applications/services/poison_workload/application.fam"
+        ).read_text(encoding="utf-8")
+        workload_adapter = (
+            ROOT
+            / "applications"
+            / "services"
+            / "poison_workload"
+            / "poison_workload_js_adapter.c"
+        ).read_text(encoding="utf-8")
+        system_package = (
+            ROOT / "applications/system/application.fam"
+        ).read_text(encoding="utf-8")
+
+        core = manifest[: manifest.index('appid="js_runner"')]
+        runner = manifest[manifest.index('appid="js_runner"') :]
+        self.assertIn('appid="js_app"', core)
+        self.assertIn("apptype=FlipperAppType.SYSTEM", core)
+        self.assertNotIn("cdefines=", runner.split(")", 1)[0])
+        self.assertIn("apptype=FlipperAppType.EXTERNAL", runner)
+        self.assertIn('fap_category="Scripts"', runner)
+        self.assertIn('fap_icon_assets="../../../assets/icons/Archive"', runner)
+        self.assertIn('requires=["js_app"]', runner)
+        self.assertIn('"js_runner"', system_package)
+        self.assertNotIn("JS_RUNNER_FAP", source)
+        self.assertIn('"js_runner.c"', runner)
+        self.assertIn("loader_enqueue_launch", source)
+        self.assertIn('EXT_PATH("apps/Scripts/js_runner.fap")', source)
+        self.assertIn('requires=["js_app"', workload_manifest)
+        self.assertIn("js_thread_run_managed", workload_adapter)
+
     def test_crypto_plugin_consumes_firmware_service_api(self) -> None:
         manifest = (
             ROOT / "applications/system/js_app/application.fam"

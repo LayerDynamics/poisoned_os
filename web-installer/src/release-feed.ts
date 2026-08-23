@@ -9,6 +9,7 @@ const IDENTIFIER = /^[a-z0-9][a-z0-9._-]{0,63}$/;
 const MAX_FEED_BYTES = 512 * 1024;
 const MAX_PACKAGE_BYTES = 32 * 1024 * 1024;
 const MAX_COMPONENT_BYTES = Number.MAX_SAFE_INTEGER;
+const CONFIG_SCHEMA = "poison.web-installer-config/v1";
 
 export type ReleaseChannel = "stable" | "beta" | "developer" | "internal";
 
@@ -53,6 +54,12 @@ export interface InstallerFeed {
 }
 
 export type TrustedReleaseKeys = Readonly<Record<string, string>>;
+
+export interface InstallerRuntimeConfig {
+  readonly schema: typeof CONFIG_SCHEMA;
+  readonly releaseFeedUrl: string;
+  readonly trustedReleaseKeys: TrustedReleaseKeys;
+}
 
 export class ReleaseFeedError extends Error {
   public constructor(message: string) {
@@ -280,16 +287,50 @@ export async function verifyReleaseSignature(
   if (!valid) throw new ReleaseFeedError(`Release ${manifest.version} has an invalid signature`);
 }
 
-export function configuredTrustedKeys(raw = import.meta.env.VITE_POISON_RELEASE_KEYS): TrustedReleaseKeys {
-  if (!raw) return {};
-  let parsed: unknown;
-  try { parsed = JSON.parse(raw); } catch { throw new ReleaseFeedError("VITE_POISON_RELEASE_KEYS is not valid JSON"); }
-  const keys = object(parsed, "trusted release keys");
+function validateTrustedReleaseKeys(value: unknown): TrustedReleaseKeys {
+  const keys = object(value, "trusted release keys");
   for (const [keyId, pem] of Object.entries(keys)) {
     if (!IDENTIFIER.test(keyId) || typeof pem !== "string") throw new ReleaseFeedError("Trusted release key map is invalid");
     pemBytes(pem);
   }
   return keys as Record<string, string>;
+}
+
+export function configuredTrustedKeys(raw = import.meta.env.VITE_POISON_RELEASE_KEYS): TrustedReleaseKeys {
+  if (!raw) return {};
+  let parsed: unknown;
+  try { parsed = JSON.parse(raw); } catch { throw new ReleaseFeedError("VITE_POISON_RELEASE_KEYS is not valid JSON"); }
+  return validateTrustedReleaseKeys(parsed);
+}
+
+export function validateInstallerRuntimeConfig(value: unknown): InstallerRuntimeConfig {
+  const config = object(value, "installer runtime config");
+  exactKeys(config, ["schema", "releaseFeedUrl", "trustedReleaseKeys"], "installer runtime config");
+  if (config.schema !== CONFIG_SCHEMA) throw new ReleaseFeedError("Installer runtime config schema is invalid");
+  if (typeof config.releaseFeedUrl !== "string" || !config.releaseFeedUrl || config.releaseFeedUrl.startsWith("//") ||
+      config.releaseFeedUrl.split("/").some((part) => part === "..")) {
+    throw new ReleaseFeedError("Installer release feed URL is unsafe");
+  }
+  return {
+    schema: CONFIG_SCHEMA,
+    releaseFeedUrl: config.releaseFeedUrl,
+    trustedReleaseKeys: validateTrustedReleaseKeys(config.trustedReleaseKeys),
+  };
+}
+
+export async function loadInstallerRuntimeConfig(
+  fetcher: typeof fetch = fetch,
+): Promise<InstallerRuntimeConfig | null> {
+  const response = await fetcher("./installer-config.json", {
+    cache: "no-store",
+    credentials: "omit",
+    redirect: "error",
+  });
+  if (response.status === 404) return null;
+  if (!response.ok) throw new ReleaseFeedError(`Installer runtime config request failed with HTTP ${response.status}`);
+  let decoded: unknown;
+  try { decoded = await response.json(); } catch { throw new ReleaseFeedError("Installer runtime config is not valid JSON"); }
+  return validateInstallerRuntimeConfig(decoded);
 }
 
 function declaredContentLength(response: Response, label: string): number | null {

@@ -8,6 +8,8 @@
 #include <subghz_worker.h>
 #include <level_duration.h>
 
+#define POISON_SUBGHZ_RAW_TIMINGS_MAX (1024u)
+
 typedef struct {
     SubGhzEnvironment* environment;
     SubGhzReceiver* receiver;
@@ -19,6 +21,10 @@ typedef struct {
     uint32_t frequency;
     size_t tx_count;
     size_t tx_index;
+    LevelDuration raw_timings[POISON_SUBGHZ_RAW_TIMINGS_MAX];
+    size_t raw_count;
+    bool raw_overflow;
+    bool decoded_ready;
     bool running;
     bool transmitting;
 } PoisonSubGhzHandle;
@@ -28,6 +34,10 @@ typedef struct {
     float rssi;
     uint8_t lqi;
     char decoded[192];
+    LevelDuration raw_timings[POISON_SUBGHZ_RAW_TIMINGS_MAX];
+    size_t raw_count;
+    bool decoded_valid;
+    bool raw_overflow;
 } PoisonSubGhzResult;
 
 #ifdef __cplusplus

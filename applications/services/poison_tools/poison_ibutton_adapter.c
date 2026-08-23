@@ -34,11 +34,24 @@ void poison_ibutton_close(PoisonIbuttonHandle* handle) {
 
 bool poison_ibutton_read(PoisonIbuttonHandle* handle, PoisonIbuttonReadResult* result) {
     if(!handle || !handle->protocols || !handle->key || !result) return false;
+    memset(result, 0, sizeof(*result));
     poison_ibutton_otg(true);
     bool read = ibutton_protocols_read(handle->protocols, handle->key);
     poison_ibutton_otg(false);
     if(!read) return false;
     result->protocol = ibutton_key_get_protocol_id(handle->key);
+    const char* protocol_name = ibutton_protocols_get_name(handle->protocols, result->protocol);
+    if(!protocol_name ||
+       strnlen(protocol_name, sizeof(result->protocol_name)) >= sizeof(result->protocol_name)) {
+        return false;
+    }
+    strcpy(result->protocol_name, protocol_name);
+    iButtonEditableData editable = {0};
+    ibutton_protocols_get_editable_data(handle->protocols, handle->key, &editable);
+    if(!editable.ptr || editable.size == 0u || editable.size > sizeof(result->data)) return false;
+    memcpy(result->data, editable.ptr, editable.size);
+    result->data_size = editable.size;
+    result->valid = ibutton_protocols_is_valid(handle->protocols, handle->key);
     FuriString* rendered = furi_string_alloc();
     ibutton_protocols_render_brief_data(handle->protocols, handle->key, rendered);
     const size_t size = furi_string_size(rendered);

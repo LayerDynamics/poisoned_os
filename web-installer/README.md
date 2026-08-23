@@ -13,7 +13,7 @@ pnpm --dir web-installer install --frozen-lockfile
 pnpm --dir web-installer dev
 ```
 
-Open the localhost URL printed by Vite and choose `dist/f7-C/flipper-z-f7-update-poisonedos.tgz`. Local selection validates the archive's structure, target, transfer, and returned device identity, but does not authenticate the archive's publisher. Use only a package you built from reviewed source until commissioned signed publication exists.
+Open the localhost URL printed by Vite and choose `dist/f7-C/flipper-z-f7-update-poisonedos.tgz`. Local selection validates the archive's structure, target, transfer, and returned device identity, but does not authenticate the archive's publisher. Use only a package you built from reviewed source until signed publication is configured.
 
 ## Verify and Build
 
@@ -27,7 +27,7 @@ The output is a static site in `web-installer/dist/`. Its relative asset paths s
 
 A distribution build sets `VITE_POISON_RELEASE_FEED_URL` to a same-site feed and `VITE_POISON_RELEASE_KEYS` to a JSON map of trusted key IDs to SPKI P-256 public-key PEMs. The client rejects an unknown key, altered signed manifest, unsafe URL, non-target-7 release, oversized package, byte-count mismatch, or SHA-256 mismatch before archive parsing.
 
-`tools/release/build_web_installer_feed.py` constructs the feed only after independently checking the same signed manifest and exact `.tgz` with OpenSSL. `.github/workflows/web-installer.yml` performs that check, requires the release tag to match the signed version, and publishes to GitHub Pages only for a published release while `POISON_RELEASE_DISTRIBUTION_APPROVED` is `true`. The repository currently leaves publication disabled because its production signing authority is not commissioned and recorded licensing blockers prohibit distribution.
+`tools/release/build_web_installer_feed.py` constructs the feed only after independently checking the same signed manifest and exact `.tgz` with OpenSSL. `.github/workflows/web-installer.yml` performs that check, requires the release tag to match the signed version, and publishes to GitHub Pages only for a published release while `POISON_RELEASE_DISTRIBUTION_APPROVED` is `true`. The Railway deployment uses the repository `Dockerfile` to build the target-7 updater package, sign a developer-channel manifest, and serve `releases.json`, `installer-config.json`, and the immutable package from the same origin. Railway's `POISON_RELEASE_PRIVATE_KEY_B64` is a developer deployment secret; it is not the commissioned production signing authority, so stable publication remains disabled until the production key and recorded licensing blockers are resolved.
 
 ## Recovery Behavior
 

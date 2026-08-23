@@ -3,7 +3,7 @@
 import json
 import os
 import subprocess
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 
 from flipper.app import App
 
@@ -16,27 +16,28 @@ class GitVersion:
 
     def get_version_info(self):
         commit = (
-            self._exec_git(f"rev-parse --short={self.REVISION_SUFFIX_LENGTH} HEAD")
+            self._safe_git(f"rev-parse --short={self.REVISION_SUFFIX_LENGTH} HEAD")
+            or os.environ.get("RAILWAY_GIT_COMMIT_SHA", "")[: self.REVISION_SUFFIX_LENGTH]
             or "unknown"
         )
 
         dirty = False
         try:
             self._exec_git("diff --quiet")
-        except subprocess.CalledProcessError as e:
-            if e.returncode == 1:
+        except (subprocess.CalledProcessError, OSError) as e:
+            if isinstance(e, subprocess.CalledProcessError) and e.returncode == 1:
                 dirty = True
 
         # If WORKFLOW_BRANCH_OR_TAG is set in environment, is has precedence
         # (set by CI)
         branch = (
             os.environ.get("WORKFLOW_BRANCH_OR_TAG", None)
-            or self._exec_git("rev-parse --abbrev-ref HEAD")
+            or self._safe_git("rev-parse --abbrev-ref HEAD")
             or "unknown"
         )
 
         try:
-            version = self._exec_git("describe --tags --abbrev=0 --exact-match")
+            version = self._safe_git("describe --tags --abbrev=0 --exact-match")
         except subprocess.CalledProcessError:
             version = "unknown"
 
@@ -45,10 +46,8 @@ class GitVersion:
                 int(os.environ["SOURCE_DATE_EPOCH"])
             )
         else:
-            commit_date = datetime.strptime(
-                self._exec_git("log -1 --format=%cd --date=default").strip(),
-                "%a %b %d %H:%M:%S %Y %z",
-            )
+            git_date = self._safe_git("log -1 --format=%cd --date=default").strip()
+            commit_date = datetime.strptime(git_date, "%a %b %d %H:%M:%S %Y %z") if git_date else datetime.now(timezone.utc)
 
         return {
             "GIT_COMMIT": commit,
@@ -61,8 +60,8 @@ class GitVersion:
 
     def _get_git_origins(self):
         try:
-            remotes = self._exec_git("remote -v")
-        except subprocess.CalledProcessError:
+            remotes = self._safe_git("remote -v")
+        except (subprocess.CalledProcessError, OSError):
             return set()
         origins = set()
         for line in remotes.split("\n"):
@@ -81,6 +80,12 @@ class GitVersion:
             .strip()
             .decode()
         )
+
+    def _safe_git(self, args):
+        try:
+            return self._exec_git(args)
+        except (OSError, subprocess.CalledProcessError):
+            return ""
 
 
 class Main(App):

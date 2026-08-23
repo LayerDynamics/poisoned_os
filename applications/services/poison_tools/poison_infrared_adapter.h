@@ -13,11 +13,17 @@ typedef struct {
     FuriSemaphore* received;
     bool running;
     bool transmitting;
+    bool capture_valid;
 } PoisonInfraredHandle;
 
 typedef struct {
     bool decoded;
+    InfraredProtocol protocol;
+    uint32_t address;
+    uint32_t command;
+    bool repeat;
     size_t timings;
+    uint32_t raw_timings[MAX_TIMINGS_AMOUNT];
     uint32_t frequency;
     float duty_cycle;
 } PoisonInfraredResult;

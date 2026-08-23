@@ -19,6 +19,7 @@ TOOLCHAIN_VERIFIER = REPOSITORY_ROOT / "tools" / "verify_toolchain.py"
 REPRODUCIBLE_BUILD_CHECKER = REPOSITORY_ROOT / "tools" / "check_reproducible_build.py"
 RECURSIVE_GLOB = REPOSITORY_ROOT / "scripts" / "fbt_tools" / "sconsrecursiveglob.py"
 FBT_DIST = REPOSITORY_ROOT / "scripts" / "fbt_tools" / "fbt_dist.py"
+FW_SIZE_SCRIPT = REPOSITORY_ROOT / "scripts" / "fwsize.py"
 TOOLCHAIN_SITE_PACKAGES = (
     REPOSITORY_ROOT / "toolchain" / "arm64-darwin" / "lib" / "python3.11" / "site-packages"
 )
@@ -77,6 +78,29 @@ def load_fbt_dist_module():
         "SCons.Defaults": scons_defaults,
     }
     spec = importlib.util.spec_from_file_location("fbt_dist_under_test", FBT_DIST)
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    from unittest import mock
+
+    with mock.patch.dict(sys.modules, modules):
+        spec.loader.exec_module(module)
+    return module
+
+
+def load_fwsize_module():
+    ansi = types.ModuleType("ansi")
+    ansi_color = types.ModuleType("ansi.color")
+    ansi_color.fg = types.SimpleNamespace(yellow=lambda value: value)
+    flipper = types.ModuleType("flipper")
+    flipper_app = types.ModuleType("flipper.app")
+    flipper_app.App = object
+    modules = {
+        "ansi": ansi,
+        "ansi.color": ansi_color,
+        "flipper": flipper,
+        "flipper.app": flipper_app,
+    }
+    spec = importlib.util.spec_from_file_location("fwsize_under_test", FW_SIZE_SCRIPT)
     assert spec is not None and spec.loader is not None
     module = importlib.util.module_from_spec(spec)
     from unittest import mock
@@ -316,6 +340,31 @@ class ReproducibleBuildTests(unittest.TestCase):
 
 
 class BuildProfileIsolationTests(unittest.TestCase):
+    def test_firmware_build_enforces_radio_boundary_with_one_page_reserve(self) -> None:
+        fwsize = load_fwsize_module()
+        firmware_graph = (REPOSITORY_ROOT / "firmware.scons").read_text(
+            encoding="utf-8"
+        )
+
+        boundary = 0x080D7000
+        origin = 0x08000000
+        self.assertEqual(
+            fwsize.radio_gap_bytes(boundary - origin - 4096, origin, boundary),
+            4096,
+        )
+        self.assertTrue(
+            fwsize.radio_layout_fits(
+                boundary - origin - 4096, origin, boundary, reserve_pages=1
+            )
+        )
+        self.assertFalse(
+            fwsize.radio_layout_fits(
+                boundary - origin - 4095, origin, boundary, reserve_pages=1
+            )
+        )
+        self.assertIn('"--radio"', firmware_graph)
+        self.assertIn('"--reserve-pages", "1"', firmware_graph)
+
     def test_default_device_build_is_compact_release_profile(self) -> None:
         options = (REPOSITORY_ROOT / "fbt_options.py").read_text(encoding="utf-8")
 

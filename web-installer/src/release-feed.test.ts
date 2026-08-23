@@ -2,9 +2,11 @@ import { describe, expect, it } from "vitest";
 import {
   derEcdsaToP1363,
   downloadRelease,
+  loadInstallerRuntimeConfig,
   loadReleaseFeed,
   signedManifestPayload,
   validateFeed,
+  validateInstallerRuntimeConfig,
   verifyReleaseSignature,
   type SignedReleaseManifest,
 } from "./release-feed";
@@ -70,6 +72,26 @@ async function signedFixture(packageBytes = Uint8Array.from([1, 2, 3, 4])): Prom
 }
 
 describe("signed web installer release feed", () => {
+  it("loads the Railway-generated runtime feed and trust configuration", async () => {
+    const config = {
+      schema: "poison.web-installer-config/v1",
+      releaseFeedUrl: "../releases.json",
+      trustedReleaseKeys: { "firmware-test-1": "-----BEGIN PUBLIC KEY-----\nAAAA\n-----END PUBLIC KEY-----" },
+    };
+    expect(() => validateInstallerRuntimeConfig(config)).toThrowError(/unsafe/);
+
+    const { publicPem } = await signedFixture();
+    const valid = { ...config, releaseFeedUrl: "./releases.json", trustedReleaseKeys: { "firmware-test-1": publicPem } };
+    expect(validateInstallerRuntimeConfig(valid)).toEqual(valid);
+    const fetcher = async () => new Response(JSON.stringify(valid), { status: 200 });
+    await expect(loadInstallerRuntimeConfig(fetcher as typeof fetch)).resolves.toEqual(valid);
+  });
+
+  it("keeps local package mode when Railway has no generated config", async () => {
+    const fetcher = async () => new Response("not found", { status: 404 });
+    await expect(loadInstallerRuntimeConfig(fetcher as typeof fetch)).resolves.toBeNull();
+  });
+
   it("validates the feed, binds the tgz component, and verifies its P-256 signature", async () => {
     const { manifest, publicPem } = await signedFixture();
     const feed = validateFeed({

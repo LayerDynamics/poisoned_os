@@ -4,6 +4,7 @@ import { BrowserFirmwareInstaller, type InstallProgress } from "./installer";
 import {
   configuredTrustedKeys,
   downloadRelease,
+  loadInstallerRuntimeConfig,
   loadReleaseFeed,
   type InstallerRelease,
 } from "./release-feed";
@@ -298,11 +299,14 @@ function formatBytes(value: number): string {
 async function loadPublishedReleases(): Promise<void> {
   const configuredUrl = import.meta.env.VITE_POISON_RELEASE_FEED_URL as string | undefined;
   const keys = configuredTrustedKeys();
-  if (!configuredUrl || Object.keys(keys).length === 0) {
+  const runtimeConfig = configuredUrl && Object.keys(keys).length > 0 ? null : await loadInstallerRuntimeConfig();
+  const releaseFeedUrl = configuredUrl || runtimeConfig?.releaseFeedUrl;
+  const trustedKeys = Object.keys(keys).length > 0 ? keys : runtimeConfig?.trustedReleaseKeys || {};
+  if (!releaseFeedUrl || Object.keys(trustedKeys).length === 0) {
     log("RELEASES · no signed feed configured; local package installation remains available");
     return;
   }
-  const feed = await loadReleaseFeed(configuredUrl, keys);
+  const feed = await loadReleaseFeed(releaseFeedUrl, trustedKeys);
   releases = [...feed.releases].sort((left, right) => {
     const order = { stable: 0, beta: 1, developer: 2, internal: 3 } as const;
     return order[left.manifest.channel] - order[right.manifest.channel] || right.manifest.version.localeCompare(left.manifest.version, undefined, { numeric: true });

@@ -445,23 +445,60 @@ class MarauderProvisioningTest(unittest.TestCase):
         )
         manifest = (app_dir / "application.fam").read_text(encoding="utf-8")
         source = (app_dir / "poison_marauder.c").read_text(encoding="utf-8")
-        driver = (
+        driver_path = (
             ROOT
             / "applications"
             / "drivers"
             / "esp32marauder"
             / "esp32_marauder_driver.c"
-        ).read_text(encoding="utf-8")
+        )
+        driver = driver_path.read_text(encoding="utf-8")
+        commands = json.loads(
+            driver_path.with_name("esp32_marauder_commands.json").read_text(
+                encoding="utf-8"
+            )
+        )
         self.assertIn('appid="poison_external_apps"', category_manifest)
         self.assertIn('("applications/external", False)', app_search)
         self.assertIn('appid="poison_marauder"', manifest)
         self.assertIn('fap_category="GPIO"', manifest)
-        self.assertIn('OBSERVE("info"', driver)
-        self.assertIn('CONTROL("scan.all"', driver)
-        self.assertIn('CAPTURE("sniff.pmkid"', driver)
-        self.assertIn('ACTIVE("attack.deauth"', driver)
+        commands_by_id = {command["id"]: command for command in commands}
+        self.assertEqual(commands_by_id["info"]["capability"], "observe")
+        self.assertEqual(commands_by_id["scan.all"]["capability"], "control")
+        self.assertTrue(commands_by_id["sniff.pmkid"]["producesCapture"])
+        self.assertEqual(commands_by_id["attack.deauth"]["capability"], "active")
+        self.assertIn("esp32_marauder_registry_init", driver)
         self.assertIn("esp32_marauder_command_format", source)
         self.assertIn("poison_marauder_confirm_command", source)
+
+    def test_embedded_command_registry_is_generated_exactly_from_canonical_data(self):
+        registry_path = (
+            ROOT
+            / "applications"
+            / "drivers"
+            / "esp32marauder"
+            / "esp32_marauder_commands.json"
+        )
+        generated_path = registry_path.with_name("esp32_marauder_registry.inc")
+        generator_path = ROOT / "scripts" / "marauder_registry.py"
+        spec = importlib.util.spec_from_file_location(
+            "poison_marauder_registry", generator_path
+        )
+        module = importlib.util.module_from_spec(spec)
+        assert spec.loader is not None
+        spec.loader.exec_module(module)
+
+        commands = json.loads(registry_path.read_text(encoding="utf-8"))
+        self.assertEqual(len(commands), 98)
+        module.validate_commands(commands)
+        self.assertEqual(
+            generated_path.read_text(encoding="utf-8"),
+            module.render_registry_include(commands),
+        )
+
+        encoded = module.encode_registry(commands)
+        self.assertEqual(module.decode_registry(encoded), commands)
+        self.assertLess(len(encoded), 2400)
 
 
 if __name__ == "__main__":
