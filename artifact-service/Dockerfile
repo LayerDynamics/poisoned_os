@@ -9,11 +9,15 @@ RUN apt-get update \
 WORKDIR /src
 COPY . .
 
+ARG POISON_SOURCE_REPOSITORY=https://github.com/LayerDynamics/poisoned_os.git
+ARG POISON_SOURCE_REF=main
+RUN git clone --depth 1 --branch "$POISON_SOURCE_REF" "$POISON_SOURCE_REPOSITORY" /repo
+
 RUN corepack enable \
     && corepack prepare pnpm@10.32.1 --activate \
-    && pnpm --dir dashboard install --frozen-lockfile
+    && pnpm --dir /repo/dashboard install --frozen-lockfile
 
-ENV ARTIFACT_ROOT=/src \
+ENV ARTIFACT_ROOT=/repo \
     ARTIFACT_OUTPUT=/srv
 EXPOSE 8080
-CMD ["python3", "artifact-service/server.py"]
+CMD ["python3", "server.py"]

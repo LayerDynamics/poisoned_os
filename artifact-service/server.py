@@ -7,7 +7,9 @@ import json
 import os
 from pathlib import Path
 import re
+import shutil
 import subprocess
+import tempfile
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import threading
 import time
@@ -37,11 +39,13 @@ def _build(version: str, channel: str) -> None:
         _set_state(status="building", version=version, channel=channel, error=None)
         environment = os.environ.copy()
         environment["POISON_RELEASE_PRIVATE_KEY_B64"] = os.environ.get("POISON_RELEASE_PRIVATE_KEY_B64", "")
+        OUTPUT.parent.mkdir(parents=True, exist_ok=True)
+        staging = Path(tempfile.mkdtemp(prefix="poisoned-artifacts-", dir=OUTPUT.parent))
         subprocess.run(
             [
                 "uv", "run", "--no-project", "--python", "3.11", "python",
                 "tools/release/build_release_artifacts.py",
-                "--root", str(ROOT), "--output", str(OUTPUT), "--version", version,
+                "--root", str(ROOT), "--output", str(staging), "--version", version,
                 "--channel", channel, "--key-id", os.environ.get("POISON_RELEASE_KEY_ID", ""),
             ],
             cwd=ROOT,
@@ -49,11 +53,21 @@ def _build(version: str, channel: str) -> None:
             check=True,
             timeout=45 * 60,
         )
+        previous = OUTPUT.with_name(f"{OUTPUT.name}.previous")
+        if previous.exists():
+            shutil.rmtree(previous)
+        if OUTPUT.exists():
+            os.replace(OUTPUT, previous)
+        os.replace(staging, OUTPUT)
+        if previous.exists():
+            shutil.rmtree(previous)
         _set_state(status="ready", version=version, channel=channel, error=None)
     except Exception as error:
         _set_state(status="error", error=str(error))
         raise
     finally:
+        if "staging" in locals() and staging.exists():
+            shutil.rmtree(staging, ignore_errors=True)
         BUILD_LOCK.release()
 
 

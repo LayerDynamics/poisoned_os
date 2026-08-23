@@ -19,10 +19,9 @@ app.innerHTML = `
           <div class="hero-actions"><a class="button button-primary" href="/docs/#/getting-started">Start with the docs <span aria-hidden="true">→</span></a><a class="button button-secondary" href="https://web-installer-production.up.railway.app">Install over USB <span aria-hidden="true">↗</span></a></div>
           <p class="hero-note"><span class="note-rule"></span> Local-first by design. No account required for device control.</p>
         </div>
-        <div class="hero-instrument" aria-label="Illustration of the pocket interface">
-          <div class="contamination-mark" aria-hidden="true"><svg viewBox="0 0 80 80"><path d="M40 7 48 28l22 1-17 14 6 22-19-12-19 12 6-22L10 29l22-1z"/><circle cx="40" cy="37" r="8"/><path d="M40 45v28m-6-9 6 9 6-9"/></svg><span>AUTHORIZED<br>FIELD TOOL</span></div>
+        <div class="hero-instrument" aria-label="Flipper Zero hardware reference">
           <div class="instrument-label instrument-label-top">POISONED_OS / LIVE LINK</div>
-          <div class="device-card"><div class="device-top"><span>FLIPPER ZERO</span><span class="device-online">● ONLINE</span></div><div class="device-display"><span class="display-cursor">_</span><strong>FIELD CASE</strong><small>4 CAPTURES · 2 NOTES</small></div><div class="device-controls"><span class="d-pad"></span><span class="control-buttons"><i></i><i></i><i></i><i></i></span></div></div>
+          <figure class="flipper-photo"><img src="/images/flipper-zero-front.png" alt="Flipper Zero handheld device" loading="eager" /></figure>
           <div class="instrument-line line-one"></div><div class="instrument-line line-two"></div><div class="instrument-label instrument-label-bottom">BROWSER / WI-FI / DEVICE</div>
           <div class="instrument-readout"><span>SESSION</span><strong>SECURE</strong><span>↳ AUDIT CHAIN INTACT</span></div>
         </div>

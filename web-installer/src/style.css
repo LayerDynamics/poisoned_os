@@ -92,3 +92,12 @@ button:disabled { color: #fff; background: #000; }
 .technical-log ol { border: 1px solid var(--line); }
 @media (max-width: 920px) { .tool-rail { flex-wrap: wrap; }.rail-status { margin-left: 0; }.drip-mark { right: 35px; } }
 @media (max-width: 560px) { .tool-rail { gap: 11px; }.rail-label { width: 100%; }.rail-status { margin-left: auto; }.drip-mark { top: 95px; right: 28px; }.brand-stamp { right: 20px; } }
+
+/* Final strict palette pass: only literal black and literal white are rendered. */
+:root { color: #fff !important; background: #000 !important; --black: #000; --surface: #000; --surface-2: #000; --white: #fff; --muted: #fff; --faint: #fff; --line: #fff; --poison: #fff; --poison-dim: #fff; --danger: #fff; }
+html, body, .installer-shell, .device-bay, .workflow, .flipper-body, .flipper-screen, .host-port, select, .technical-log ol, .message, .confirmation { background: #000 !important; background-image: none !important; }
+body, h1, h2, h3, p, span, small, strong, em, dt, dd, label, summary, code, .stage-title span, .rail-label, .rail-status, .kicker, footer, footer a { color: #fff !important; }
+*, *::before, *::after { border-color: #fff !important; box-shadow: none !important; text-shadow: none !important; opacity: 1 !important; }
+.device-bay::before { background: none !important; }.device-bay::after { color: #fff !important; }.drip-mark span, .cable-trace span, progress::-webkit-progress-value, progress::-moz-progress-bar { background: #fff !important; }.cable-trace, progress, progress::-webkit-progress-bar { background: #000 !important; }
+.tool-icon, .tool-icon.active, .flipper-screen, .flipper-controls i, .confirmation, .message, code, select { background: #000 !important; color: #fff !important; }
+button, .stage.active .stage-index { color: #000 !important; background: #fff !important; }.button.quiet, button.quiet, button:disabled { color: #fff !important; background: #000 !important; }
