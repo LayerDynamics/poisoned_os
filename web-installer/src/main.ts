@@ -14,11 +14,11 @@ const root = document.querySelector<HTMLDivElement>("#app");
 if (!root) throw new Error("Installer root is missing");
 
 root.innerHTML = `
-  <main class="installer-shell">
+  <main class="installer-shell" data-brand="poisoned">
     <header class="masthead">
       <a class="wordmark" href="./" aria-label="Poisoned OS cable installer home">
-        <span class="wordmark-mark" aria-hidden="true">P_</span>
-        <span>Poisoned_Os</span>
+        <span class="wordmark-mark" aria-hidden="true">☣</span>
+        <span>Poisoned<span class="wordmark-dim">_Os</span></span>
       </a>
       <nav class="installer-nav" aria-label="Poisoned OS links"><a href="https://poisoned-os-site-production.up.railway.app/">Product site <span aria-hidden="true">↗</span></a><a href="https://poisoned-os-site-production.up.railway.app/docs/">Documentation <span aria-hidden="true">↗</span></a></nav>
       <div class="masthead-meta"><span>Target F7</span><span>USB / 230400</span><span>Local execution</span></div>
@@ -26,9 +26,10 @@ root.innerHTML = `
 
     <div class="installer-grid">
       <aside class="device-bay" aria-label="Flipper connection status">
-        <p class="kicker">Cable installer</p>
-        <h1>Put the operating system in your pocket.</h1>
-        <p class="lede">Install Poisoned_Os directly over USB. The package is checked here, transferred locally, read back, and then handed to the Flipper's own updater.</p>
+        <p class="kicker">Poisoned / USB flash</p>
+        <h1>A clean install.<br><em>A contaminated signal.</em></h1>
+        <p class="lede">A direct, local path from this browser to your Flipper Zero. The package is inspected, transferred, read back, and verified before Poisoned_Os takes over.</p>
+        <div class="brand-stamp" aria-hidden="true"><span>POISONED</span><b>F7 / USB</b></div>
 
         <div class="device-figure" aria-hidden="true">
           <div class="flipper-body">
@@ -36,7 +37,7 @@ root.innerHTML = `
             <div class="flipper-controls"><i></i><i></i><i></i><i></i><b></b></div>
           </div>
           <div class="cable-trace"><span id="cable-progress"></span></div>
-          <div class="host-port">BROWSER</div>
+          <div class="host-port">HOST</div>
         </div>
 
         <dl class="device-facts">
