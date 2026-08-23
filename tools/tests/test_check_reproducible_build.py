@@ -7,11 +7,13 @@ import os
 from pathlib import Path
 import platform
 import re
+import struct
 import subprocess
 import sys
 import tempfile
 import types
 import unittest
+import zlib
 
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
@@ -20,8 +22,14 @@ REPRODUCIBLE_BUILD_CHECKER = REPOSITORY_ROOT / "tools" / "check_reproducible_bui
 RECURSIVE_GLOB = REPOSITORY_ROOT / "scripts" / "fbt_tools" / "sconsrecursiveglob.py"
 FBT_DIST = REPOSITORY_ROOT / "scripts" / "fbt_tools" / "fbt_dist.py"
 FW_SIZE_SCRIPT = REPOSITORY_ROOT / "scripts" / "fwsize.py"
+UPDATE_SCRIPT = REPOSITORY_ROOT / "scripts" / "update.py"
 TOOLCHAIN_SITE_PACKAGES = (
-    REPOSITORY_ROOT / "toolchain" / "arm64-darwin" / "lib" / "python3.11" / "site-packages"
+    REPOSITORY_ROOT
+    / "toolchain"
+    / "arm64-darwin"
+    / "lib"
+    / "python3.11"
+    / "site-packages"
 )
 
 
@@ -53,7 +61,9 @@ def load_recursive_glob_module():
         "fbt": fbt,
         "fbt.util": fbt_util,
     }
-    spec = importlib.util.spec_from_file_location("recursive_glob_under_test", RECURSIVE_GLOB)
+    spec = importlib.util.spec_from_file_location(
+        "recursive_glob_under_test", RECURSIVE_GLOB
+    )
     assert spec is not None and spec.loader is not None
     module = importlib.util.module_from_spec(spec)
     from unittest import mock
@@ -110,6 +120,21 @@ def load_fwsize_module():
     return module
 
 
+def load_update_module():
+    scripts_path = os.fspath(REPOSITORY_ROOT / "scripts")
+    sys.path.insert(0, scripts_path)
+    try:
+        spec = importlib.util.spec_from_file_location(
+            "update_under_test", UPDATE_SCRIPT
+        )
+        assert spec is not None and spec.loader is not None
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        return module
+    finally:
+        sys.path.remove(scripts_path)
+
+
 class ToolchainFixture:
     def __init__(self) -> None:
         self.temporary = tempfile.TemporaryDirectory()
@@ -118,7 +143,9 @@ class ToolchainFixture:
         (self.toolchain / "bin").mkdir(parents=True)
         (self.toolchain / "VERSION").write_text("39\n", encoding="utf-8")
         self.compiler = self.toolchain / "bin" / "compiler"
-        self.compiler.write_text("#!/bin/sh\nprintf 'compiler 1.0\\n'\n", encoding="utf-8")
+        self.compiler.write_text(
+            "#!/bin/sh\nprintf 'compiler 1.0\\n'\n", encoding="utf-8"
+        )
         self.compiler.chmod(0o755)
         self.archive = self.root / "toolchain" / "bundle.tar.gz"
         self.archive.write_bytes(b"fixture archive\n")
@@ -222,10 +249,14 @@ class VerifyToolchainTests(unittest.TestCase):
         self.fixture.flags.write_text("CCFLAGS = ['-w']\n", encoding="utf-8")
         result = self.fixture.run()
         self.assertNotEqual(result.returncode, 0)
-        self.assertIn("build input digest mismatch: compiler-flags.scons", result.stderr)
+        self.assertIn(
+            "build input digest mismatch: compiler-flags.scons", result.stderr
+        )
 
     def test_write_refreshes_only_declared_build_input_digests(self) -> None:
-        self.fixture.flags.write_text("CCFLAGS = ['-Werror', '-Wextra']\n", encoding="utf-8")
+        self.fixture.flags.write_text(
+            "CCFLAGS = ['-Werror', '-Wextra']\n", encoding="utf-8"
+        )
         original = json.loads(self.fixture.manifest_path.read_text(encoding="utf-8"))
 
         refreshed = self.fixture.run(None, "--write")
@@ -236,7 +267,9 @@ class VerifyToolchainTests(unittest.TestCase):
         self.assertEqual(updated["bundle"], original["bundle"])
         self.assertEqual(updated["tools"], original["tools"])
         self.assertEqual(updated["buildInputs"][0]["path"], "compiler-flags.scons")
-        self.assertEqual(updated["buildInputs"][0]["sha256"], sha256(self.fixture.flags))
+        self.assertEqual(
+            updated["buildInputs"][0]["sha256"], sha256(self.fixture.flags)
+        )
         checked = self.fixture.run()
         self.assertEqual(checked.returncode, 0, checked.stderr)
 
@@ -340,9 +373,41 @@ class ReproducibleBuildTests(unittest.TestCase):
 
 
 class BuildProfileIsolationTests(unittest.TestCase):
+    def test_updater_layout_uses_dfuse_flash_extent_not_container_size(self) -> None:
+        update = load_update_module()
+        payload = b"firmware payload" * 257
+        image_base = 0x08000000
+        element = struct.pack("<II", image_base, len(payload)) + payload
+        target = (
+            struct.pack(
+                "<6sBI255sII",
+                b"Target",
+                0,
+                1,
+                b"Flipper Zero F7",
+                len(element),
+                1,
+            )
+            + element
+        )
+        prefix = struct.pack("<5sBIB", b"DfuSe", 1, len(target) + 11, 1)
+        suffix = struct.pack("<HHHH3sB", 0xFFFF, 0xDF11, 0x0483, 0x011A, b"UFD", 16)
+        without_crc = prefix + target + suffix
+        dfu = without_crc + struct.pack("<I", ~zlib.crc32(without_crc) & 0xFFFFFFFF)
+
+        self.assertGreater(len(dfu), len(payload))
+        self.assertEqual(update.dfuse_flash_extent(dfu, image_base), len(payload))
+        corrupted = bytearray(dfu)
+        corrupted[-1] ^= 0x01
+        with self.assertRaises(ValueError):
+            update.dfuse_flash_extent(corrupted, image_base)
+
     def test_firmware_build_enforces_radio_boundary_with_one_page_reserve(self) -> None:
         fwsize = load_fwsize_module()
         firmware_graph = (REPOSITORY_ROOT / "firmware.scons").read_text(
+            encoding="utf-8"
+        )
+        updater = (REPOSITORY_ROOT / "scripts" / "update.py").read_text(
             encoding="utf-8"
         )
 
@@ -363,7 +428,8 @@ class BuildProfileIsolationTests(unittest.TestCase):
             )
         )
         self.assertIn('"--radio"', firmware_graph)
-        self.assertIn('"--reserve-pages", "1"', firmware_graph)
+        self.assertRegex(firmware_graph, r'"--reserve-pages",\s*"1"')
+        self.assertIn("MIN_GAP_PAGES = 1", updater)
 
     def test_default_device_build_is_compact_release_profile(self) -> None:
         options = (REPOSITORY_ROOT / "fbt_options.py").read_text(encoding="utf-8")
@@ -426,10 +492,12 @@ class BuildProfileIsolationTests(unittest.TestCase):
         )
 
     def test_firmware_api_lookup_table_is_an_optional_sd_resource(self) -> None:
-        sdk_builder = (REPOSITORY_ROOT / "scripts" / "fbt_tools" / "fbt_sdk.py").read_text(
+        sdk_builder = (
+            REPOSITORY_ROOT / "scripts" / "fbt_tools" / "fbt_sdk.py"
+        ).read_text(encoding="utf-8")
+        firmware_graph = (REPOSITORY_ROOT / "firmware.scons").read_text(
             encoding="utf-8"
         )
-        firmware_graph = (REPOSITORY_ROOT / "firmware.scons").read_text(encoding="utf-8")
         external_app_graph = (
             REPOSITORY_ROOT / "site_scons" / "extapps.scons"
         ).read_text(encoding="utf-8")
@@ -444,7 +512,7 @@ class BuildProfileIsolationTests(unittest.TestCase):
 
         self.assertIn('"ApiExternalTable": Builder(', sdk_builder)
         self.assertIn(
-            'FW_API_KEEP=firmware_apitable[1]', external_app_graph.replace(" ", "")
+            "FW_API_KEEP=firmware_apitable[1]", external_app_graph.replace(" ", "")
         )
         self.assertIn('fwenv["APPENV"].ApiExternalTable(', firmware_graph)
         self.assertIn('"@${FW_API_KEEP.abspath}"', firmware_graph)
@@ -479,7 +547,9 @@ class ExternalFirmwareApiTableTests(unittest.TestCase):
         with self.assertRaises(self.cache.ExternalApiTableError):
             self.cache.decode_external_api_table(bytes(corrupted))
 
-    def test_nondefault_app_set_has_distinct_build_and_distribution_flavors(self) -> None:
+    def test_nondefault_app_set_has_distinct_build_and_distribution_flavors(
+        self,
+    ) -> None:
         module = load_fbt_dist_module()
         default = {
             "TARGET_HW": 7,

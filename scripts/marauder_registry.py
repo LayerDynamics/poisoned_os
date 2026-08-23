@@ -149,7 +149,10 @@ def main(argv=None):
     commands = json.loads(args.registry.read_text(encoding="utf-8"))
     rendered = render_registry_include(commands)
     if args.check:
-        if not args.output.exists() or args.output.read_text(encoding="utf-8") != rendered:
+        if (
+            not args.output.exists()
+            or args.output.read_text(encoding="utf-8") != rendered
+        ):
             parser.error("generated Marauder registry is stale")
         return 0
     args.output.write_text(rendered, encoding="utf-8")

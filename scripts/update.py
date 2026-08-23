@@ -3,6 +3,7 @@
 import math
 import os
 import shutil
+import struct
 import tarfile
 import zlib
 from os.path import exists, join
@@ -14,6 +15,81 @@ from flipper.assets.obdata import ObReferenceValues, OptionBytesData
 from flipper.assets.tarball import compress_tree_tarball, tar_sanitizer_filter
 from flipper.utils.fff import FlipperFormatFile
 from slideshow import Main as SlideshowMain
+
+
+DFUSE_PREFIX_FORMAT = "<5sBIB"
+DFUSE_TARGET_FORMAT = "<6sBI255sII"
+DFUSE_ELEMENT_FORMAT = "<II"
+DFUSE_SUFFIX_FORMAT = "<HHHH3sB"
+
+
+def parse_dfuse_elements(data):
+    data = bytes(data)
+    prefix_size = struct.calcsize(DFUSE_PREFIX_FORMAT)
+    target_header_size = struct.calcsize(DFUSE_TARGET_FORMAT)
+    element_header_size = struct.calcsize(DFUSE_ELEMENT_FORMAT)
+    suffix_fields_size = struct.calcsize(DFUSE_SUFFIX_FORMAT)
+    suffix_size = suffix_fields_size + 4
+    if len(data) < prefix_size + target_header_size + suffix_size:
+        raise ValueError("DfuSe container is truncated")
+
+    signature, version, image_size, target_count = struct.unpack_from(
+        DFUSE_PREFIX_FORMAT, data, 0
+    )
+    suffix_offset = len(data) - suffix_size
+    if signature != b"DfuSe" or version != 1 or image_size != suffix_offset:
+        raise ValueError("invalid DfuSe prefix")
+
+    _, _, _, dfu_version, suffix_signature, suffix_length = struct.unpack_from(
+        DFUSE_SUFFIX_FORMAT, data, suffix_offset
+    )
+    stored_crc = struct.unpack_from("<I", data, len(data) - 4)[0]
+    calculated_crc = ~zlib.crc32(data[:-4]) & 0xFFFFFFFF
+    if (
+        dfu_version != 0x011A
+        or suffix_signature != b"UFD"
+        or suffix_length != suffix_size
+        or stored_crc != calculated_crc
+    ):
+        raise ValueError("invalid DfuSe suffix or checksum")
+
+    elements = []
+    offset = prefix_size
+    for _ in range(target_count):
+        if offset + target_header_size > suffix_offset:
+            raise ValueError("truncated DfuSe target")
+        target_signature, _, _, _, target_size, element_count = struct.unpack_from(
+            DFUSE_TARGET_FORMAT, data, offset
+        )
+        if target_signature != b"Target":
+            raise ValueError("invalid DfuSe target prefix")
+        offset += target_header_size
+        target_end = offset + target_size
+        if target_end > suffix_offset:
+            raise ValueError("DfuSe target exceeds container")
+        for _ in range(element_count):
+            if offset + element_header_size > target_end:
+                raise ValueError("truncated DfuSe element")
+            address, payload_size = struct.unpack_from(
+                DFUSE_ELEMENT_FORMAT, data, offset
+            )
+            offset += element_header_size
+            if payload_size == 0 or offset + payload_size > target_end:
+                raise ValueError("invalid DfuSe element payload")
+            elements.append((address, payload_size))
+            offset += payload_size
+        if offset != target_end:
+            raise ValueError("DfuSe target size does not match its elements")
+    if offset != suffix_offset or not elements:
+        raise ValueError("DfuSe container size or element count is invalid")
+    return elements
+
+
+def dfuse_flash_extent(data, image_base):
+    elements = parse_dfuse_elements(data)
+    if any(address < image_base for address, _ in elements):
+        raise ValueError("DfuSe element begins before firmware image base")
+    return max(address + size for address, size in elements) - image_base
 
 
 class Main(App):
@@ -34,7 +110,7 @@ class Main(App):
 
     FLASH_BASE = 0x8000000
     FLASH_PAGE_SIZE = 4 * 1024
-    MIN_GAP_PAGES = 0
+    MIN_GAP_PAGES = 1
 
     # Update stage file larger than that is not loadable without fix
     # https://github.com/flipperdevices/flipperzero-firmware/pull/3676
@@ -138,7 +214,12 @@ class Main(App):
 
         dfu_size = 0
         if self.args.dfu:
-            dfu_size = os.stat(self.args.dfu).st_size
+            try:
+                with open(self.args.dfu, "rb") as dfu_file:
+                    dfu_size = dfuse_flash_extent(dfu_file.read(), self.FLASH_BASE)
+            except (OSError, ValueError) as error:
+                self.logger.error(f"Cannot validate firmware DfuSe image: {error}")
+                return 1
             shutil.copyfile(self.args.dfu, join(self.args.directory, dfu_basename))
         if radiobin_basename:
             shutil.copyfile(

@@ -11,10 +11,7 @@
 int32_t js_app(void* arg) {
     Loader* loader = furi_record_open(RECORD_LOADER);
     loader_enqueue_launch(
-        loader,
-        EXT_PATH("apps/Scripts/js_runner.fap"),
-        arg,
-        LoaderDeferredLaunchFlagGui);
+        loader, EXT_PATH("apps/Scripts/js_runner.fap"), arg, LoaderDeferredLaunchFlagGui);
     furi_record_close(RECORD_LOADER);
     return 0;
 }

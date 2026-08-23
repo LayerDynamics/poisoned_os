@@ -16,7 +16,10 @@ def radio_gap_bytes(bin_size, image_base, radio_address):
 
 
 def radio_layout_fits(bin_size, image_base, radio_address, reserve_pages):
-    return radio_gap_bytes(bin_size, image_base, radio_address) >= reserve_pages * PAGE_SIZE
+    return (
+        radio_gap_bytes(bin_size, image_base, radio_address)
+        >= reserve_pages * PAGE_SIZE
+    )
 
 
 class Main(App):

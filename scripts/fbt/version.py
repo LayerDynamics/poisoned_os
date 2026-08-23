@@ -32,4 +32,7 @@ def get_fast_git_version_id():
         return (version, datetime.date.today())
     except (OSError, subprocess.CalledProcessError) as error:
         print("Failed to check for git changes", error)
-        return (os.environ.get("RAILWAY_GIT_COMMIT_SHA", "unknown"), datetime.date.today())
+        return (
+            os.environ.get("RAILWAY_GIT_COMMIT_SHA", "unknown"),
+            datetime.date.today(),
+        )

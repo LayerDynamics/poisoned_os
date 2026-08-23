@@ -277,7 +277,8 @@ if env["IS_BASE_FIRMWARE"]:
             "${ROOT_DIR.abspath}/${COPRO_STACK_BIN_DIR}/${COPRO_STACK_BIN}",
             "--image-base",
             "${IMAGE_BASE_ADDRESS}",
-            "--reserve-pages", "1",
+            "--reserve-pages",
+            "1",
         ]
     )
 AddPostAction(

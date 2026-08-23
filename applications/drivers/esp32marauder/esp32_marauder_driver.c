@@ -81,10 +81,10 @@ static bool esp32_marauder_registry_init(void) {
         commands[index].capability = (Esp32MarauderCapability)capability;
         commands[index].argument_required = (flags & 0x01u) != 0u;
         commands[index].produces_capture = (flags & 0x02u) != 0u;
-        valid = esp32_marauder_registry_parse_string(&cursor, end, &commands[index].id) &&
-                esp32_marauder_registry_parse_string(&cursor, end, &commands[index].label) &&
-                esp32_marauder_registry_parse_string(
-                    &cursor, end, &commands[index].command_template);
+        valid =
+            esp32_marauder_registry_parse_string(&cursor, end, &commands[index].id) &&
+            esp32_marauder_registry_parse_string(&cursor, end, &commands[index].label) &&
+            esp32_marauder_registry_parse_string(&cursor, end, &commands[index].command_template);
     }
     if(!valid || cursor != end) {
         free(decoded);

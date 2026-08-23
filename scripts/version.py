@@ -17,7 +17,9 @@ class GitVersion:
     def get_version_info(self):
         commit = (
             self._safe_git(f"rev-parse --short={self.REVISION_SUFFIX_LENGTH} HEAD")
-            or os.environ.get("RAILWAY_GIT_COMMIT_SHA", "")[: self.REVISION_SUFFIX_LENGTH]
+            or os.environ.get("RAILWAY_GIT_COMMIT_SHA", "")[
+                : self.REVISION_SUFFIX_LENGTH
+            ]
             or "unknown"
         )
 
@@ -47,7 +49,11 @@ class GitVersion:
             )
         else:
             git_date = self._safe_git("log -1 --format=%cd --date=default").strip()
-            commit_date = datetime.strptime(git_date, "%a %b %d %H:%M:%S %Y %z") if git_date else datetime.now(timezone.utc)
+            commit_date = (
+                datetime.strptime(git_date, "%a %b %d %H:%M:%S %Y %z")
+                if git_date
+                else datetime.now(timezone.utc)
+            )
 
         return {
             "GIT_COMMIT": commit,
