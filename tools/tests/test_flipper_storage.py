@@ -273,6 +273,13 @@ class DeviceInstallTests(unittest.TestCase):
         install = source.index("distenv.AddUsbFlashTarget(")
         self.assertLess(preflight, install)
 
+    def test_fbt_exposes_shared_exact_device_doctor(self) -> None:
+        source = (REPOSITORY_ROOT / "SConstruct").read_text()
+        self.assertIn('"device_doctor"', source)
+        self.assertIn('distenv.Alias("doctor", device_doctor)', source)
+        self.assertIn('"${FBT_SCRIPT_DIR}/device_install.py"', source)
+        self.assertIn('"--doctor"', source)
+
     def test_dfu_parser_ignores_displaylink_and_deduplicates_flipper_alts(self) -> None:
         module = load_device_install_module()
         output = """
@@ -445,7 +452,13 @@ Found DFU: [0483:df11] alt=0 serial="2075308D4242"
             )
 
         self.assertEqual(result, 3)
-        detect_runtime.assert_called_once_with("/dev/cu.usbmodemflip_Osprit1")
+        self.assertEqual(
+            detect_runtime.call_args_list,
+            [
+                mock.call("/dev/cu.usbmodemflip_Osprit1"),
+                mock.call("/dev/cu.usbmodemflip_Osprit1"),
+            ],
+        )
         wait_dfu.assert_called_once_with()
         repair.assert_not_called()
         rpc_update.assert_called_once_with(

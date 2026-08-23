@@ -18,7 +18,6 @@ web-installer/node_modules/
 web-installer/.vite/
 web-installer/dist/
 website/node_modules/
-website/dist/
 .pnpm-store/
 bridge/target/
 tools/protocol/target/

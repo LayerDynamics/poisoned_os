@@ -49,6 +49,22 @@ DEFAULT_MARAUDER_FAP = (
     SCRIPTS_ROOT.parent / "build/f7-firmware-D/.extapps/poison_esp_flasher.fap"
 )
 DEFAULT_MARAUDER_TARGET = "flipper-zero-wifi-dev-board"
+UPDATE_ROOT = "/ext/update/poison-lkg"
+UPDATE_RESOURCE_MILESTONES = {
+    "manifest": "/ext/Manifest",
+    "marauder-s2": (
+        "/ext/apps_data/esp_flasher/assets/marauder/s2/"
+        "esp32_marauder.flipper.bin"
+    ),
+    "marauder-s3": (
+        "/ext/apps_data/esp_flasher/assets/marauder/s3/"
+        "esp32_marauder.multiboardS3.bin"
+    ),
+    "marauder-wroom": (
+        "/ext/apps_data/esp_flasher/assets/marauder/wroom/"
+        "esp32_marauder.dev_board_pro.bin"
+    ),
+}
 
 
 def run(command: list[str], **kwargs) -> subprocess.CompletedProcess:
@@ -226,6 +242,23 @@ def wait_for_flipper_dfu(timeout: float = MANUAL_DFU_TIMEOUT) -> str | None:
     return None
 
 
+def wait_for_recovery_device(
+    expected_runtime_serial: str | None,
+    timeout: float = MANUAL_DFU_TIMEOUT,
+) -> tuple[str, str] | None:
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        if dfu_serial := detect_flipper_dfu():
+            return "dfu", dfu_serial
+        runtime = detect_flipper_runtime("auto")
+        if runtime and (
+            expected_runtime_serial is None or runtime[1] == expected_runtime_serial
+        ):
+            return "runtime", runtime[0]
+        time.sleep(POST_INSTALL_RETRY_DELAY)
+    return None
+
+
 def run_qflipper_runtime_repair(expected_port: str, expected_serial: str) -> str | None:
     current_runtime = detect_flipper_runtime(expected_port)
     if current_runtime != (expected_port, expected_serial):
@@ -360,6 +393,126 @@ def run_install_attempt(port: str, manifest: Path, passthrough: list[str]) -> in
     return 0 if verify_poisoned_os(port) else 6
 
 
+def collect_runtime_diagnostics(port: str) -> bool:
+    with FlipperRpc(port) as rpc:
+        version = rpc.protobuf_version()
+        device_info = rpc.device_info()
+        _require_flipper_identity(device_info)
+        storage_info = rpc.storage_info("/ext")
+        update_entries = rpc.list_dir(UPDATE_ROOT)
+        milestones = {
+            name: rpc.stat(path) for name, path in UPDATE_RESOURCE_MILESTONES.items()
+        }
+
+    print(
+        "Doctor runtime: "
+        f"port={port} protobuf={version[0]}.{version[1]} "
+        f"firmware_version={device_info.get('firmware_version', 'unknown')} "
+        f"firmware_origin_fork={device_info.get('firmware_origin_fork', 'unknown')}"
+    )
+    print(
+        "Doctor storage: "
+        f"total={storage_info['total_space']} free={storage_info['free_space']}"
+    )
+    if update_entries:
+        for entry in sorted(update_entries, key=lambda item: str(item["name"])):
+            print(
+                "Doctor update artifact: "
+                f"{entry['name']} type={entry['type']} size={entry['size']}"
+            )
+    else:
+        print(f"Doctor update artifacts: {UPDATE_ROOT} is absent or empty")
+    for name, file_info in milestones.items():
+        state = "present" if file_info else "absent"
+        details = f" size={file_info['size']}" if file_info else ""
+        print(f"Doctor resource milestone: {name}={state}{details}")
+    return True
+
+
+def _print_manual_recovery_sequence() -> None:
+    print(
+        "Exact Flipper is absent. Unplug Flipper USB, hold BACK for 30 seconds, "
+        "then hold BACK + OK for 30 seconds, release both, and reconnect USB. "
+        f"Waiting up to {MANUAL_DFU_TIMEOUT:.0f}s for Flipper runtime or DFU "
+        f"{FLIPPER_DFU_VID_PID}.",
+        file=sys.stderr,
+    )
+
+
+def recover_after_failed_update(expected_runtime_serial: str | None) -> str | None:
+    print("Post-install verification failed; starting exact-device recovery", file=sys.stderr)
+    recovery_device = None
+    if dfu_serial := detect_flipper_dfu():
+        recovery_device = ("dfu", dfu_serial)
+    else:
+        runtime = detect_flipper_runtime("auto")
+        if runtime and (
+            expected_runtime_serial is None or runtime[1] == expected_runtime_serial
+        ):
+            recovery_device = ("runtime", runtime[0])
+
+    if recovery_device is None:
+        _print_manual_recovery_sequence()
+        recovery_device = wait_for_recovery_device(expected_runtime_serial)
+    if recovery_device is None:
+        print("Doctor did not observe Flipper runtime or DFU", file=sys.stderr)
+        return None
+
+    state, identifier = recovery_device
+    if state == "dfu":
+        return recover_flipper_dfu(
+            identifier, expected_runtime_serial=expected_runtime_serial
+        )
+
+    try:
+        collect_runtime_diagnostics(identifier)
+        return identifier
+    except (OSError, RuntimeError, RpcError) as error:
+        print(
+            f"Recovered runtime is not diagnosable over RPC: {error}; "
+            "restoring official firmware with qFlipper",
+            file=sys.stderr,
+        )
+    runtime = detect_flipper_runtime(identifier)
+    if not runtime:
+        return None
+    return run_qflipper_runtime_repair(runtime[0], runtime[1])
+
+
+def doctor(port: str, recover: bool = True) -> int:
+    try:
+        if dfu_serial := detect_flipper_dfu():
+            print(f"Doctor state: Flipper DFU {dfu_serial}")
+            if not recover:
+                return 2
+            runtime_port = recover_flipper_dfu(dfu_serial)
+            collect_runtime_diagnostics(runtime_port)
+            return 0
+
+        if runtime := detect_flipper_runtime(port):
+            print(f"Doctor state: Flipper runtime {runtime[1]} on {runtime[0]}")
+            collect_runtime_diagnostics(runtime[0])
+            return 0
+
+        print("Doctor state: exact Flipper is absent", file=sys.stderr)
+        if not recover:
+            return 3
+        _print_manual_recovery_sequence()
+        recovery_device = wait_for_recovery_device(None)
+        if recovery_device is None:
+            print("Doctor did not observe Flipper runtime or DFU", file=sys.stderr)
+            return 3
+        state, identifier = recovery_device
+        runtime_port = (
+            recover_flipper_dfu(identifier) if state == "dfu" else identifier
+        )
+        collect_runtime_diagnostics(runtime_port)
+        return 0
+    except (OSError, RuntimeError, RpcError) as error:
+        print(f"Doctor failed: {error}", file=sys.stderr)
+        return 4
+
+
 def install(port: str, manifest: Path, passthrough: list[str]) -> int:
     if not manifest.is_file():
         print(f"Update manifest not found: {manifest}", file=sys.stderr)
@@ -372,10 +525,13 @@ def install(port: str, manifest: Path, passthrough: list[str]) -> int:
             active_port = recover_flipper_dfu(dfu_serial)
         else:
             active_port = port
+        selected_runtime = detect_flipper_runtime(active_port)
+        expected_runtime_serial = selected_runtime[1] if selected_runtime else None
         result = run_install_attempt(active_port, manifest, passthrough)
         if result == 0:
             return 0
         if result == 6:
+            recover_after_failed_update(expected_runtime_serial)
             return result
         dfu_serial = detect_flipper_dfu()
         if dfu_serial:
@@ -407,6 +563,7 @@ def install(port: str, manifest: Path, passthrough: list[str]) -> int:
         if result == 0:
             return 0
         if result == 6:
+            recover_after_failed_update(expected_runtime_serial)
             return result
 
         # A second failed custom install is not retried. If it returned to DFU,
@@ -503,6 +660,8 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument("-p", "--port", default="auto")
     parser.add_argument("--preflight-only", action="store_true")
+    parser.add_argument("--doctor", action="store_true")
+    parser.add_argument("--diagnose-only", action="store_true")
     parser.add_argument("--skip-marauder", action="store_true")
     parser.add_argument("--marauder-fap", type=Path, default=DEFAULT_MARAUDER_FAP)
     parser.add_argument("--marauder-target", default=DEFAULT_MARAUDER_TARGET)
@@ -512,6 +671,12 @@ def main(argv: list[str] | None = None) -> int:
         if args.manifest_path is not None or passthrough:
             parser.error("--preflight-only does not accept an update manifest")
         return preflight(args.port)
+    if args.doctor:
+        if args.manifest_path is not None or passthrough:
+            parser.error("--doctor does not accept an update manifest")
+        return doctor(args.port, recover=not args.diagnose_only)
+    if args.diagnose_only:
+        parser.error("--diagnose-only requires --doctor")
     if args.manifest_path is None:
         parser.error("an update manifest is required")
     result = install(args.port, args.manifest_path.resolve(), passthrough)

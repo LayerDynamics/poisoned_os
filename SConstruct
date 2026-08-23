@@ -525,6 +525,20 @@ distenv.PhonyTarget(
     source=poison_esp_flasher_fap,
 )
 
+device_doctor = distenv.PhonyTarget(
+    "device_doctor",
+    [
+        [
+            "${PYTHON3}",
+            "${FBT_SCRIPT_DIR}/device_install.py",
+            "--doctor",
+            "-p",
+            "${FLIP_PORT}",
+        ]
+    ],
+)
+distenv.Alias("doctor", device_doctor)
+
 
 # Find blackmagic probe
 distenv.PhonyTarget(
