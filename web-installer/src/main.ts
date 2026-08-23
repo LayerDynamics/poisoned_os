@@ -32,7 +32,7 @@ root.innerHTML = `
         <div class="brand-stamp" aria-hidden="true"><span>DIRECT FLASH</span><b>F7 / USB</b></div>
 
         <div class="device-figure" aria-hidden="true">
-          <div class="flipper-body" role="img" aria-label="Flipper Zero connection schematic"><span class="device-screen" id="device-screen">NO LINK</span></div>
+          <div class="flipper-body"><img src="/images/flipper-zero-front.png" alt="Flipper Zero" /><span class="device-screen" id="device-screen">NO LINK</span></div>
           <div class="cable-trace"><span id="cable-progress"></span></div>
           <div class="host-port">USB</div>
         </div>
