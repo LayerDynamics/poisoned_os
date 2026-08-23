@@ -19,6 +19,14 @@ RUN corepack enable \
     && pnpm --dir dashboard install --frozen-lockfile \
     && pnpm --dir web-installer install --frozen-lockfile
 
+RUN marauder_version="$(sed -n 's/.*"version": "\([^"]*\)".*/\1/p' /src/provenance/marauder.lock.json | head -1)" \
+    && marauder_url="$(sed -n 's/.*"installerBundleUrl": "\([^"]*\)".*/\1/p' /src/provenance/marauder.lock.json)" \
+    && marauder_sha256="$(sed -n 's/.*"installerBundleSha256": "\([^"]*\)".*/\1/p' /src/provenance/marauder.lock.json)" \
+    && marauder_path="/src/dist/marauder/${marauder_version}/marauder-installer-assets.zip" \
+    && mkdir -p "$(dirname "$marauder_path")" \
+    && curl --fail --location --silent --show-error "$marauder_url" --output "$marauder_path" \
+    && printf '%s  %s\n' "$marauder_sha256" "$marauder_path" | sha256sum --check --status
+
 RUN FBT_NO_SYNC=1 SOURCE_DATE_EPOCH=0 ./fbt \
     DEBUG=0 COMPACT=1 DIST_SUFFIX=poisonedos \
     UPDATE_VERSION_STRING="$POISON_RELEASE_VERSION" updater_package

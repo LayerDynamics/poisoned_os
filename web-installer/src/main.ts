@@ -26,19 +26,15 @@ root.innerHTML = `
 
     <div class="installer-grid">
       <aside class="device-bay" aria-label="Flipper connection status">
-        <p class="kicker">Poisoned / USB flash</p>
-        <h1>A clean install.<br><em>A contaminated signal.</em></h1>
-        <p class="lede">A direct, local path from this browser to your Flipper Zero. The package is inspected, transferred, read back, and verified before Poisoned_Os takes over.</p>
-        <div class="brand-stamp" aria-hidden="true"><span>POISONED</span><b>F7 / USB</b></div>
-        <div class="drip-mark" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="bay-heading"><p class="kicker">POISONED_OS / INSTALLER</p><span class="bay-index">01—04</span></div>
+        <h1>Put Poisoned_Os<br><em>on the device.</em></h1>
+        <p class="lede">A local USB install for Flipper Zero target 7. The archive is checked, copied, read back, and verified before the device restarts.</p>
+        <div class="brand-stamp" aria-hidden="true"><span>DIRECT FLASH</span><b>F7 / USB</b></div>
 
         <div class="device-figure" aria-hidden="true">
-          <div class="flipper-body">
-            <div class="flipper-screen"><span id="device-screen">NO LINK</span></div>
-            <div class="flipper-controls"><i></i><i></i><i></i><i></i><b></b></div>
-          </div>
+          <div class="flipper-body" role="img" aria-label="Flipper Zero connection schematic"><span class="device-screen" id="device-screen">NO LINK</span></div>
           <div class="cable-trace"><span id="cable-progress"></span></div>
-          <div class="host-port">HOST</div>
+          <div class="host-port">USB</div>
         </div>
 
         <dl class="device-facts">
@@ -50,18 +46,9 @@ root.innerHTML = `
       </aside>
 
       <section class="workflow" aria-labelledby="workflow-title">
-        <div class="tool-rail" aria-label="Poisoned field tool modules">
-          <span class="rail-label">POISON / FIELD TOOL 01</span>
-          <div class="rail-icons">
-            <span class="tool-icon active" title="Package inspection"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7.5 12 3l8 4.5v9L12 21l-8-4.5zM4 7.5l8 4.5 8-4.5M12 12v9"/><path d="m8 5.2 8 4.6"/></svg></span>
-            <span class="tool-icon" title="USB transport"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20V4m0 0L8 8m4-4 4 4M12 12H6m-2 0 2-2m-2 2 2 2M12 16h6m2 0-2-2m2 2-2 2"/></svg></span>
-            <span class="tool-icon" title="Target verification"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/></svg></span>
-            <span class="tool-icon" title="Local execution"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5zM8 8h8M8 12h5M8 16h8"/></svg></span>
-          </div>
-          <span class="rail-status"><i></i> LOCAL / NO CLOUD</span>
-        </div>
+        <div class="tool-rail" aria-label="Installer guarantees"><span class="rail-label">LOCAL PROCESS</span><span class="rail-status"><i></i> NO CLOUD · NO ACCOUNT</span></div>
         <div class="workflow-heading">
-          <div><p class="kicker">Four physical stages</p><h2 id="workflow-title">Cable in. Firmware checked. Device back.</h2></div>
+          <div><p class="kicker">Install sequence</p><h2 id="workflow-title">Check. Connect. Verify.</h2></div>
           <output id="overall-status" class="status-chip">Ready</output>
         </div>
 
