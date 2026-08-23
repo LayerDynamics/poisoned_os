@@ -49,6 +49,47 @@ distenv = coreenv.Clone(
     UPDATE_BUNDLE_DIR="dist/${DIST_DIR}/f${TARGET_HW}-update-${DIST_SUFFIX}",
 )
 
+marauder_device_resource_paths = (
+    "boot_app0.bin",
+    "esp32_marauder.ino.partitions.bin",
+    "s2/esp32_marauder.ino.bootloader.bin",
+    "s2/esp32_marauder.flipper.bin",
+    "s3/esp32_marauder.ino.bootloader.bin",
+    "s3/esp32_marauder.multiboardS3.bin",
+    "wroom/esp32_marauder.ino.bootloader.bin",
+    "wroom/esp32_marauder.dev_board_pro.bin",
+    "upstream-release.json",
+)
+marauder_resource_root = coreenv.Dir("#build/generated/marauder-resources")
+coreenv.Replace(MARAUDER_RESOURCE_ROOT=marauder_resource_root)
+marauder_resource_nodes = coreenv.Command(
+    [marauder_resource_root.File(path) for path in marauder_device_resource_paths],
+    [
+        coreenv.File("#scripts/marauder.py"),
+        coreenv.File("#provenance/marauder.lock.json"),
+    ],
+    [
+        [
+            "${PYTHON3}",
+            "${FBT_SCRIPT_DIR}/marauder.py",
+            "stage-resources",
+            "--output",
+            "${MARAUDER_RESOURCE_ROOT}",
+        ]
+    ],
+)
+coreenv.Replace(
+    RESOURCE_OVERRIDES=[
+        (
+            node,
+            f"apps_data/esp_flasher/assets/marauder/{relative_path}",
+        )
+        for node, relative_path in zip(
+            marauder_resource_nodes, marauder_device_resource_paths
+        )
+    ]
+)
+
 firmware_env = distenv.AddFwProject(
     base_env=coreenv,
     fw_type="firmware",
@@ -60,16 +101,7 @@ external_app_list = external_apps_artifacts.application_map.values()
 poison_esp_flasher_fap = external_apps_artifacts.application_map[
     "poison_esp_flasher"
 ].compact
-marauder_prepare = distenv.PhonyTarget(
-    "marauder_prepare",
-    [
-        [
-            "${PYTHON3}",
-            "${FBT_SCRIPT_DIR}/marauder.py",
-            "prepare",
-        ]
-    ],
-)
+marauder_prepare = distenv.Alias("marauder_prepare", marauder_resource_nodes)
 
 # If enabled, initialize updater-related targets
 if GetOption("fullenv") or any(

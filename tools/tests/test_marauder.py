@@ -285,7 +285,123 @@ class MarauderProvisioningTest(unittest.TestCase):
         self.assertIn('"marauder_prepare"', source)
         self.assertIn('"marauder_flash"', source)
         self.assertIn('"${FBT_SCRIPT_DIR}/marauder.py"', source)
+        self.assertIn('"stage-resources"', source)
+        self.assertIn("RESOURCE_OVERRIDES", source)
         self.assertIn("poison_esp_flasher_fap", source)
+
+    def test_offline_resources_are_staged_from_verified_upstream_profiles(self):
+        role_offsets = {
+            "bootloader": 0x1000,
+            "partition-table": 0x8000,
+            "ota-data": 0xE000,
+            "application": 0x10000,
+        }
+        common_payloads = {
+            "partition-table": b"official-partitions",
+            "ota-data": b"official-ota-data",
+        }
+        profile_payloads = {
+            "flipper-zero-wifi-dev-board": {
+                "bootloader": b"official-s2-bootloader",
+                "application": b"official-s2-application",
+            },
+            "flipper-zero-multiboard-s3": {
+                "bootloader": b"official-s3-bootloader",
+                "application": b"official-s3-application",
+            },
+            "marauder-dev-board-pro": {
+                "bootloader": b"official-wroom-bootloader",
+                "application": b"official-wroom-application",
+            },
+        }
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            asset_root = Path(temp_dir) / "upstream"
+            output_root = Path(temp_dir) / "staged"
+            asset_root.mkdir()
+            targets = []
+            for target_id, unique_payloads in profile_payloads.items():
+                segments = []
+                for role, offset in role_offsets.items():
+                    payload = (
+                        unique_payloads[role]
+                        if role in unique_payloads
+                        else common_payloads[role]
+                    )
+                    file_name = f"{target_id}-{role}.bin"
+                    (asset_root / file_name).write_bytes(payload)
+                    segments.append(
+                        {
+                            "role": role,
+                            "offset": offset,
+                            "size": len(payload),
+                            "sha256": hashlib.sha256(payload).hexdigest(),
+                            "fileName": file_name,
+                        }
+                    )
+                targets.append(
+                    {
+                        "id": target_id,
+                        "displayName": target_id,
+                        "aliases": [],
+                        "chipFamily": "ESP32-S2",
+                        "esptoolChip": "esp32s2",
+                        "flash": {
+                            "sizeBytes": 4 * 1024 * 1024,
+                            "mode": "dio",
+                            "frequency": "80m",
+                            "factory": {
+                                "erase": True,
+                                "preservesUserData": False,
+                                "segments": segments,
+                            },
+                        },
+                    }
+                )
+
+            lock = {
+                **self.lock,
+                "installerBundleSha256": "a" * 64,
+            }
+            manifest = {**self.manifest, "targets": targets}
+            with mock.patch.object(
+                self.module,
+                "prepare_assets",
+                return_value=(lock, manifest, asset_root),
+            ):
+                staged = self.module.stage_on_device_resources(output_root)
+
+            self.assertEqual(
+                set(path.relative_to(output_root).as_posix() for path in staged),
+                {
+                    *(
+                        path
+                        for paths in self.module.ON_DEVICE_RESOURCE_PROFILES.values()
+                        for path in paths.values()
+                    ),
+                    self.module.ON_DEVICE_PROVENANCE_PATH,
+                },
+            )
+            for target_id, role_paths in self.module.ON_DEVICE_RESOURCE_PROFILES.items():
+                for role, relative_path in role_paths.items():
+                    expected = (
+                        profile_payloads[target_id][role]
+                        if role in profile_payloads[target_id]
+                        else common_payloads[role]
+                    )
+                    self.assertEqual((output_root / relative_path).read_bytes(), expected)
+
+            provenance = json.loads(
+                (output_root / self.module.ON_DEVICE_PROVENANCE_PATH).read_text(
+                    encoding="utf-8"
+                )
+            )
+            self.assertEqual(provenance["sourceRepository"], self.lock["sourceRepository"])
+            self.assertEqual(provenance["sourceCommit"], self.lock["sourceCommit"])
+            self.assertEqual(
+                {target["id"] for target in provenance["targets"]},
+                set(profile_payloads),
+            )
 
     def test_requested_port_must_be_real_flipper_descriptor(self):
         display_link = types.SimpleNamespace(
@@ -415,6 +531,19 @@ class MarauderProvisioningTest(unittest.TestCase):
         self.assertIn('resources="resources"', flasher_manifest)
         self.assertIn("for app_property in ():", manifest_loader)
         self.assertIn('env["FW_EXTAPPS"].application_map.values()', resource_builder)
+        self.assertIn('env.get("RESOURCE_OVERRIDES", ())', resource_builder)
+
+    def test_on_device_flasher_exposes_confirmed_offline_marauder_install(self):
+        app_dir = ROOT / "applications/external/poison_esp_flasher"
+        app_source = (app_dir / "esp_flasher_app.c").read_text(encoding="utf-8")
+        start_scene = (app_dir / "scenes/esp_flasher_scene_start.c").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("void esp_flasher_configure_marauder_flipper", app_source)
+        self.assertIn('"Install Marauder"', start_scene)
+        self.assertIn("Verified offline firmware", start_scene)
+        self.assertIn('dialog_message_set_buttons(message, "Cancel", NULL, "Install")', start_scene)
+        self.assertIn("esp_flasher_configure_marauder_flipper(app)", start_scene)
 
     def test_on_device_flasher_uses_fixed_usart_and_md5_verification(self):
         app_dir = ROOT / "applications/external/poison_esp_flasher"

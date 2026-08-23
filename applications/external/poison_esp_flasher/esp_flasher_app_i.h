@@ -110,3 +110,5 @@ typedef enum {
     EspFlasherAppViewWidget,
     EspFlasherAppViewSubmenu,
 } EspFlasherAppView;
+
+void esp_flasher_configure_marauder_flipper(EspFlasherApp* app);

@@ -1,6 +1,7 @@
 #include "../esp_flasher_app_i.h"
 
 enum SubmenuIndex {
+    SubmenuIndexEspFlasherInstallMarauder,
     SubmenuIndexEspFlasherQuickFlash,
     SubmenuIndexEspFlasherSwitchA,
     SubmenuIndexEspFlasherSwitchB,
@@ -23,6 +24,12 @@ void esp_flasher_scene_start_on_enter(void* context) {
     EspFlasherApp* app = context;
     Submenu* submenu = app->submenu;
     submenu_set_header(submenu, "POISON ESP FLASHER");
+    submenu_add_item(
+        submenu,
+        "Install Marauder",
+        SubmenuIndexEspFlasherInstallMarauder,
+        esp_flasher_scene_start_submenu_callback,
+        app);
     submenu_add_item(
         submenu,
         "Quick Flash",
@@ -78,7 +85,23 @@ bool esp_flasher_scene_start_on_event(void* context, SceneManagerEvent event) {
     EspFlasherApp* app = context;
     bool consumed = false;
     if(event.type == SceneManagerEventTypeCustom) {
-        if(event.event == SubmenuIndexEspFlasherAbout) {
+        if(event.event == SubmenuIndexEspFlasherInstallMarauder) {
+            DialogMessage* message = dialog_message_alloc();
+            dialog_message_set_header(message, "Install Marauder?", 64, 0, AlignCenter, AlignTop);
+            dialog_message_set_text(
+                message,
+                "Flipper WiFi Devboard\nVerified offline firmware\nErases board flash",
+                64,
+                31,
+                AlignCenter,
+                AlignCenter);
+            dialog_message_set_buttons(message, "Cancel", NULL, "Install");
+            const bool approved =
+                dialog_message_show(app->dialogs, message) == DialogMessageButtonRight;
+            dialog_message_free(message);
+            if(approved) esp_flasher_configure_marauder_flipper(app);
+            consumed = true;
+        } else if(event.event == SubmenuIndexEspFlasherAbout) {
             scene_manager_next_scene(app->scene_manager, EspFlasherSceneAbout);
             consumed = true;
         } else if(event.event == SubmenuIndexEspFlasherQuickFlash) {

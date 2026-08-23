@@ -5,6 +5,7 @@ import hashlib
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import time
@@ -38,6 +39,27 @@ ON_DEVICE_ASSET_ROOT = "/ext/apps_data/esp_flasher/assets/marauder"
 ON_DEVICE_STATUS_PATH = "/ext/apps_data/esp_flasher/marauder-status.txt"
 ON_DEVICE_FLASH_TIMEOUT = 600.0
 FLIPPER_TARGET_ID = "flipper-zero-wifi-dev-board"
+ON_DEVICE_RESOURCE_PROFILES = {
+    FLIPPER_TARGET_ID: {
+        "bootloader": "s2/esp32_marauder.ino.bootloader.bin",
+        "partition-table": "esp32_marauder.ino.partitions.bin",
+        "ota-data": "boot_app0.bin",
+        "application": "s2/esp32_marauder.flipper.bin",
+    },
+    "flipper-zero-multiboard-s3": {
+        "bootloader": "s3/esp32_marauder.ino.bootloader.bin",
+        "partition-table": "esp32_marauder.ino.partitions.bin",
+        "ota-data": "boot_app0.bin",
+        "application": "s3/esp32_marauder.multiboardS3.bin",
+    },
+    "marauder-dev-board-pro": {
+        "bootloader": "wroom/esp32_marauder.ino.bootloader.bin",
+        "partition-table": "esp32_marauder.ino.partitions.bin",
+        "ota-data": "boot_app0.bin",
+        "application": "wroom/esp32_marauder.dev_board_pro.bin",
+    },
+}
+ON_DEVICE_PROVENANCE_PATH = "upstream-release.json"
 ON_DEVICE_SEGMENT_PATHS = {
     0x1000: f"{ON_DEVICE_ASSET_ROOT}/s2/esp32_marauder.ino.bootloader.bin",
     0x8000: f"{ON_DEVICE_ASSET_ROOT}/esp32_marauder.ino.partitions.bin",
@@ -467,6 +489,87 @@ def prepare_assets(lock_path=DEFAULT_LOCK_PATH, cache_root=DEFAULT_CACHE_ROOT):
     return lock, manifest, asset_root
 
 
+def stage_on_device_resources(
+    output_root,
+    lock_path=DEFAULT_LOCK_PATH,
+    cache_root=DEFAULT_CACHE_ROOT,
+):
+    lock, manifest, asset_root = prepare_assets(lock_path, cache_root)
+    staged = {}
+    provenance_targets = []
+
+    for target_id, role_paths in ON_DEVICE_RESOURCE_PROFILES.items():
+        target = select_target(manifest, requested=target_id)
+        segments = verify_target_assets(target, asset_root, "factory")
+        segments_by_role = {segment.role: segment for segment in segments}
+        if set(segments_by_role) != set(role_paths):
+            raise AssetVerificationError(
+                f"target {target_id} factory roles do not match the on-device flasher: "
+                f"{sorted(segments_by_role)} != {sorted(role_paths)}"
+            )
+
+        target_resources = {}
+        for role, relative_path in role_paths.items():
+            segment = segments_by_role[role]
+            existing = staged.get(relative_path)
+            if existing and existing.sha256 != segment.sha256:
+                raise AssetVerificationError(
+                    f"targets require different upstream {role} assets at {relative_path}"
+                )
+            staged[relative_path] = segment
+            target_resources[role] = {
+                "path": relative_path,
+                "offset": segment.offset,
+                "size": segment.size,
+                "sha256": segment.sha256,
+            }
+        provenance_targets.append(
+            {
+                "id": target_id,
+                "displayName": target["displayName"],
+                "resources": target_resources,
+            }
+        )
+
+    output_root = Path(output_root)
+    for relative_path, segment in staged.items():
+        destination = output_root / relative_path
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        partial = destination.with_name(destination.name + ".partial")
+        try:
+            with segment.path.open("rb") as source, partial.open("wb") as output:
+                shutil.copyfileobj(source, output, 1024 * 1024)
+                output.flush()
+                os.fsync(output.fileno())
+            actual_hash = sha256_file(partial)
+            if actual_hash != segment.sha256:
+                raise AssetVerificationError(
+                    f"staged resource SHA-256 mismatch for {relative_path}: {actual_hash}"
+                )
+            os.replace(partial, destination)
+        except OSError as error:
+            raise AssetVerificationError(
+                f"cannot stage on-device resource {relative_path}: {error}"
+            ) from error
+
+    provenance = {
+        "schemaVersion": 1,
+        "sourceRepository": lock["sourceRepository"],
+        "sourceCommit": lock["sourceCommit"],
+        "version": lock["version"],
+        "channel": lock["channel"],
+        "installerBundleSha256": lock["installerBundleSha256"],
+        "targets": provenance_targets,
+    }
+    provenance_path = output_root / ON_DEVICE_PROVENANCE_PATH
+    provenance_path.parent.mkdir(parents=True, exist_ok=True)
+    provenance_path.write_text(
+        json.dumps(provenance, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    return tuple(output_root / path for path in (*staged, ON_DEVICE_PROVENANCE_PATH))
+
+
 def _serial_module():
     try:
         import serial
@@ -773,6 +876,18 @@ def build_parser():
 
     targets = subparsers.add_parser("targets", help="list pinned board profiles")
     targets.set_defaults(func=list_targets)
+
+    stage_resources = subparsers.add_parser(
+        "stage-resources",
+        help="verify and stage pinned upstream assets for the offline device flasher",
+    )
+    stage_resources.add_argument("--output", type=Path, required=True)
+    stage_resources.set_defaults(
+        func=lambda args: (
+            stage_on_device_resources(args.output, args.lock, args.cache),
+            0,
+        )[1]
+    )
 
     flash = subparsers.add_parser(
         "flash", help="stage verified assets and launch the on-device flasher"

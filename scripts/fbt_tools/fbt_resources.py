@@ -1,4 +1,5 @@
 import os
+from pathlib import PurePosixPath
 import shutil
 
 from SCons.Action import Action
@@ -11,6 +12,17 @@ def __generate_resources_dist_entries(env):
     src_target_entries = []
 
     resources_root = env.Dir(env["RESOURCES_ROOT"])
+    resource_overrides = {}
+    for source, relative_target in env.get("RESOURCE_OVERRIDES", ()):
+        target_path = PurePosixPath(relative_target)
+        if target_path.is_absolute() or ".." in target_path.parts:
+            raise StopError(f"Unsafe resource override target: {relative_target}")
+        normalized_target = target_path.as_posix()
+        if normalized_target in resource_overrides:
+            raise StopError(f"Duplicate resource override target: {normalized_target}")
+        resource_overrides[normalized_target] = (
+            source if isinstance(source, File) else env.File(source)
+        )
 
     for app_artifacts in env["FW_EXTAPPS"].application_map.values():
         for _, dist_path in filter(
@@ -33,14 +45,20 @@ def __generate_resources_dist_entries(env):
         for res_file in env.GlobRecursive("*", apps_resource_dir):
             if not isinstance(res_file, File):
                 continue
+            relative_target = res_file.get_path(apps_resource_dir)
+            if relative_target in resource_overrides:
+                continue
             src_target_entries.append(
                 (
                     res_file,
                     resources_root.File(
-                        res_file.get_path(apps_resource_dir),
+                        relative_target,
                     ),
                 )
             )
+
+    for relative_target, source in resource_overrides.items():
+        src_target_entries.append((source, resources_root.File(relative_target)))
 
     # Deploy other stuff from _EXTRA_DIST
     for extra_dist in env["_EXTRA_DIST"]:

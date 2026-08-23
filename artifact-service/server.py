@@ -39,8 +39,8 @@ def _build(version: str, channel: str) -> None:
         _set_state(status="building", version=version, channel=channel, error=None)
         environment = os.environ.copy()
         environment["POISON_RELEASE_PRIVATE_KEY_B64"] = os.environ.get("POISON_RELEASE_PRIVATE_KEY_B64", "")
-        OUTPUT.parent.mkdir(parents=True, exist_ok=True)
-        staging = Path(tempfile.mkdtemp(prefix="poisoned-artifacts-", dir=OUTPUT.parent))
+        OUTPUT.mkdir(parents=True, exist_ok=True)
+        staging = Path(tempfile.mkdtemp(prefix=".poisoned-artifacts-", dir=OUTPUT))
         subprocess.run(
             [
                 "uv", "run", "--no-project", "--python", "3.11", "python",
@@ -53,14 +53,15 @@ def _build(version: str, channel: str) -> None:
             check=True,
             timeout=45 * 60,
         )
-        previous = OUTPUT.with_name(f"{OUTPUT.name}.previous")
-        if previous.exists():
-            shutil.rmtree(previous)
-        if OUTPUT.exists():
-            os.replace(OUTPUT, previous)
-        os.replace(staging, OUTPUT)
-        if previous.exists():
-            shutil.rmtree(previous)
+        for existing in OUTPUT.iterdir():
+            if existing != staging:
+                if existing.is_dir():
+                    shutil.rmtree(existing)
+                else:
+                    existing.unlink()
+        for artifact in staging.iterdir():
+            os.replace(artifact, OUTPUT / artifact.name)
+        staging.rmdir()
         _set_state(status="ready", version=version, channel=channel, error=None)
     except Exception as error:
         _set_state(status="error", error=str(error))

@@ -99,7 +99,18 @@ EspFlasherApp* esp_flasher_app_alloc() {
     return app;
 }
 
-static void esp_flasher_configure_marauder_flipper(EspFlasherApp* app) {
+void esp_flasher_configure_marauder_flipper(EspFlasherApp* app) {
+    furi_assert(app);
+    memset(app->selected_flash_options, 0, sizeof(app->selected_flash_options));
+    memset(app->custom_slot_addrs, 0, sizeof(app->custom_slot_addrs));
+    app->bin_file_path_boot[0] = '\0';
+    app->bin_file_path_part[0] = '\0';
+    app->bin_file_path_nvs[0] = '\0';
+    app->bin_file_path_boot_app0[0] = '\0';
+    app->bin_file_path_app_a[0] = '\0';
+    app->bin_file_path_app_b[0] = '\0';
+    app->bin_file_path_custom[0] = '\0';
+
     app->selected_flash_options[SelectedFlashBoot] = true;
     app->selected_flash_options[SelectedFlashPart] = true;
     app->selected_flash_options[SelectedFlashBootApp0] = true;
@@ -131,6 +142,7 @@ static void esp_flasher_configure_marauder_flipper(EspFlasherApp* app) {
     app->boot = true;
     app->quickflash = true;
     app->turbospeed = true;
+    app->switch_fw = SwitchNotSet;
     scene_manager_next_scene(app->scene_manager, EspFlasherSceneConsoleOutput);
 }
 
