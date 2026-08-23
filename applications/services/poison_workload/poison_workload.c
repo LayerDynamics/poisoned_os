@@ -2,6 +2,7 @@
 #include "poison_workload_i.h"
 
 #include <furi.h>
+#include <applications/services/poison_startup.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -47,6 +48,7 @@ static PoisonWorkloadState state_for_reason(PoisonWorkloadTerminalReason reason)
 }
 
 void poison_workload_on_system_start(void) {
+    if(!poison_startup_is_runtime_boot()) return;
     if(!poison_managed_workloads_mutex)
         poison_managed_workloads_mutex = furi_mutex_alloc(FuriMutexTypeNormal);
     furi_check(poison_managed_workloads_mutex);

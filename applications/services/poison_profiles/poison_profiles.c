@@ -6,6 +6,7 @@
 
 #include <furi.h>
 #include <furi_hal_region.h>
+#include <applications/services/poison_startup.h>
 #include <mbedtls/sha256.h>
 #include <storage/storage.h>
 
@@ -61,6 +62,7 @@ static bool profile_region_valid(const char* value) {
 }
 
 void poison_profiles_on_system_start(void) {
+    if(!poison_startup_is_runtime_boot()) return;
     poison_profiles_mutex = furi_mutex_alloc(FuriMutexTypeNormal);
     poison_profile_store_init(&poison_profiles_store_instance);
     (void)poison_profile_store_load(&poison_profiles_store_instance, POISON_PROFILE_STATE_PATH);

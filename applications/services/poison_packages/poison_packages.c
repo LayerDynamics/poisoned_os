@@ -2,6 +2,7 @@
 #include "poison_package_manager.h"
 
 #include <furi.h>
+#include <applications/services/poison_startup.h>
 #include <storage/storage.h>
 
 #include <mbedtls/sha256.h>
@@ -30,6 +31,7 @@ typedef struct {
 } PoisonPackageStateFile;
 
 void poison_packages_on_system_start(void) {
+    if(!poison_startup_is_runtime_boot()) return;
     poison_package_manager_init(&poison_package_service_manager);
     if(poison_package_manager_load(&poison_package_service_manager, POISON_PACKAGE_STATE_PATH)) {
         (void)poison_packages_recover_storage_state();

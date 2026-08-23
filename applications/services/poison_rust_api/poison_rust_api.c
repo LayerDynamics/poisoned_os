@@ -1,8 +1,11 @@
 #include "poison_rust_api.h"
 
+#include <applications/services/poison_startup.h>
+
 #include <string.h>
 
 void poison_rust_api_on_system_start(void) {
+    if(!poison_startup_is_runtime_boot()) return;
 }
 
 bool poison_rust_byte_slice_valid(PoisonRustByteSlice slice, size_t maximum) {

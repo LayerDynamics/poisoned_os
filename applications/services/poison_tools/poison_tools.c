@@ -28,6 +28,7 @@
 
 #include <furi.h>
 #include <furi_hal_region.h>
+#include <applications/services/poison_startup.h>
 #include <applications/drivers/esp32marauder/esp32_marauder_driver.h>
 
 #define POISON_TOOLS_APP_ID          "org.poison.tools"
@@ -101,6 +102,7 @@ static bool bounded_identifier(const char* value, size_t max_length) {
 }
 
 void poison_tools_on_system_start(void) {
+    if(!poison_startup_is_runtime_boot()) return;
     furi_check(!poison_tools_service);
     poison_tools_service = malloc(sizeof(*poison_tools_service));
     furi_check(poison_tools_service);

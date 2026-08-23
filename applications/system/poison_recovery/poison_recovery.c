@@ -1,5 +1,6 @@
 #include "poison_recovery.h"
 #include <applications/services/poison_diagnostics/poison_diagnostics.h>
+#include <applications/services/poison_startup.h>
 
 #include <string.h>
 
@@ -16,6 +17,7 @@ void poison_recovery_boot_init(PoisonRecovery* recovery, bool device_locked, boo
 }
 
 void poison_recovery_on_system_start(void) {
+    if(!poison_startup_is_runtime_boot()) return;
     poison_recovery_boot_init(&poison_recovery, false, true);
 }
 

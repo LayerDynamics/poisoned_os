@@ -1,5 +1,7 @@
 #include "poison_lessons.h"
 
+#include <applications/services/poison_startup.h>
+
 #include <string.h>
 
 static bool id_valid(const char* value, size_t maximum) {
@@ -21,6 +23,7 @@ static bool digest_valid_or_empty(const char* value) {
 }
 
 void poison_lessons_on_system_start(void) {
+    if(!poison_startup_is_runtime_boot()) return;
 }
 
 bool poison_lesson_init(

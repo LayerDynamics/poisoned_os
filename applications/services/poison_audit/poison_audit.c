@@ -3,6 +3,7 @@
 #include <mbedtls/sha256.h>
 
 #include <furi.h>
+#include <applications/services/poison_startup.h>
 
 #include <string.h>
 
@@ -55,6 +56,7 @@ void poison_audit_init(PoisonAuditChain* chain) {
 }
 
 void poison_audit_on_system_start(void) {
+    if(!poison_startup_is_runtime_boot()) return;
     poison_audit_init(&poison_audit_chain);
     furi_check(!poison_audit_mutex);
     poison_audit_mutex = furi_mutex_alloc(FuriMutexTypeNormal);

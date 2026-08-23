@@ -2,6 +2,7 @@
 
 #include <furi.h>
 #include <toolbox/compress.h>
+#include <applications/services/poison_startup.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -100,6 +101,7 @@ static bool esp32_marauder_registry_init(void) {
 
 void esp32_marauder_driver_on_system_start(void* context) {
     UNUSED(context);
+    if(!poison_startup_is_runtime_boot()) return;
     furi_check(esp32_marauder_registry_init());
 }
 

@@ -53,6 +53,18 @@ button { min-height: 42px; padding: 0 18px; border: 1px solid var(--poison); col
 @media (max-width: 560px) { .masthead, footer { padding: 0 18px; }.masthead-meta span:not(:last-child), footer span:last-child { display: none; }.installer-nav { gap: 9px; margin-right: 12px; font-size: 9px; }.device-bay, .workflow { padding: 30px 20px; }h1 { font-size: 50px; }.device-figure { grid-template-columns: 126px 1fr 50px; min-height: 215px; }.flipper-body { width: 118px; height: 184px; padding: 16px 13px; }.flipper-screen { height: 58px; }.flipper-controls { transform: scale(.8); margin-top: 18px; }.host-port { width: 50px; }.workflow-heading { display: block; }.status-chip { display: block; margin-top: 16px; }.stage { grid-template-columns: 36px 1fr; gap: 12px; }.stage-index { width: 32px; height: 32px; }.stage-title { display: block; }.stage-title span { display: block; margin-top: 7px; }.file-picker { align-items: start; flex-direction: column; }.control-row > * { width: 100%; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; } }
 
+/* Strict two-ink output: no gray, tint, alpha, gradient, or shadow survives rendering. */
+:root { color: #fff; background: #000; --black: #000; --surface: #000; --surface-2: #000; --white: #fff; --muted: #fff; --faint: #fff; --line: #fff; --poison: #fff; --poison-dim: #fff; --danger: #fff; }
+html, body, .installer-shell, .device-bay, .workflow, .flipper-body, .flipper-screen, .host-port, select, .technical-log ol, .message, .confirmation { background: #000; }
+body, h1, h2, h3, p, span, small, strong, em, dt, dd, label, summary, code, .stage-title span, .rail-label, .rail-status, .kicker, footer, footer a { color: #fff; }
+* { border-color: #fff !important; box-shadow: none !important; text-shadow: none !important; opacity: 1 !important; }
+body { background-image: none; }.device-bay::before { background: none; }.device-bay::after { color: #fff; opacity: 1; }.drip-mark { opacity: 1; }.stage { opacity: 1; }.stage::before { background: #fff; }.tool-icon, .tool-icon.active { color: #fff; background: #000; }.rail-status i { background: #fff; }
+.cable-trace, progress, progress::-webkit-progress-bar { background: #000; }.cable-trace span, progress::-webkit-progress-value, progress::-moz-progress-bar { background: #fff; box-shadow: none; }
+.flipper-screen, .flipper-controls i, .confirmation, .message, code, .file-picker:hover, button.quiet:hover:not(:disabled), .status-chip[data-kind="success"], .status-chip[data-kind="working"], .message[data-kind="working"], .message[data-kind="success"], .message[data-kind="error"] { background: #000; }
+button, .stage.active .stage-index { color: #000; background: #fff; }.button:hover:not(:disabled), button:hover:not(:disabled) { color: #000; background: #fff; }.button.quiet, button.quiet { color: #fff; background: #000; }
+.file-picker, .file-picker small, .technical-log time { color: #fff; }.brand-stamp { color: #fff; opacity: 1; }
+button:disabled { color: #fff; background: #000; }
+
 /* Field-tool layer: dense telemetry, hard geometry, and a monochrome poison mark. */
 .device-bay::before { position: absolute; inset: 0; background: linear-gradient(90deg, transparent 0 24px, rgb(255 255 255 / 4%) 24px 25px, transparent 25px 49px), linear-gradient(135deg, transparent 0 68%, rgb(255 255 255 / 5%) 68% 68.2%, transparent 68.2%); content: ""; pointer-events: none; }
 .device-bay::after { content: "F7 / 01"; right: -20px; top: 12px; color: rgb(255 255 255 / 5%); font-size: clamp(100px, 16vw, 240px); }

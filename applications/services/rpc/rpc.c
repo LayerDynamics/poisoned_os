@@ -23,6 +23,7 @@
 #include <bt/bt_service/bt.h>
 #include <dialogs/dialogs.h>
 #include <update_util/update_operation.h>
+#include <applications/services/poison_startup.h>
 
 #define TAG                            "RpcSrv"
 #define RPC_SECURE_REQUEST_PAYLOAD_MAX (768u)
@@ -1226,6 +1227,8 @@ static void rpc_content_update_reset(void* context, uint32_t arg) {
 }
 
 void rpc_on_system_start(void) {
+    if(!poison_startup_is_runtime_boot()) return;
+
     Rpc* rpc = malloc(sizeof(Rpc));
 
     poison_pairing_registry_on_system_start();

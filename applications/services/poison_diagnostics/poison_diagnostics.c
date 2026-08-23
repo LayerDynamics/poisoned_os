@@ -1,5 +1,7 @@
 #include "poison_diagnostics.h"
 
+#include <applications/services/poison_startup.h>
+
 #include <string.h>
 
 static PoisonDiagnostics poison_diagnostics;
@@ -119,6 +121,7 @@ const char* poison_diagnostics_category_name(PoisonDiagnosticCategory category) 
 }
 
 void poison_diagnostics_on_system_start(void) {
+    if(!poison_startup_is_runtime_boot()) return;
     poison_diagnostics_init(&poison_diagnostics);
 }
 

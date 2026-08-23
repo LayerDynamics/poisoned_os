@@ -21,6 +21,8 @@ Promote one channel at a time and retain the exact manifest and output digests.
 
 ## Browser Installer Publication
 
+New-version artifact generation is handled by the dedicated Railway `poisoned-artifacts` service. Set its release variables and call its authenticated `POST /v1/build` endpoint with the new version and channel; the service runs `updater_package`, signs the exact archive, and replaces the served feed/config/package atomically. The service also builds automatically on startup when `POISON_RELEASE_VERSION` is configured. Its private signing key never appears in served artifacts.
+
 The published GitHub release must contain these exact asset names:
 
 - `release.json`, signed by the commissioned firmware release key;

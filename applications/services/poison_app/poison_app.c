@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include <furi.h>
+#include <applications/services/poison_startup.h>
 
 #define RECORD_POISON_APP "poison_app"
 
@@ -40,6 +41,7 @@ static bool poison_app_artifact_path_is_valid(const char* value) {
 }
 
 void poison_app_on_system_start(void) {
+    if(!poison_startup_is_runtime_boot()) return;
     furi_check(!poison_app_service);
     poison_app_service = malloc(sizeof(*poison_app_service));
     furi_check(poison_app_service);

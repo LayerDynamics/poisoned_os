@@ -2,6 +2,7 @@
 #include "poison_evidence_i.h"
 
 #include <furi.h>
+#include <applications/services/poison_startup.h>
 #include <mbedtls/sha256.h>
 #include <storage/storage.h>
 #include <stdio.h>
@@ -271,6 +272,7 @@ const PoisonEvidenceRecord*
 }
 
 void poison_evidence_on_system_start(void) {
+    if(!poison_startup_is_runtime_boot()) return;
     furi_check(!poison_evidence_service);
     poison_evidence_service = malloc(sizeof(*poison_evidence_service));
     furi_check(poison_evidence_service);
