@@ -168,13 +168,15 @@ typedef struct {
 static void rpc_poison_channel_open_process(const PB_Main* request, void* context) {
     RpcPoisonChannel* system = context;
     furi_assert(system);
-    PB_Main response = PB_Main_init_zero;
-    response.command_id = request->command_id;
+    PB_Main* response = rpc_message_alloc();
+    *response = (PB_Main)PB_Main_init_zero;
+    response->command_id = request->command_id;
     if(request->which_content != PB_Main_poison_channel_open_tag || request->has_next ||
        !rpc_session_is_secure_dispatch_active(system->session)) {
-        response.command_status = PB_CommandStatus_ERROR_INVALID_PARAMETERS;
-        response.which_content = PB_Main_empty_tag;
-        rpc_send_and_release(system->session, &response);
+        response->command_status = PB_CommandStatus_ERROR_INVALID_PARAMETERS;
+        response->which_content = PB_Main_empty_tag;
+        rpc_send_and_release(system->session, response);
+        free(response);
         return;
     }
     const PB_Poison_ChannelOpen* input = &request->content.poison_channel_open;
@@ -189,17 +191,19 @@ static void rpc_poison_channel_open_process(const PB_Main* request, void* contex
                            &granted_credits,
                            &granted_sequence);
     if(!valid) {
-        response.command_status = PB_CommandStatus_ERROR_INVALID_PARAMETERS;
-        response.which_content = PB_Main_empty_tag;
-        rpc_send_and_release(system->session, &response);
+        response->command_status = PB_CommandStatus_ERROR_INVALID_PARAMETERS;
+        response->which_content = PB_Main_empty_tag;
+        rpc_send_and_release(system->session, response);
+        free(response);
         return;
     }
-    response.command_status = PB_CommandStatus_OK;
-    response.which_content = PB_Main_poison_channel_opened_tag;
-    strcpy(response.content.poison_channel_opened.channel, input->channel);
-    response.content.poison_channel_opened.granted_credits = granted_credits;
-    response.content.poison_channel_opened.next_sequence = granted_sequence;
-    rpc_send_and_release(system->session, &response);
+    response->command_status = PB_CommandStatus_OK;
+    response->which_content = PB_Main_poison_channel_opened_tag;
+    strcpy(response->content.poison_channel_opened.channel, input->channel);
+    response->content.poison_channel_opened.granted_credits = granted_credits;
+    response->content.poison_channel_opened.next_sequence = granted_sequence;
+    rpc_send_and_release(system->session, response);
+    free(response);
 }
 
 static void rpc_poison_credit_update_process(const PB_Main* request, void* context) {

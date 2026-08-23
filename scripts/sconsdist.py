@@ -242,14 +242,12 @@ class Main(App):
         stack_report_path = self._dist_components.get("firmware.startup-stack.json")
         firmware_elf_path = self._dist_components.get("firmware.elf")
         if not stack_report_path or not firmware_elf_path:
-            self.logger.error(
-                "Firmware startup stack report is required for update bundles"
-            )
+            self.logger.error("Firmware stack report is required for update bundles")
             return 4
         try:
             stack_report = validate_stack_report(stack_report_path, firmware_elf_path)
         except StackAnalysisError as error:
-            self.logger.error(f"Invalid firmware startup stack report: {error}")
+            self.logger.error(f"Invalid firmware stack report: {error}")
             return 4
 
         firmware_dfu_path = self.get_dist_path(

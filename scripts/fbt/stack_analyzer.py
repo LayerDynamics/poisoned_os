@@ -21,6 +21,9 @@ FDE_HEADER = re.compile(
 )
 CFA_OFFSET = re.compile(r"DW_CFA_def_cfa_offset:\s*(?P<bytes>\d+)")
 DIE_HEADER = re.compile(r"^\s*<\d+><[0-9a-fA-F]+>:.*\(DW_TAG_(?P<tag>[^)]+)\)")
+RPC_HANDLER_ASSIGNMENT = re.compile(
+    r"\b(?:message_handler|decode_submessage)\s*=\s*(?P<name>[A-Za-z_]\w*)"
+)
 
 
 class StackAnalysisError(RuntimeError):
@@ -204,12 +207,118 @@ def calculate_stack_path(
     )
 
 
+def parse_rpc_handler_sources(source_paths: tuple[str | Path, ...]) -> tuple[str, ...]:
+    handlers: set[str] = set()
+    for source_path in source_paths:
+        source = Path(source_path)
+        try:
+            contents = source.read_text(encoding="utf-8")
+        except OSError as error:
+            raise StackAnalysisError(
+                f"cannot read RPC source {source}: {error}"
+            ) from error
+        handlers.update(
+            match.group("name")
+            for match in RPC_HANDLER_ASSIGNMENT.finditer(contents)
+            if match.group("name") != "NULL"
+        )
+    if not handlers:
+        raise StackAnalysisError("no RPC handlers found in the configured sources")
+    return tuple(sorted(handlers))
+
+
+def read_stack_budget(path: str | Path, macro: str) -> int:
+    header = Path(path)
+    try:
+        contents = header.read_text(encoding="utf-8")
+    except OSError as error:
+        raise StackAnalysisError(
+            f"cannot read stack budget header {header}: {error}"
+        ) from error
+    match = re.search(
+        rf"^\s*#define\s+{re.escape(macro)}\s+(?P<bytes>\d+)u?\s*$",
+        contents,
+        re.MULTILINE,
+    )
+    if not match:
+        raise StackAnalysisError(f"{header} does not define integer macro {macro}")
+    budget = int(match.group("bytes"))
+    if budget <= 0:
+        raise StackAnalysisError(f"{macro} must be positive")
+    return budget
+
+
+def validate_startup_order(startup_apps: tuple[str, ...] | list[str]) -> None:
+    if len(startup_apps) != len(set(startup_apps)):
+        raise StackAnalysisError("firmware startup order contains duplicate apps")
+    positions = {appid: index for index, appid in enumerate(startup_apps)}
+    required_edges = (
+        ("storage_start", "rpc_start"),
+        ("rpc_start", "expansion_start"),
+    )
+    for required, dependent in required_edges:
+        if required not in positions or dependent not in positions:
+            raise StackAnalysisError(
+                f"firmware startup order is missing {required} or {dependent}"
+            )
+        if positions[required] >= positions[dependent]:
+            raise StackAnalysisError(f"{required} must run before {dependent}")
+
+
+def calculate_rpc_worker_stack(
+    functions: dict[str, Function],
+    root: str,
+    handlers: tuple[str, ...],
+    nested_handler: str,
+    stack_budget: int,
+    terminal_functions: set[str] | None = None,
+) -> dict[str, object]:
+    resolved_root = _resolve_symbol(functions, root)
+    resolved_handlers = tuple(
+        _resolve_symbol(functions, handler) for handler in handlers
+    )
+    resolved_nested_handler = _resolve_symbol(functions, nested_handler)
+    synthetic_calls = {
+        resolved_root: resolved_handlers,
+        resolved_nested_handler: resolved_handlers,
+    }
+    path, indirect_calls, recursive_edges = calculate_stack_path(
+        functions,
+        resolved_root,
+        synthetic_calls,
+        terminal_functions,
+    )
+    result: dict[str, object] = {
+        "stack_budget": stack_budget,
+        "maximum_stack": path.bytes,
+        "maximum_path": list(path.functions),
+        "root": resolved_root,
+        "handlers": list(resolved_handlers),
+        "nested_handler": resolved_nested_handler,
+        "reachable_indirect_calls": list(indirect_calls),
+        "recursive_call_edges": list(recursive_edges),
+        "passed": path.bytes <= stack_budget,
+    }
+    if path.bytes > stack_budget:
+        raise StackAnalysisError(
+            f"RPC worker stack requires {path.bytes} bytes but {root} has {stack_budget}: "
+            + " -> ".join(path.functions)
+        )
+    return result
+
+
 def analyze_startup_stack(
     elf_path: str | Path,
     objdump: str,
     root: str,
     startup_hooks: tuple[str, ...],
     stack_budget: int,
+    *,
+    rpc_sources: tuple[str | Path, ...] = (),
+    rpc_root: str | None = None,
+    rpc_stack_budget: int | None = None,
+    rpc_nested_handler: str | None = None,
+    startup_apps: tuple[str, ...] = (),
 ) -> dict[str, object]:
     elf = Path(elf_path)
     frames = parse_dwarf_frames(_run_objdump(objdump, "--dwarf=frames", str(elf)))
@@ -227,18 +336,36 @@ def analyze_startup_stack(
         {resolved_root: resolved_hooks},
         noreturn_functions,
     )
+    if (
+        not rpc_sources
+        or not rpc_root
+        or rpc_stack_budget is None
+        or not rpc_nested_handler
+    ):
+        raise StackAnalysisError("RPC worker stack configuration is required")
+    rpc_worker = calculate_rpc_worker_stack(
+        functions,
+        rpc_root,
+        parse_rpc_handler_sources(rpc_sources),
+        rpc_nested_handler,
+        rpc_stack_budget,
+        noreturn_functions,
+    )
+    validate_startup_order(startup_apps)
     result: dict[str, object] = {
-        "schema": "poison.startup-stack/v1",
+        "schema": "poison.firmware-stack/v2",
         "elf_sha256": hashlib.sha256(elf.read_bytes()).hexdigest(),
         "stack_budget": stack_budget,
         "maximum_stack": path.bytes,
         "maximum_path": list(path.functions),
         "root": resolved_root,
         "startup_hooks": list(resolved_hooks),
+        "startup_order": list(startup_apps),
         "reachable_indirect_calls": list(indirect_calls),
         "recursive_call_edges": list(recursive_edges),
         "noreturn_functions": sorted(noreturn_functions),
-        "passed": path.bytes <= stack_budget,
+        "rpc_worker": rpc_worker,
+        "passed": path.bytes <= stack_budget and rpc_worker["passed"] is True,
     }
     if path.bytes > stack_budget:
         raise StackAnalysisError(
@@ -260,10 +387,10 @@ def validate_stack_report(
             f"cannot read startup stack report: {error}"
         ) from error
     if (
-        report.get("schema") != "poison.startup-stack/v1"
+        report.get("schema") != "poison.firmware-stack/v2"
         or report.get("passed") is not True
     ):
-        raise StackAnalysisError("startup stack report is not a passing v1 report")
+        raise StackAnalysisError("firmware stack report is not a passing v2 report")
     actual_hash = hashlib.sha256(elf_file.read_bytes()).hexdigest()
     if report.get("elf_sha256") != actual_hash:
         raise StackAnalysisError("startup stack report does not match the firmware ELF")
@@ -271,6 +398,27 @@ def validate_stack_report(
     budget = report.get("stack_budget")
     if not isinstance(maximum, int) or not isinstance(budget, int) or maximum > budget:
         raise StackAnalysisError("startup stack report contains an invalid stack bound")
+    rpc_worker = report.get("rpc_worker")
+    if not isinstance(rpc_worker, dict):
+        raise StackAnalysisError("firmware stack report has no RPC worker bound")
+    rpc_maximum = rpc_worker.get("maximum_stack")
+    rpc_budget = rpc_worker.get("stack_budget")
+    if (
+        rpc_worker.get("passed") is not True
+        or not isinstance(rpc_maximum, int)
+        or not isinstance(rpc_budget, int)
+        or rpc_maximum > rpc_budget
+        or not rpc_worker.get("handlers")
+    ):
+        raise StackAnalysisError(
+            "firmware stack report contains an invalid RPC worker bound"
+        )
+    startup_order = report.get("startup_order")
+    if not isinstance(startup_order, list) or not all(
+        isinstance(appid, str) and appid for appid in startup_order
+    ):
+        raise StackAnalysisError("firmware stack report has no valid startup order")
+    validate_startup_order(startup_order)
     return report
 
 
@@ -282,7 +430,13 @@ def main() -> int:
     parser.add_argument("--objdump", required=True)
     parser.add_argument("--root", required=True)
     parser.add_argument("--hook", action="append", default=[])
+    parser.add_argument("--startup-app", action="append", default=[], required=True)
     parser.add_argument("--budget", required=True, type=int)
+    parser.add_argument("--rpc-root", required=True)
+    parser.add_argument("--rpc-source", action="append", default=[], required=True)
+    parser.add_argument("--rpc-budget-header", required=True)
+    parser.add_argument("--rpc-budget-macro", required=True)
+    parser.add_argument("--rpc-nested-handler", required=True)
     parser.add_argument("--output", required=True)
     args = parser.parse_args()
     try:
@@ -292,6 +446,13 @@ def main() -> int:
             args.root,
             tuple(args.hook),
             args.budget,
+            rpc_sources=tuple(args.rpc_source),
+            rpc_root=args.rpc_root,
+            rpc_stack_budget=read_stack_budget(
+                args.rpc_budget_header, args.rpc_budget_macro
+            ),
+            rpc_nested_handler=args.rpc_nested_handler,
+            startup_apps=tuple(args.startup_app),
         )
     except StackAnalysisError as error:
         parser.error(str(error))

@@ -1,0 +1,27 @@
+---
+import { getCollection } from "astro:content";
+import DocsSidebar from "../../components/DocsSidebar.astro";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+import { sortDocs, toRepositoryDoc } from "../../lib/docs";
+
+const docs = sortDocs((await getCollection("docs")).map(toRepositoryDoc));
+const sections = new Set(docs.map((doc) => doc.section));
+---
+<SiteLayout title="Documentation" description="The generated Poisoned_Os manual: install, operate, build, and understand the browser-controlled Flipper Zero platform.">
+  <div class="docs-layout frame">
+    <DocsSidebar docs={docs} />
+    <main class="docs-main">
+      <div class="doc-kicker"><span>Repository index</span><span>{docs.length} sources · {sections.size} sections</span></div>
+      <h1>Find your way<br /><em>through the system.</em></h1>
+      <p class="doc-intro">This manual is compiled directly from the repository. Browse by intent, search every source, or open the document that owns the behavior you need to understand.</p>
+      <div class="index-callouts">
+        <a href="/docs/getting-started/"><span>START HERE</span><strong>Install and orient yourself</strong><small>README.md · the product thesis, setup path, and operating boundary.</small><i aria-hidden="true">→</i></a>
+        <a href="/docs/specs/spec-1-poisonedos-for-the-flipper-zero/"><span>UNDERSTAND</span><strong>Read the product specification</strong><small>SPEC-1 · the complete browser-controlled device model and release intent.</small><i aria-hidden="true">→</i></a>
+      </div>
+      <section class="index-sections">
+        <div class="section-label"><span>Index</span><span>Every source</span></div>
+        {Array.from(new Set(docs.map((doc) => doc.section))).map((section) => <div class="index-section"><h2>{section}</h2>{docs.filter((doc) => doc.section === section).map((doc) => <a href={`/docs/${doc.slug}/`}><span>{doc.sourcePath}</span><strong>{doc.title}</strong><small>{doc.description}</small><i aria-hidden="true">↗</i></a>)}</div>)}
+      </section>
+    </main>
+  </div>
+</SiteLayout>

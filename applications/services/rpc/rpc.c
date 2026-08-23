@@ -363,13 +363,15 @@ static void rpc_cancel_request_process(const PB_Main* request, void* context) {
             }
         }
     }
-    PB_Main response = PB_Main_init_zero;
-    response.command_id = request->command_id;
-    response.command_status = PB_CommandStatus_OK;
-    response.which_content = PB_Main_poison_cancelled_tag;
-    response.content.poison_cancelled.command_id = target_id;
-    response.content.poison_cancelled.accepted = accepted;
-    rpc_send_and_release(session, &response);
+    PB_Main* response = rpc_message_alloc();
+    *response = (PB_Main)PB_Main_init_zero;
+    response->command_id = request->command_id;
+    response->command_status = PB_CommandStatus_OK;
+    response->which_content = PB_Main_poison_cancelled_tag;
+    response->content.poison_cancelled.command_id = target_id;
+    response->content.poison_cancelled.accepted = accepted;
+    rpc_send_and_release(session, response);
+    free(response);
 }
 
 static void rpc_close_session_process(const PB_Main* request, void* context) {
@@ -887,16 +889,18 @@ bool rpc_session_dispatch_secure_payload(
        payload_length == 0u || payload_length > RPC_SECURE_REQUEST_PAYLOAD_MAX) {
         return false;
     }
-    PB_Main inner = PB_Main_init_zero;
-    inner.cb_content.funcs.decode = rpc_pb_content_callback;
-    inner.cb_content.arg = session;
+    PB_Main* inner = rpc_message_alloc();
+    *inner = (PB_Main)PB_Main_init_zero;
+    inner->cb_content.funcs.decode = rpc_pb_content_callback;
+    inner->cb_content.arg = session;
     pb_istream_t stream = pb_istream_from_buffer(payload, payload_length);
-    if(!pb_decode(&stream, &PB_Main_msg, &inner) || stream.bytes_left != 0u ||
-       inner.which_content == 0u || inner.which_content == PB_Main_poison_session_envelope_tag ||
-       inner.which_content == PB_Main_poison_pairing_hello_tag ||
-       inner.which_content == PB_Main_poison_pairing_challenge_tag ||
-       inner.which_content == PB_Main_poison_pairing_confirm_tag) {
-        pb_release(&PB_Main_msg, &inner);
+    if(!pb_decode(&stream, &PB_Main_msg, inner) || stream.bytes_left != 0u ||
+       inner->which_content == 0u || inner->which_content == PB_Main_poison_session_envelope_tag ||
+       inner->which_content == PB_Main_poison_pairing_hello_tag ||
+       inner->which_content == PB_Main_poison_pairing_challenge_tag ||
+       inner->which_content == PB_Main_poison_pairing_confirm_tag) {
+        pb_release(&PB_Main_msg, inner);
+        free(inner);
         return false;
     }
 
@@ -908,25 +912,26 @@ bool rpc_session_dispatch_secure_payload(
     session->secure_acknowledgement = acknowledgement;
     furi_check(furi_mutex_release(session->secure_mutex) == FuriStatusOk);
 
-    RpcHandler* handler = RpcHandlerDict_get(session->handlers, inner.which_content);
-    const PoisonCapability required = rpc_secure_required_capabilities(inner.which_content);
-    const bool channel_ready = inner.which_content == PB_Main_poison_channel_open_tag ||
+    RpcHandler* handler = RpcHandlerDict_get(session->handlers, inner->which_content);
+    const PoisonCapability required = rpc_secure_required_capabilities(inner->which_content);
+    const bool channel_ready = inner->which_content == PB_Main_poison_channel_open_tag ||
                                rpc_session_secure_channel_is_open(session, channel);
     const bool authorized = channel_ready && required != 0u &&
                             (poison_session->granted_capabilities & required) == required;
     if(!authorized) {
         rpc_send_and_release_empty(
-            session, inner.command_id, PB_CommandStatus_ERROR_INVALID_PARAMETERS);
+            session, inner->command_id, PB_CommandStatus_ERROR_INVALID_PARAMETERS);
     } else if(handler && handler->message_handler) {
-        handler->message_handler(&inner, handler->context);
+        handler->message_handler(inner, handler->context);
     } else {
         rpc_send_and_release_empty(
-            session, inner.command_id, PB_CommandStatus_ERROR_NOT_IMPLEMENTED);
+            session, inner->command_id, PB_CommandStatus_ERROR_NOT_IMPLEMENTED);
     }
     furi_check(furi_mutex_acquire(session->secure_mutex, FuriWaitForever) == FuriStatusOk);
     session->secure_dispatch_active = false;
     furi_check(furi_mutex_release(session->secure_mutex) == FuriStatusOk);
-    pb_release(&PB_Main_msg, &inner);
+    pb_release(&PB_Main_msg, inner);
+    free(inner);
     return true;
 }
 
@@ -1123,7 +1128,8 @@ RpcSession* rpc_session_open(Rpc* rpc, RpcOwner owner) {
     rpc_handler.message_handler = rpc_cancel_request_process;
     rpc_add_handler(session, PB_Main_poison_cancel_request_tag, &rpc_handler);
 
-    session->thread = furi_thread_alloc_ex("RpcSessionWorker", 3072, rpc_session_worker, session);
+    session->thread = furi_thread_alloc_ex(
+        "RpcSessionWorker", RPC_SESSION_STACK_SIZE, rpc_session_worker, session);
 
     furi_thread_set_state_context(session->thread, session);
     furi_thread_set_state_callback(session->thread, rpc_session_thread_state_callback);
@@ -1307,21 +1313,23 @@ static void rpc_send_secure(RpcSession* session, PB_Main* message) {
     furi_check(plaintext);
     furi_check(ciphertext);
     pb_ostream_t inner_stream = pb_ostream_from_buffer(plaintext, payload_capacity);
-    PB_Main fallback = PB_Main_init_zero;
-    PB_Main* encoded_message = message;
-    if(!pb_encode(&inner_stream, &PB_Main_msg, encoded_message)) {
-        fallback.command_id = message->command_id;
-        fallback.command_status = PB_CommandStatus_ERROR_INVALID_PARAMETERS;
-        fallback.which_content = PB_Main_empty_tag;
+    if(!pb_encode(&inner_stream, &PB_Main_msg, message)) {
+        PB_Main* fallback = rpc_message_alloc();
+        *fallback = (PB_Main)PB_Main_init_zero;
+        fallback->command_id = message->command_id;
+        fallback->command_status = PB_CommandStatus_ERROR_INVALID_PARAMETERS;
+        fallback->which_content = PB_Main_empty_tag;
         inner_stream = pb_ostream_from_buffer(plaintext, payload_capacity);
-        furi_check(pb_encode(&inner_stream, &PB_Main_msg, &fallback));
+        furi_check(pb_encode(&inner_stream, &PB_Main_msg, fallback));
+        free(fallback);
     }
 
-    PB_Main outer = PB_Main_init_zero;
-    outer.command_id = message->command_id;
-    outer.command_status = PB_CommandStatus_OK;
-    outer.which_content = PB_Main_poison_session_envelope_tag;
-    PB_Poison_SessionEnvelope* envelope = &outer.content.poison_session_envelope;
+    PB_Main* outer = rpc_message_alloc();
+    *outer = (PB_Main)PB_Main_init_zero;
+    outer->command_id = message->command_id;
+    outer->command_status = PB_CommandStatus_OK;
+    outer->which_content = PB_Main_poison_session_envelope_tag;
+    PB_Poison_SessionEnvelope* envelope = &outer->content.poison_session_envelope;
     PoisonSession* poison_session = session->secure_session;
     furi_check(poison_session);
     envelope->protocol_version = poison_session->protocol_version;
@@ -1343,7 +1351,8 @@ static void rpc_send_secure(RpcSession* session, PB_Main* message) {
     memcpy(envelope->payload.bytes, ciphertext, inner_stream.bytes_written);
     memset(plaintext, 0, inner_stream.bytes_written);
     memset(ciphertext, 0, inner_stream.bytes_written);
-    rpc_send_plain(session, &outer);
+    rpc_send_plain(session, outer);
+    free(outer);
     free(ciphertext);
     free(plaintext);
 }
@@ -1367,16 +1376,24 @@ void rpc_send_and_release(RpcSession* session, PB_Main* message) {
     pb_release(&PB_Main_msg, message);
 }
 
+PB_Main* rpc_message_alloc(void) {
+    PB_Main* message = malloc(sizeof(*message));
+    furi_check(message);
+    *message = (PB_Main)PB_Main_init_zero;
+    return message;
+}
+
 void rpc_send_and_release_empty(RpcSession* session, uint32_t command_id, PB_CommandStatus status) {
     furi_assert(session);
 
-    PB_Main message = {
+    PB_Main* message = rpc_message_alloc();
+    *message = (PB_Main){
         .command_id = command_id,
         .command_status = status,
         .has_next = false,
         .which_content = PB_Main_empty_tag,
     };
 
-    rpc_send_and_release(session, &message);
-    pb_release(&PB_Main_msg, &message);
+    rpc_send_and_release(session, message);
+    free(message);
 }

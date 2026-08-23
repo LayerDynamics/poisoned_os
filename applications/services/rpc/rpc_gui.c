@@ -267,7 +267,8 @@ static void rpc_system_gui_virtual_display_input_callback(InputEvent* event, voi
 
     FURI_LOG_D(TAG, "VirtualDisplay: SendInputEvent");
 
-    PB_Main rpc_message = {
+    PB_Main* rpc_message = rpc_message_alloc();
+    *rpc_message = (PB_Main){
         .command_id = 0,
         .command_status = PB_CommandStatus_OK,
         .has_next = false,
@@ -276,7 +277,8 @@ static void rpc_system_gui_virtual_display_input_callback(InputEvent* event, voi
         .content.gui_send_input_event_request.type = (int32_t)event->type,
     };
 
-    rpc_send_and_release(session, &rpc_message);
+    rpc_send_and_release(session, rpc_message);
+    free(rpc_message);
 }
 
 static void rpc_system_gui_start_virtual_display_process(const PB_Main* request, void* context) {

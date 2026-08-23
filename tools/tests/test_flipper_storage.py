@@ -201,11 +201,22 @@ class DeviceInstallTests(unittest.TestCase):
         (bundle / "startup-stack.json").write_text(
             json.dumps(
                 {
-                    "schema": "poison.startup-stack/v1",
+                    "schema": "poison.firmware-stack/v2",
                     "passed": True,
                     "stack_budget": 2048,
                     "maximum_stack": 1512,
                     "startup_hooks": ["fixture_start"],
+                    "startup_order": [
+                        "storage_start",
+                        "rpc_start",
+                        "expansion_start",
+                    ],
+                    "rpc_worker": {
+                        "passed": True,
+                        "stack_budget": 6144,
+                        "maximum_stack": 4616,
+                        "handlers": ["rpc_fixture_process"],
+                    },
                     "firmware_dfu_sha256": hashlib.sha256(b"dfu").hexdigest(),
                 }
             ),
@@ -213,13 +224,31 @@ class DeviceInstallTests(unittest.TestCase):
         )
         return manifest
 
-    def test_bundle_preflight_rejects_dfu_that_does_not_match_stack_report(self) -> None:
+    def test_bundle_preflight_rejects_dfu_that_does_not_match_stack_report(
+        self,
+    ) -> None:
         module = load_device_install_module()
         with tempfile.TemporaryDirectory() as directory:
             bundle = Path(directory)
             manifest = self.write_passing_bundle(bundle)
             (bundle / "firmware.dfu").write_bytes(b"changed")
             with self.assertRaisesRegex(RuntimeError, "does not match firmware.dfu"):
+                module.validate_update_bundle(manifest)
+
+    def test_bundle_preflight_rejects_rpc_before_storage(self) -> None:
+        module = load_device_install_module()
+        with tempfile.TemporaryDirectory() as directory:
+            bundle = Path(directory)
+            manifest = self.write_passing_bundle(bundle)
+            report_path = bundle / "startup-stack.json"
+            report = json.loads(report_path.read_text(encoding="utf-8"))
+            report["startup_order"] = [
+                "rpc_start",
+                "storage_start",
+                "expansion_start",
+            ]
+            report_path.write_text(json.dumps(report), encoding="utf-8")
+            with self.assertRaisesRegex(RuntimeError, "invalid startup order"):
                 module.validate_update_bundle(manifest)
 
     def test_rpc_install_retains_complete_bundle_at_bootstrap_lkg_path(self) -> None:
@@ -253,9 +282,9 @@ class DeviceInstallTests(unittest.TestCase):
         self.assertIn("poison_esp_flasher_fap,", source)
         self.assertIn('"--marauder-target",', source)
         self.assertIn('POST_INSTALL_ARGS=["--skip-marauder"]', source)
-        builder = (
-            REPOSITORY_ROOT / "scripts" / "fbt_tools" / "fbt_dist.py"
-        ).read_text(encoding="utf-8")
+        builder = (REPOSITORY_ROOT / "scripts" / "fbt_tools" / "fbt_dist.py").read_text(
+            encoding="utf-8"
+        )
         self.assertIn("*extra_deps,\n        ),\n        **kw,", builder)
 
     def test_successful_normal_install_provisions_exact_marauder_target(self) -> None:
@@ -263,7 +292,9 @@ class DeviceInstallTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             manifest = self.write_passing_bundle(Path(directory))
             fap = Path(directory) / "flasher.fap"
-            with mock.patch.object(module, "install", return_value=0), mock.patch.object(
+            with mock.patch.object(
+                module, "install", return_value=0
+            ), mock.patch.object(
                 module, "provision_marauder", return_value=0
             ) as provision:
                 result = module.main(
@@ -285,9 +316,9 @@ class DeviceInstallTests(unittest.TestCase):
         module = load_device_install_module()
         with tempfile.TemporaryDirectory() as directory:
             manifest = self.write_passing_bundle(Path(directory))
-            with mock.patch.object(module, "install", return_value=0), mock.patch.object(
-                module, "provision_marauder"
-            ) as provision:
+            with mock.patch.object(
+                module, "install", return_value=0
+            ), mock.patch.object(module, "provision_marauder") as provision:
                 result = module.main(["--skip-marauder", str(manifest)])
 
         self.assertEqual(result, 0)
@@ -316,11 +347,11 @@ Found DFU: [0483:df11] alt=1 serial="2075308D4242"
 Found DFU: [0483:df11] alt=0 serial="2075308D4242"
 """
 
-        self.assertEqual(
-            module.parse_flipper_dfu_serials(output), ["2075308D4242"]
-        )
+        self.assertEqual(module.parse_flipper_dfu_serials(output), ["2075308D4242"])
 
-    def test_recovery_accepts_late_qflipper_error_only_after_live_rpc_identity(self) -> None:
+    def test_recovery_accepts_late_qflipper_error_only_after_live_rpc_identity(
+        self,
+    ) -> None:
         module = load_device_install_module()
         device_info = {
             "hardware_model": "Flipper Zero",
@@ -353,7 +384,9 @@ Found DFU: [0483:df11] alt=0 serial="2075308D4242"
             module, "run_qflipper_repair", return_value=1
         ), mock.patch.object(
             module, "wait_for_flipper_runtime", return_value=None
-        ), mock.patch.object(module, "_probe_rpc") as probe:
+        ), mock.patch.object(
+            module, "_probe_rpc"
+        ) as probe:
             with self.assertRaisesRegex(
                 RuntimeError, "qFlipper exited with status 1.*runtime did not return"
             ):
@@ -383,17 +416,19 @@ Found DFU: [0483:df11] alt=0 serial="2075308D4242"
         manifest = mock.Mock()
         manifest.is_file.return_value = True
 
-        with mock.patch.object(module, "detect_flipper_dfu", return_value=None), mock.patch.object(
+        with mock.patch.object(
+            module, "detect_flipper_dfu", return_value=None
+        ), mock.patch.object(
             module, "run_rpc_update", return_value=0
         ) as rpc_update, mock.patch.object(
             module, "verify_poisoned_os", return_value=True
-        ) as verify, mock.patch.object(module, "run_qflipper_repair") as repair:
+        ) as verify, mock.patch.object(
+            module, "run_qflipper_repair"
+        ) as repair:
             result = module.install("/dev/fixture", manifest, ["--fixture"])
 
         self.assertEqual(result, 0)
-        rpc_update.assert_called_once_with(
-            "/dev/fixture", manifest, ["--fixture"]
-        )
+        rpc_update.assert_called_once_with("/dev/fixture", manifest, ["--fixture"])
         verify.assert_called_once_with("/dev/fixture")
         repair.assert_not_called()
 
@@ -417,9 +452,7 @@ Found DFU: [0483:df11] alt=0 serial="2075308D4242"
 
         self.assertEqual(result, 0)
         recover.assert_called_once_with("2075308D4242")
-        rpc_update.assert_called_once_with(
-            "/dev/cu.usbmodemflip_Osprit1", manifest, []
-        )
+        rpc_update.assert_called_once_with("/dev/cu.usbmodemflip_Osprit1", manifest, [])
         verify.assert_called_once_with("/dev/cu.usbmodemflip_Osprit1")
 
     def test_failed_selfupdate_recovers_only_when_flipper_enters_dfu(self) -> None:
@@ -474,9 +507,7 @@ Found DFU: [0483:df11] alt=0 serial="2075308D4242"
         ) as rpc_update, mock.patch.object(
             module, "verify_poisoned_os"
         ) as verify:
-            result = module.install(
-                "/dev/cu.usbmodemflip_Osprit1", manifest, []
-            )
+            result = module.install("/dev/cu.usbmodemflip_Osprit1", manifest, [])
 
         self.assertEqual(result, 3)
         self.assertEqual(
@@ -488,9 +519,7 @@ Found DFU: [0483:df11] alt=0 serial="2075308D4242"
         )
         wait_dfu.assert_called_once_with()
         repair.assert_not_called()
-        rpc_update.assert_called_once_with(
-            "/dev/cu.usbmodemflip_Osprit1", manifest, []
-        )
+        rpc_update.assert_called_once_with("/dev/cu.usbmodemflip_Osprit1", manifest, [])
         verify.assert_not_called()
 
     def test_failed_runtime_rpc_waits_for_dfu_then_recovers_and_retries(self) -> None:
@@ -515,9 +544,7 @@ Found DFU: [0483:df11] alt=0 serial="2075308D4242"
         ) as rpc_update, mock.patch.object(
             module, "verify_poisoned_os", return_value=True
         ):
-            result = module.install(
-                "/dev/cu.usbmodemflip_Osprit1", manifest, []
-            )
+            result = module.install("/dev/cu.usbmodemflip_Osprit1", manifest, [])
 
         self.assertEqual(result, 0)
         wait_dfu.assert_called_once_with()
@@ -526,7 +553,9 @@ Found DFU: [0483:df11] alt=0 serial="2075308D4242"
         )
         self.assertEqual(rpc_update.call_count, 2)
 
-    def test_successful_update_timeout_recovers_device_without_retrying_update(self) -> None:
+    def test_successful_update_timeout_recovers_device_without_retrying_update(
+        self,
+    ) -> None:
         module = load_device_install_module()
         manifest = mock.Mock()
         manifest.is_file.return_value = True
@@ -551,7 +580,9 @@ Found DFU: [0483:df11] alt=0 serial="2075308D4242"
         self.assertEqual(result, 6)
         recover.assert_called_once_with("flip_fixture")
 
-    def test_post_install_verification_allows_full_update_and_unlock_window(self) -> None:
+    def test_post_install_verification_allows_full_update_and_unlock_window(
+        self,
+    ) -> None:
         module = load_device_install_module()
 
         self.assertGreaterEqual(module.POST_INSTALL_TIMEOUT, 600.0)
@@ -581,13 +612,13 @@ Found DFU: [0483:df11] alt=0 serial="2075308D4242"
             module,
             "detect_flipper_runtime",
             return_value=("/dev/cu.fixture", "flip_fixture"),
-        ), mock.patch.object(
-            module, "FlipperRpc", return_value=rpc
-        ), mock.patch.object(
+        ), mock.patch.object(module, "FlipperRpc", return_value=rpc), mock.patch.object(
             module.time, "monotonic", side_effect=monotonic
         ), mock.patch.object(
             module.time, "sleep", side_effect=sleep
-        ), mock.patch("sys.stderr", stderr):
+        ), mock.patch(
+            "sys.stderr", stderr
+        ):
             result = module.verify_poisoned_os("/dev/cu.fixture", timeout=1.0)
 
         self.assertFalse(result)
@@ -603,7 +634,9 @@ Found DFU: [0483:df11] alt=0 serial="2075308D4242"
             ("88", "61"),
         )
 
-    def test_post_install_verification_bounds_rpc_attempt_by_remaining_time(self) -> None:
+    def test_post_install_verification_bounds_rpc_attempt_by_remaining_time(
+        self,
+    ) -> None:
         module = load_device_install_module()
         clock = [0.0]
 
@@ -625,7 +658,9 @@ Found DFU: [0483:df11] alt=0 serial="2075308D4242"
             module.time, "monotonic", side_effect=monotonic
         ), mock.patch.object(
             module.time, "sleep", side_effect=sleep
-        ), mock.patch("sys.stderr", new_callable=io.StringIO):
+        ), mock.patch(
+            "sys.stderr", new_callable=io.StringIO
+        ):
             result = module.verify_poisoned_os("/dev/cu.fixture", timeout=3.0)
 
         self.assertFalse(result)
@@ -653,19 +688,21 @@ Found DFU: [0483:df11] alt=0 serial="2075308D4242"
             module,
             "detect_flipper_runtime",
             return_value=("/dev/cu.fixture", "flip_fixture"),
-        ), mock.patch.object(
-            module, "FlipperRpc", return_value=rpc
-        ), mock.patch.object(
+        ), mock.patch.object(module, "FlipperRpc", return_value=rpc), mock.patch.object(
             module.time, "monotonic", side_effect=monotonic
         ), mock.patch.object(
             module.time, "sleep", side_effect=sleep
-        ), mock.patch("sys.stderr", stderr):
+        ), mock.patch(
+            "sys.stderr", stderr
+        ):
             result = module.verify_poisoned_os("/dev/cu.fixture", timeout=3.0)
 
         self.assertFalse(result)
         self.assertIn("unlock the device", stderr.getvalue())
 
-    def test_failed_identity_check_enters_diagnosis_but_never_retries_update(self) -> None:
+    def test_failed_identity_check_enters_diagnosis_but_never_retries_update(
+        self,
+    ) -> None:
         module = load_device_install_module()
         manifest = mock.Mock()
         manifest.is_file.return_value = True
@@ -785,9 +822,7 @@ Found DFU: [0483:df11] alt=0 serial="2075308D4242"
             module,
             "detect_flipper_runtime",
             return_value=("/dev/cu.fixture", "flip_fixture"),
-        ), mock.patch.object(
-            module, "FlipperRpc", return_value=rpc
-        ) as rpc_class:
+        ), mock.patch.object(module, "FlipperRpc", return_value=rpc) as rpc_class:
             result = module.preflight("auto")
 
         self.assertEqual(result, 0)
@@ -804,11 +839,11 @@ Found DFU: [0483:df11] alt=0 serial="2075308D4242"
             module,
             "detect_flipper_runtime",
             return_value=("/dev/cu.fixture", "flip_fixture"),
-        ), mock.patch.object(
-            module, "FlipperRpc", return_value=rpc
-        ), mock.patch.object(
+        ), mock.patch.object(module, "FlipperRpc", return_value=rpc), mock.patch.object(
             module, "run_qflipper_runtime_repair", return_value=None
-        ), mock.patch.object(module, "detect_flipper_dfu", return_value=None):
+        ), mock.patch.object(
+            module, "detect_flipper_dfu", return_value=None
+        ):
             result = module.preflight("auto")
 
         self.assertEqual(result, 4)

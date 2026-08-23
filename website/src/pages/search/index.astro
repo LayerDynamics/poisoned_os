@@ -1,0 +1,12 @@
+---
+import SiteLayout from "../../layouts/SiteLayout.astro";
+---
+<SiteLayout title="Search" description="Search every generated Poisoned_Os documentation source.">
+  <main class="search-page frame">
+    <p class="eyebrow">Repository search</p>
+    <h1>Search the manual.</h1>
+    <form class="search-page-form" action="/search/" role="search"><input id="search-input" name="q" type="search" placeholder="Try pairing, evidence, release…" autofocus /><button class="button button-primary" type="submit">Search <span aria-hidden="true">→</span></button></form>
+    <div id="search-results" class="search-results" aria-live="polite"><p class="search-status">Loading the repository index…</p></div>
+  </main>
+  <script is:inline src="/scripts/search.js"></script>
+</SiteLayout>

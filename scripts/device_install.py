@@ -25,6 +25,7 @@ if str(SCRIPTS_ROOT) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_ROOT))
 
 from flipper.rpc import RPC_TIMEOUT, FlipperRpc, RpcError
+from fbt.stack_analyzer import StackAnalysisError, validate_startup_order
 
 
 def read_expected_firmware_api(path: Path) -> tuple[str, str]:
@@ -180,15 +181,37 @@ def validate_update_bundle(manifest: Path) -> None:
         raise RuntimeError(f"cannot read startup stack report: {error}") from error
     maximum = report.get("maximum_stack")
     budget = report.get("stack_budget")
+    rpc_worker = report.get("rpc_worker")
+    rpc_maximum = (
+        rpc_worker.get("maximum_stack") if isinstance(rpc_worker, dict) else None
+    )
+    rpc_budget = (
+        rpc_worker.get("stack_budget") if isinstance(rpc_worker, dict) else None
+    )
     if (
-        report.get("schema") != "poison.startup-stack/v1"
+        report.get("schema") != "poison.firmware-stack/v2"
         or report.get("passed") is not True
         or not isinstance(maximum, int)
         or not isinstance(budget, int)
         or maximum > budget
         or not report.get("startup_hooks")
+        or not isinstance(rpc_worker, dict)
+        or rpc_worker.get("passed") is not True
+        or not isinstance(rpc_maximum, int)
+        or not isinstance(rpc_budget, int)
+        or rpc_maximum > rpc_budget
+        or not rpc_worker.get("handlers")
     ):
-        raise RuntimeError("update bundle has an invalid startup stack report")
+        raise RuntimeError("update bundle has an invalid firmware stack report")
+    startup_order = report.get("startup_order")
+    if not isinstance(startup_order, list):
+        raise RuntimeError("update bundle has no validated startup order")
+    try:
+        validate_startup_order(startup_order)
+    except StackAnalysisError as error:
+        raise RuntimeError(
+            f"update bundle has an invalid startup order: {error}"
+        ) from error
     expected_dfu_hash = report.get("firmware_dfu_sha256")
     if not isinstance(expected_dfu_hash, str) or not re.fullmatch(
         r"[0-9a-f]{64}", expected_dfu_hash

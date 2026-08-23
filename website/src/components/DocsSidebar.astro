@@ -1,0 +1,35 @@
+---
+import type { RepositoryDoc } from "../lib/docs";
+import { docsBySection } from "../lib/docs";
+
+interface Props {
+  docs: RepositoryDoc[];
+  currentSlug?: string;
+}
+
+const { docs, currentSlug } = Astro.props;
+const groups = docsBySection(docs);
+---
+<aside class="docs-sidebar">
+  <div class="sidebar-heading">
+    <p class="eyebrow">Repository manual</p>
+    <h1>Documentation</h1>
+    <p class="sidebar-copy">Every published page is built from the Markdown already living in Poisoned_Os.</p>
+  </div>
+  <form class="search-box" action="/search/" role="search">
+    <span aria-hidden="true">⌕</span>
+    <input name="q" type="search" placeholder="Search the repository" autocomplete="off" />
+    <kbd>/</kbd>
+  </form>
+  <nav class="doc-nav" aria-label="Documentation sections">
+    {Array.from(groups.entries()).map(([section, entries]) => (
+      <details open={entries.some((entry) => entry.slug === currentSlug) || section === "Start here"}>
+        <summary>{section}<span>{entries.length.toString().padStart(2, "0")}</span></summary>
+        <div class="nav-items">
+          {entries.map((entry) => <a class:list={{ active: entry.slug === currentSlug }} href={`/docs/${entry.slug}/`}>{entry.title}</a>)}
+        </div>
+      </details>
+    ))}
+  </nav>
+  <a class="sidebar-source" href="https://github.com/LayerDynamics/poisoned_os/tree/main/docs">Browse docs in GitHub <span aria-hidden="true">↗</span></a>
+</aside>

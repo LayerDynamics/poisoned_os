@@ -272,3 +272,4 @@ body, h1, h2, h3, p, span, small, strong, em, dt, dd, a, .markdown, .markdown p,
 .docs-sidebar h1 { font-size: 52px; }.doc-content > h1, .doc-results > h1 { font-size: clamp(54px, 6vw, 86px); }.doc-intro { margin-bottom: 46px; }
 @media (max-width: 900px) { .hero.section-pad { grid-template-columns: 1fr; gap: 54px; }.hero-instrument { max-width: 620px; }.proof-strip, .capabilities, .manifest, .closing, .topbar, .site-footer, .docs-layout { width: calc(100% - 48px); } }
 @media (max-width: 620px) { .hero.section-pad { width: calc(100% - 32px); padding-top: 58px; padding-bottom: 70px; }.hero h1 { font-size: clamp(54px, 16vw, 82px); }.hero-instrument { min-height: 380px; }.flipper-photo { inset: 74px 7% 58px 16%; }.instrument-readout { right: 4%; bottom: 96px; }.proof-strip, .capabilities, .manifest, .closing, .docs-layout { width: calc(100% - 32px); }.topbar, .site-footer { width: calc(100% - 32px); } }
+@import "./styles/global.css";

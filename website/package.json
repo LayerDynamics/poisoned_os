@@ -8,9 +8,9 @@
   },
   "type": "module",
   "scripts": {
-    "build": "vite build",
-    "dev": "vite",
-    "typecheck": "tsc --noEmit",
+    "build": "astro build",
+    "dev": "astro dev",
+    "typecheck": "astro check",
     "verify": "pnpm typecheck && pnpm build"
   },
   "dependencies": {
@@ -18,7 +18,10 @@
     "marked": "16.3.0"
   },
   "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@astrojs/markdown-remark": "^7.2.4",
     "@types/node": "24.3.0",
+    "astro": "^7.2.4",
     "typescript": "5.9.2",
     "vite": "7.1.3"
   }

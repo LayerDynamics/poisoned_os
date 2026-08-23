@@ -185,16 +185,17 @@ static void rpc_poison_profile_preview_process(const PB_Main* request, void* con
     }
     uint64_t session_id;
     PoisonRole role;
-    PoisonProfile profile;
+    PoisonProfile* profile = malloc(sizeof(*profile));
+    furi_check(profile);
     uint8_t command[POISON_CONFIRMATION_DIGEST_BYTES];
     uint8_t target[POISON_CONFIRMATION_DIGEST_BYTES];
     uint8_t consequence[POISON_CONFIRMATION_DIGEST_BYTES];
     const uint64_t now_ms = ((uint64_t)furi_get_tick() * 1000u) / furi_kernel_get_tick_frequency();
     const bool previewed =
         rpc_session_get_secure_identity(profiles->session, &session_id, &role) &&
-        rpc_poison_profile_from_pb(&request->content.poison_profile, &profile) &&
-        poison_profiles_preview_global(&profile, poison_policy_role_capabilities(role)) &&
-        rpc_poison_profile_digests(&profile, command, target, consequence) &&
+        rpc_poison_profile_from_pb(&request->content.poison_profile, profile) &&
+        poison_profiles_preview_global(profile, poison_policy_role_capabilities(role)) &&
+        rpc_poison_profile_digests(profile, command, target, consequence) &&
         poison_confirmation_issue(
             &profiles->confirmation,
             session_id,
@@ -216,17 +217,18 @@ static void rpc_poison_profile_preview_process(const PB_Main* request, void* con
         request->content.poison_profile.id,
         previewed);
     if(!previewed) {
-        memset(&profile, 0, sizeof(profile));
+        memset(profile, 0, sizeof(*profile));
+        free(profile);
         rpc_send_and_release_empty(
             profiles->session, request->command_id, PB_CommandStatus_ERROR_INVALID_PARAMETERS);
         return;
     }
-    strcpy(profiles->preview_id, profile.id);
-    PB_Main* response = malloc(sizeof(PB_Main));
-    furi_check(response);
+    strcpy(profiles->preview_id, profile->id);
+    PB_Main* response = rpc_message_alloc();
     rpc_poison_profile_status(
-        response, request->command_id, &profile, &profiles->confirmation, true);
-    memset(&profile, 0, sizeof(profile));
+        response, request->command_id, profile, &profiles->confirmation, true);
+    memset(profile, 0, sizeof(*profile));
+    free(profile);
     rpc_send_and_release(profiles->session, response);
     free(response);
 }
@@ -240,8 +242,10 @@ static void rpc_poison_profile_apply_process(const PB_Main* request, void* conte
         return;
     }
     const PB_Poison_ProfileApply* apply = &request->content.poison_profile_apply;
-    PoisonProfile active;
-    PoisonProfile preview;
+    PoisonProfile* active = malloc(sizeof(*active));
+    PoisonProfile* preview = malloc(sizeof(*preview));
+    furi_check(active);
+    furi_check(preview);
     bool preview_valid = false;
     uint64_t session_id;
     PoisonRole role;
@@ -253,13 +257,14 @@ static void rpc_poison_profile_apply_process(const PB_Main* request, void* conte
         apply->confirmation_token[0] == '\0' &&
         apply->confirmation_token_bytes.size == POISON_CONFIRMATION_TOKEN_BYTES &&
         strcmp(apply->profile_id, profiles->preview_id) == 0 &&
-        poison_profiles_copy_global(&active, &preview, &preview_valid) && preview_valid &&
-        strcmp(preview.id, apply->profile_id) == 0 &&
+        poison_profiles_copy_global(active, preview, &preview_valid) && preview_valid &&
+        strcmp(preview->id, apply->profile_id) == 0 &&
         rpc_session_get_secure_identity(profiles->session, &session_id, &role) &&
-        rpc_poison_profile_digests(&preview, command, target, consequence);
+        rpc_poison_profile_digests(preview, command, target, consequence);
     const bool physical =
-        prepared && rpc_session_request_profile_confirmation(
-                        profiles->session, preview.id, preview.version, preview.capability_mask);
+        prepared &&
+        rpc_session_request_profile_confirmation(
+            profiles->session, preview->id, preview->version, preview->capability_mask);
     const uint64_t approval_now_ms =
         ((uint64_t)furi_get_tick() * 1000u) / furi_kernel_get_tick_frequency();
     const bool approved = physical && poison_confirmation_approve(
@@ -279,18 +284,22 @@ static void rpc_poison_profile_apply_process(const PB_Main* request, void* conte
     memset(command, 0, sizeof(command));
     memset(target, 0, sizeof(target));
     memset(consequence, 0, sizeof(consequence));
-    memset(&active, 0, sizeof(active));
-    memset(&preview, 0, sizeof(preview));
+    memset(active, 0, sizeof(*active));
+    memset(preview, 0, sizeof(*preview));
     profiles->preview_id[0] = '\0';
-    if(!applied || !poison_profiles_copy_global(&active, NULL, NULL)) {
+    if(!applied || !poison_profiles_copy_global(active, NULL, NULL)) {
+        free(preview);
+        free(active);
         rpc_send_and_release_empty(
             profiles->session, request->command_id, PB_CommandStatus_ERROR_INVALID_PARAMETERS);
         return;
     }
     PB_Main* response = malloc(sizeof(PB_Main));
     furi_check(response);
-    rpc_poison_profile_status(response, request->command_id, &active, NULL, false);
-    memset(&active, 0, sizeof(active));
+    rpc_poison_profile_status(response, request->command_id, active, NULL, false);
+    memset(active, 0, sizeof(*active));
+    free(preview);
+    free(active);
     rpc_send_and_release(profiles->session, response);
     free(response);
 }

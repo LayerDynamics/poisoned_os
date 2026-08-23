@@ -388,11 +388,12 @@ static void rpc_poison_workload_status(
     const char* requested_workload_id,
     bool accepted,
     const char* message) {
-    PB_Main response = PB_Main_init_zero;
-    response.command_id = command_id;
-    response.command_status = PB_CommandStatus_OK;
-    response.which_content = PB_Main_poison_workload_status_tag;
-    PB_Poison_WorkloadStatus* status = &response.content.poison_workload_status;
+    PB_Main* response = rpc_message_alloc();
+    *response = (PB_Main)PB_Main_init_zero;
+    response->command_id = command_id;
+    response->command_status = PB_CommandStatus_OK;
+    response->which_content = PB_Main_poison_workload_status_tag;
+    PB_Poison_WorkloadStatus* status = &response->content.poison_workload_status;
     PoisonManagedWorkload* managed = rpc_workload->managed;
     if(managed && managed->occupied && requested_workload_id &&
        strcmp(managed->workload.workload_id, requested_workload_id) == 0) {
@@ -420,7 +421,8 @@ static void rpc_poison_workload_status(
     }
     status->accepted = accepted;
     if(message) snprintf(status->message, sizeof(status->message), "%s", message);
-    rpc_send_and_release(rpc_workload->session, &response);
+    rpc_send_and_release(rpc_workload->session, response);
+    free(response);
 }
 
 static void rpc_poison_workload_console(
@@ -428,21 +430,23 @@ static void rpc_poison_workload_console(
     uint32_t command_id,
     uint64_t from_sequence) {
     const PoisonWorkload* workload = poison_workload_get(&rpc_workload->managed->workload);
+    PB_Main* response = rpc_message_alloc();
     for(size_t index = 0u; index < workload->console_count; ++index) {
         const PoisonWorkloadConsoleFrame* source = &workload->console[index];
         if(source->sequence < from_sequence) continue;
-        PB_Main response = PB_Main_init_zero;
-        response.command_id = command_id;
-        response.command_status = PB_CommandStatus_OK;
-        response.has_next = true;
-        response.which_content = PB_Main_poison_workload_console_tag;
-        PB_Poison_WorkloadConsoleFrame* frame = &response.content.poison_workload_console;
+        *response = (PB_Main)PB_Main_init_zero;
+        response->command_id = command_id;
+        response->command_status = PB_CommandStatus_OK;
+        response->has_next = true;
+        response->which_content = PB_Main_poison_workload_console_tag;
+        PB_Poison_WorkloadConsoleFrame* frame = &response->content.poison_workload_console;
         strcpy(frame->workload_id, workload->workload_id);
         frame->sequence = source->sequence;
         frame->type = (PB_Poison_WorkloadConsoleType)source->type;
         strcpy(frame->text, source->text);
-        rpc_send_and_release(rpc_workload->session, &response);
+        rpc_send_and_release(rpc_workload->session, response);
     }
+    free(response);
 }
 
 static void rpc_poison_workload_audit(

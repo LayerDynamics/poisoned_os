@@ -1,0 +1,43 @@
+---
+import "../styles/global.css";
+
+interface Props {
+  title: string;
+  description: string;
+  active?: "product" | "docs";
+}
+
+const { title, description, active = "docs" } = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="theme-color" content="#10130f" />
+    <meta name="description" content={description} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <title>{title} · Poisoned_Os</title>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Poisoned_Os home">
+        <span class="brand-mark" aria-hidden="true">☣</span>
+        <span>Poisoned_Os</span>
+      </a>
+      <nav class="topnav" aria-label="Primary navigation">
+        <a class:list={{ active: active === "docs" }} href="/docs/">Docs</a>
+        <a class:list={{ active: active === "product" }} href="/">Product</a>
+        <a href="https://web-installer-production.up.railway.app">Install over USB <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/LayerDynamics/poisoned_os">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+    </header>
+    <slot />
+    <footer class="site-footer">
+      <a class="brand" href="/"><span class="brand-mark" aria-hidden="true">☣</span><span>Poisoned_Os</span></a>
+      <span>GPLv3 · authorized research, labs, and education</span>
+      <span>Generated from the repository</span>
+    </footer>
+    <script is:inline src="/scripts/site.js"></script>
+  </body>
+</html>

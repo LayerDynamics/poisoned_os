@@ -185,29 +185,35 @@ static bool poison_profile_state_valid(const PoisonProfileState* state) {
 
 bool poison_profile_store_save(const PoisonProfileStore* store, const char* path) {
     if(!store || !path || path[0] != '/' || strstr(path, "..")) return false;
-    PoisonProfileState state = {0};
-    memcpy(state.magic, "PPRO", 4u);
-    state.version = POISON_PROFILE_STATE_VERSION;
-    state.active = store->active;
-    if(!poison_profile_validate(&state.active, UINT64_MAX) ||
-       !poison_profile_state_digest(&state, state.digest)) {
+    PoisonProfileState* state = malloc(sizeof(*state));
+    if(!state) return false;
+    memset(state, 0, sizeof(*state));
+    memcpy(state->magic, "PPRO", 4u);
+    state->version = POISON_PROFILE_STATE_VERSION;
+    state->active = store->active;
+    if(!poison_profile_validate(&state->active, UINT64_MAX) ||
+       !poison_profile_state_digest(state, state->digest)) {
+        free(state);
         return false;
     }
     char partial[128];
-    if(snprintf(partial, sizeof(partial), "%s.partial", path) >= (int)sizeof(partial))
+    if(snprintf(partial, sizeof(partial), "%s.partial", path) >= (int)sizeof(partial)) {
+        free(state);
         return false;
+    }
     Storage* storage = furi_record_open(RECORD_STORAGE);
     bool ok = storage_simply_mkdir(storage, "/int/.poison");
     File* file = storage_file_alloc(storage);
     if(ok) ok = storage_file_open(file, partial, FSAM_WRITE, FSOM_CREATE_ALWAYS);
-    if(ok) ok = storage_file_write(file, &state, sizeof(state)) == sizeof(state);
+    if(ok) ok = storage_file_write(file, state, sizeof(*state)) == sizeof(*state);
     if(ok) ok = storage_file_sync(file);
     if(storage_file_is_open(file)) ok = storage_file_close(file) && ok;
     if(ok) ok = storage_common_rename(storage, partial, path) == FSE_OK;
     storage_file_free(file);
     if(!ok) (void)storage_simply_remove(storage, partial);
     furi_record_close(RECORD_STORAGE);
-    memset(&state, 0, sizeof(state));
+    memset(state, 0, sizeof(*state));
+    free(state);
     return ok;
 }
 
@@ -245,11 +251,14 @@ bool poison_profiles_preview_global(const PoisonProfile* profile, uint64_t role_
 bool poison_profiles_apply_global(void) {
     if(!poison_profiles_mutex) return false;
     furi_check(furi_mutex_acquire(poison_profiles_mutex, FuriWaitForever) == FuriStatusOk);
-    PoisonProfileStore candidate = poison_profiles_store_instance;
-    const bool applied = poison_profile_apply(&candidate) &&
-                         poison_profile_store_save(&candidate, POISON_PROFILE_STATE_PATH);
-    if(applied) poison_profiles_store_instance = candidate;
-    memset(&candidate, 0, sizeof(candidate));
+    PoisonProfileStore* candidate = malloc(sizeof(*candidate));
+    furi_check(candidate);
+    *candidate = poison_profiles_store_instance;
+    const bool applied = poison_profile_apply(candidate) &&
+                         poison_profile_store_save(candidate, POISON_PROFILE_STATE_PATH);
+    if(applied) poison_profiles_store_instance = *candidate;
+    memset(candidate, 0, sizeof(*candidate));
+    free(candidate);
     furi_check(furi_mutex_release(poison_profiles_mutex) == FuriStatusOk);
     return applied;
 }
@@ -257,11 +266,13 @@ bool poison_profiles_apply_global(void) {
 bool poison_profiles_reset_global(void) {
     if(!poison_profiles_mutex) return false;
     furi_check(furi_mutex_acquire(poison_profiles_mutex, FuriWaitForever) == FuriStatusOk);
-    PoisonProfileStore recovery;
-    poison_profile_store_init(&recovery);
-    const bool reset = poison_profile_store_save(&recovery, POISON_PROFILE_STATE_PATH);
-    if(reset) poison_profiles_store_instance = recovery;
-    memset(&recovery, 0, sizeof(recovery));
+    PoisonProfileStore* recovery = malloc(sizeof(*recovery));
+    furi_check(recovery);
+    poison_profile_store_init(recovery);
+    const bool reset = poison_profile_store_save(recovery, POISON_PROFILE_STATE_PATH);
+    if(reset) poison_profiles_store_instance = *recovery;
+    memset(recovery, 0, sizeof(*recovery));
+    free(recovery);
     furi_check(furi_mutex_release(poison_profiles_mutex) == FuriStatusOk);
     return reset;
 }

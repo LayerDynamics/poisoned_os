@@ -214,23 +214,26 @@ static void rpc_system_storage_list_root(const PB_Main* request, void* context) 
 
     const char* hard_coded_dirs[] = {"any", "int", "ext"};
 
-    PB_Main response = {
+    PB_Main* response = rpc_message_alloc();
+    *response = (PB_Main){
         .has_next = false,
         .command_id = request->command_id,
         .command_status = PB_CommandStatus_OK,
         .which_content = PB_Main_storage_list_response_tag,
     };
-    furi_assert(COUNT_OF(hard_coded_dirs) < COUNT_OF(response.content.storage_list_response.file));
+    furi_assert(
+        COUNT_OF(hard_coded_dirs) < COUNT_OF(response->content.storage_list_response.file));
 
     for(uint32_t i = 0; i < COUNT_OF(hard_coded_dirs); ++i) {
-        ++response.content.storage_list_response.file_count;
-        response.content.storage_list_response.file[i].data = NULL;
-        response.content.storage_list_response.file[i].size = 0;
-        response.content.storage_list_response.file[i].type = PB_Storage_File_FileType_DIR;
-        response.content.storage_list_response.file[i].name = strdup(hard_coded_dirs[i]);
+        ++response->content.storage_list_response.file_count;
+        response->content.storage_list_response.file[i].data = NULL;
+        response->content.storage_list_response.file[i].size = 0;
+        response->content.storage_list_response.file[i].type = PB_Storage_File_FileType_DIR;
+        response->content.storage_list_response.file[i].name = strdup(hard_coded_dirs[i]);
     }
 
-    rpc_send_and_release(session, &response);
+    rpc_send_and_release(session, response);
+    free(response);
 }
 
 static bool rpc_system_storage_list_filter(
@@ -272,13 +275,14 @@ static void rpc_system_storage_list_process(const PB_Main* request, void* contex
 
     File* dir = storage_file_alloc(rpc_storage->api);
 
-    PB_Main response = {
+    PB_Main* response = rpc_message_alloc();
+    *response = (PB_Main){
         .command_id = request->command_id,
         .has_next = false,
         .which_content = PB_Main_storage_list_response_tag,
         .command_status = PB_CommandStatus_OK,
     };
-    PB_Storage_ListResponse* list = &response.content.storage_list_response;
+    PB_Storage_ListResponse* list = &response->content.storage_list_response;
 
     bool include_md5 = list_request->include_md5;
     FuriString* md5 = furi_string_alloc();
@@ -289,8 +293,8 @@ static void rpc_system_storage_list_process(const PB_Main* request, void* contex
     int i = 0;
 
     if(!storage_dir_open(dir, list_request->path)) {
-        response.command_status = rpc_system_storage_get_file_error(dir);
-        response.which_content = PB_Main_empty_tag;
+        response->command_status = rpc_system_storage_get_file_error(dir);
+        response->which_content = PB_Main_empty_tag;
         finish = true;
     }
 
@@ -301,8 +305,8 @@ static void rpc_system_storage_list_process(const PB_Main* request, void* contex
             if(rpc_system_storage_list_filter(list_request, &fileinfo, name)) {
                 if(i == COUNT_OF(list->file)) {
                     list->file_count = i;
-                    response.has_next = true;
-                    rpc_send_and_release(session, &response);
+                    response->has_next = true;
+                    rpc_send_and_release(session, response);
                     i = 0;
                 }
                 list->file[i].type = file_info_is_dir(&fileinfo) ? PB_Storage_File_FileType_DIR :
@@ -332,8 +336,9 @@ static void rpc_system_storage_list_process(const PB_Main* request, void* contex
         }
     }
 
-    response.has_next = false;
-    rpc_send_and_release(session, &response);
+    response->has_next = false;
+    rpc_send_and_release(session, response);
+    free(response);
 
     furi_string_free(md5);
     furi_string_free(md5_path);
@@ -594,18 +599,20 @@ static void rpc_system_storage_md5sum_process(const PB_Main* request, void* cont
     FS_Error file_error;
 
     if(md5_string_calc_file(file, filename, md5, &file_error)) {
-        PB_Main response = {
+        PB_Main* response = rpc_message_alloc();
+        *response = (PB_Main){
             .command_id = request->command_id,
             .command_status = PB_CommandStatus_OK,
             .which_content = PB_Main_storage_md5sum_response_tag,
             .has_next = false,
         };
 
-        char* md5sum = response.content.storage_md5sum_response.md5sum;
-        size_t md5sum_size = sizeof(response.content.storage_md5sum_response.md5sum);
+        char* md5sum = response->content.storage_md5sum_response.md5sum;
+        size_t md5sum_size = sizeof(response->content.storage_md5sum_response.md5sum);
         snprintf(md5sum, md5sum_size, "%s", furi_string_get_cstr(md5));
 
-        rpc_send_and_release(session, &response);
+        rpc_send_and_release(session, response);
+        free(response);
     } else {
         rpc_send_and_release_empty(
             session, request->command_id, rpc_system_storage_get_error(file_error));

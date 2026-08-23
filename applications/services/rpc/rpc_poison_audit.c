@@ -36,14 +36,15 @@ static void rpc_poison_audit_snapshot_process(const PB_Main* request, void* cont
         &truncated,
         &next_event_id,
         last_digest);
+    PB_Main* response = rpc_message_alloc();
 
     for(size_t index = 0u; index < event_count; ++index) {
-        PB_Main response = PB_Main_init_zero;
-        response.command_id = request->command_id;
-        response.command_status = PB_CommandStatus_OK;
-        response.has_next = true;
-        response.which_content = PB_Main_poison_audit_event_tag;
-        PB_Poison_AuditEvent* output = &response.content.poison_audit_event;
+        *response = (PB_Main)PB_Main_init_zero;
+        response->command_id = request->command_id;
+        response->command_status = PB_CommandStatus_OK;
+        response->has_next = true;
+        response->which_content = PB_Main_poison_audit_event_tag;
+        PB_Poison_AuditEvent* output = &response->content.poison_audit_event;
         const PoisonAuditEvent* event = &events[index];
         output->event_id = event->event_id;
         output->prior_digest.size = POISON_AUDIT_DIGEST_BYTES;
@@ -59,23 +60,24 @@ static void rpc_poison_audit_snapshot_process(const PB_Main* request, void* cont
         strcpy(output->safe_metadata, event->safe_metadata);
         output->digest.size = POISON_AUDIT_DIGEST_BYTES;
         memcpy(output->digest.bytes, event->digest, POISON_AUDIT_DIGEST_BYTES);
-        rpc_send(audit->session, &response);
+        rpc_send(audit->session, response);
     }
     memset(events, 0, sizeof(PoisonAuditEvent) * input->max_events);
     free(events);
 
-    PB_Main end = PB_Main_init_zero;
-    end.command_id = request->command_id;
-    end.command_status = PB_CommandStatus_OK;
-    end.which_content = PB_Main_poison_audit_snapshot_end_tag;
-    end.content.poison_audit_snapshot_end.next_event_id = next_event_id;
-    end.content.poison_audit_snapshot_end.last_digest.size = POISON_AUDIT_DIGEST_BYTES;
+    *response = (PB_Main)PB_Main_init_zero;
+    response->command_id = request->command_id;
+    response->command_status = PB_CommandStatus_OK;
+    response->which_content = PB_Main_poison_audit_snapshot_end_tag;
+    response->content.poison_audit_snapshot_end.next_event_id = next_event_id;
+    response->content.poison_audit_snapshot_end.last_digest.size = POISON_AUDIT_DIGEST_BYTES;
     memcpy(
-        end.content.poison_audit_snapshot_end.last_digest.bytes,
+        response->content.poison_audit_snapshot_end.last_digest.bytes,
         last_digest,
         POISON_AUDIT_DIGEST_BYTES);
-    end.content.poison_audit_snapshot_end.truncated = truncated;
-    rpc_send(audit->session, &end);
+    response->content.poison_audit_snapshot_end.truncated = truncated;
+    rpc_send(audit->session, response);
+    free(response);
 }
 
 void* rpc_system_poison_audit_alloc(RpcSession* session) {

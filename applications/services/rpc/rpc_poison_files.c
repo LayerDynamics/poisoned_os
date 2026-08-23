@@ -252,30 +252,32 @@ static void rpc_poison_files_list_process(const PB_Main* request, void* context)
 
     const bool more = entry_count > page_size;
     const size_t send_count = more ? page_size : entry_count;
+    PB_Main* response = rpc_message_alloc();
     if(send_count == 0u) {
-        PB_Main response = PB_Main_init_zero;
-        response.command_id = request->command_id;
-        response.command_status = PB_CommandStatus_OK;
-        response.which_content = PB_Main_poison_file_list_response_tag;
-        rpc_send_and_release(files->session, &response);
+        *response = (PB_Main)PB_Main_init_zero;
+        response->command_id = request->command_id;
+        response->command_status = PB_CommandStatus_OK;
+        response->which_content = PB_Main_poison_file_list_response_tag;
+        rpc_send_and_release(files->session, response);
     }
     for(size_t index = 0u; index < send_count; ++index) {
-        PB_Main response = PB_Main_init_zero;
-        response.command_id = request->command_id;
-        response.command_status = PB_CommandStatus_OK;
-        response.has_next = index + 1u < send_count;
-        response.which_content = PB_Main_poison_file_list_response_tag;
-        response.content.poison_file_list_response.entries.funcs.encode =
+        *response = (PB_Main)PB_Main_init_zero;
+        response->command_id = request->command_id;
+        response->command_status = PB_CommandStatus_OK;
+        response->has_next = index + 1u < send_count;
+        response->which_content = PB_Main_poison_file_list_response_tag;
+        response->content.poison_file_list_response.entries.funcs.encode =
             rpc_poison_files_encode_stat;
-        response.content.poison_file_list_response.entries.arg = &entries[index];
+        response->content.poison_file_list_response.entries.arg = &entries[index];
         if(more && index + 1u == send_count)
             snprintf(
-                response.content.poison_file_list_response.next_cursor,
-                sizeof(response.content.poison_file_list_response.next_cursor),
+                response->content.poison_file_list_response.next_cursor,
+                sizeof(response->content.poison_file_list_response.next_cursor),
                 "%lu",
                 (unsigned long)(offset + send_count));
-        rpc_send_and_release(files->session, &response);
+        rpc_send_and_release(files->session, response);
     }
+    free(response);
     memset(entries, 0, (page_size + 1u) * sizeof(*entries));
     free(entries);
 }

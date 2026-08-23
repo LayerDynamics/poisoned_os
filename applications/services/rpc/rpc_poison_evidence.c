@@ -224,11 +224,12 @@ static void rpc_poison_evidence_record_process(const PB_Main* request, void* con
         return;
     }
 
-    PB_Main response = PB_Main_init_zero;
-    response.command_id = request->command_id;
-    response.command_status = PB_CommandStatus_OK;
-    response.which_content = PB_Main_poison_evidence_record_tag;
-    PB_Poison_EvidenceRecord* output = &response.content.poison_evidence_record;
+    PB_Main* response = rpc_message_alloc();
+    *response = (PB_Main)PB_Main_init_zero;
+    response->command_id = request->command_id;
+    response->command_status = PB_CommandStatus_OK;
+    response->which_content = PB_Main_poison_evidence_record_tag;
+    PB_Poison_EvidenceRecord* output = &response->content.poison_evidence_record;
     strcpy(output->evidence_id, captured.evidence_id);
     strcpy(output->case_id, captured.case_id);
     output->content_length = captured.content_length;
@@ -237,7 +238,8 @@ static void rpc_poison_evidence_record_process(const PB_Main* request, void* con
     rpc_poison_evidence_hex_encode(captured.previous_audit_sha256, output->previous_audit_sha256);
     rpc_poison_evidence_hex_encode(captured.audit_sha256, output->audit_sha256);
     memset(&captured, 0, sizeof(captured));
-    rpc_send_and_release(evidence->session, &response);
+    rpc_send_and_release(evidence->session, response);
+    free(response);
 }
 
 static bool rpc_poison_evidence_identity(
@@ -293,11 +295,12 @@ static void rpc_poison_case_process(const PB_Main* request, void* context) {
         return;
     }
 
-    PB_Main response = PB_Main_init_zero;
-    response.command_id = request->command_id;
-    response.command_status = PB_CommandStatus_OK;
-    response.which_content = PB_Main_poison_case_tag;
-    PB_Poison_Case* output = &response.content.poison_case;
+    PB_Main* response = rpc_message_alloc();
+    *response = (PB_Main)PB_Main_init_zero;
+    response->command_id = request->command_id;
+    response->command_status = PB_CommandStatus_OK;
+    response->which_content = PB_Main_poison_case_tag;
+    PB_Poison_Case* output = &response->content.poison_case;
     strcpy(output->case_id, record.case_id);
     strcpy(output->name, record.name);
     strcpy(output->purpose, record.purpose);
@@ -305,7 +308,8 @@ static void rpc_poison_case_process(const PB_Main* request, void* context) {
     output->created_at_ms = record.created_at_ms;
     strcpy(output->retention_policy, record.retention_policy);
     memset(&record, 0, sizeof(record));
-    rpc_send_and_release(evidence->session, &response);
+    rpc_send_and_release(evidence->session, response);
+    free(response);
 }
 
 static void rpc_poison_annotation_process(const PB_Main* request, void* context) {
@@ -345,11 +349,12 @@ static void rpc_poison_annotation_process(const PB_Main* request, void* context)
         return;
     }
 
-    PB_Main response = PB_Main_init_zero;
-    response.command_id = request->command_id;
-    response.command_status = PB_CommandStatus_OK;
-    response.which_content = PB_Main_poison_annotation_tag;
-    PB_Poison_Annotation* output = &response.content.poison_annotation;
+    PB_Main* response = rpc_message_alloc();
+    *response = (PB_Main)PB_Main_init_zero;
+    response->command_id = request->command_id;
+    response->command_status = PB_CommandStatus_OK;
+    response->which_content = PB_Main_poison_annotation_tag;
+    PB_Poison_Annotation* output = &response->content.poison_annotation;
     strcpy(output->annotation_id, record->annotation_id);
     strcpy(output->evidence_id, record->evidence_id);
     strcpy(output->author_id, record->author_id);
@@ -360,7 +365,8 @@ static void rpc_poison_annotation_process(const PB_Main* request, void* context)
         strcpy(output->tags[index], record->tags[index]);
     memset(record, 0, sizeof(*record));
     free(record);
-    rpc_send_and_release(evidence->session, &response);
+    rpc_send_and_release(evidence->session, response);
+    free(response);
 }
 
 static bool rpc_poison_export_batch_digest(RpcPoisonEvidence* evidence, uint8_t digest[32u]) {
@@ -501,11 +507,12 @@ static void rpc_poison_export_send_response(
     RpcPoisonEvidence* evidence,
     const PB_Main* request,
     bool finalized) {
-    PB_Main response = PB_Main_init_zero;
-    response.command_id = request->command_id;
-    response.command_status = PB_CommandStatus_OK;
-    response.which_content = PB_Main_poison_export_manifest_tag;
-    PB_Poison_ExportManifest* output = &response.content.poison_export_manifest;
+    PB_Main* response = rpc_message_alloc();
+    *response = (PB_Main)PB_Main_init_zero;
+    response->command_id = request->command_id;
+    response->command_status = PB_CommandStatus_OK;
+    response->which_content = PB_Main_poison_export_manifest_tag;
+    PB_Poison_ExportManifest* output = &response->content.poison_export_manifest;
     strcpy(output->export_id, evidence->export_id);
     strcpy(output->schema, evidence->export_schema);
     output->batch_index = evidence->export_last_batch;
@@ -513,7 +520,8 @@ static void rpc_poison_export_send_response(
     output->accepted_evidence_ids = evidence->export_accepted_count;
     if(finalized)
         rpc_poison_evidence_hex_encode(evidence->export_final_sha256, output->manifest_sha256);
-    rpc_send_and_release(evidence->session, &response);
+    rpc_send_and_release(evidence->session, response);
+    free(response);
 }
 
 static void rpc_poison_export_manifest_process(const PB_Main* request, void* context) {

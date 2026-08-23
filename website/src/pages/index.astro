@@ -1,0 +1,46 @@
+---
+import { getCollection } from "astro:content";
+import SiteLayout from "../layouts/SiteLayout.astro";
+import { sortDocs, toRepositoryDoc } from "../lib/docs";
+
+const docs = sortDocs((await getCollection("docs")).map(toRepositoryDoc));
+const featured = docs.filter((doc) => ["Start here", "Understand the system", "Operate", "Development"].includes(doc.section)).slice(0, 6);
+const sections = new Set(docs.map((doc) => doc.section));
+---
+<SiteLayout active="product" title="The pocket interface" description="Poisoned_Os puts the Flipper Zero in your browser while the hardware stays in your pocket.">
+  <main>
+    <section class="home-hero frame">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="signal-dot"></span> Field instrument / target 7</p>
+        <h1>The whole device.<br /><em>Still in your pocket.</em></h1>
+        <p class="hero-lede">Poisoned_Os turns the Flipper Zero into a browser-controlled field instrument. Keep the hardware attached to its Wi-Fi Dev Board, keep your hands free, and keep every capture, run, and decision together.</p>
+        <div class="hero-actions"><a class="button button-primary" href="/docs/">Start with the docs <span aria-hidden="true">→</span></a><a class="button button-secondary" href="https://web-installer-production.up.railway.app">Install over USB <span aria-hidden="true">↗</span></a></div>
+        <p class="hero-note"><span class="note-rule"></span> Local-first by design. No account required for device control.</p>
+      </div>
+      <div class="hero-plate">
+        <span class="plate-label plate-label-top">POISONED_OS / LIVE LINK</span>
+        <img src="/images/flipper-zero-front.png" alt="Flipper Zero handheld device" loading="eager" />
+        <span class="plate-crosshair" aria-hidden="true"></span>
+        <span class="plate-label plate-label-bottom">BROWSER / WI-FI / DEVICE</span>
+        <div class="plate-readout"><span>SESSION</span><strong>SECURE</strong><span>↳ AUDIT CHAIN INTACT</span></div>
+      </div>
+    </section>
+    <section class="proof-strip" aria-label="Product capabilities">
+      <div><strong>01</strong><span>Live control</span><small>Screen, input, apps, and hardware tools from a browser.</small></div>
+      <div><strong>02</strong><span>Evidence intact</span><small>Captures keep files, notes, checksums, and export history together.</small></div>
+      <div><strong>03</strong><span>Offline core</span><small>Local device control works without a hosted account or WAN.</small></div>
+    </section>
+    <section class="home-section frame">
+      <div class="section-intro"><p class="eyebrow">The repository is the manual</p><h2>One source. Every path.</h2><p>{docs.length} Markdown sources are indexed into {sections.size} navigable sections at build time.</p></div>
+      <div class="feature-grid">
+        {featured.map((doc, index) => <a class="feature-card" href={`/docs/${doc.slug}/`}><span class="card-index">{String(index + 1).padStart(2, "0")} / {doc.section}</span><h3>{doc.title}</h3><p>{doc.description}</p><span class="card-arrow" aria-hidden="true">↗</span></a>)}
+      </div>
+    </section>
+    <section class="manifest frame">
+      <div class="manifest-stamp">OS / 01<br />LOCAL FIRST</div>
+      <div><p class="eyebrow">A clear boundary</p><h2>Your device is not a cloud feature.</h2><p>Dashboard control, files, evidence export, customization, and installed workloads remain local capabilities. The standalone cable installer runs in the browser and never uploads the package it is checking.</p><a class="text-link" href="/docs/decisions/adr-0001-distribution-and-hosted-boundary/">Read the distribution decision <span>↗</span></a></div>
+      <div class="manifest-list"><div><span>Transport</span><strong>HTTP(S) + WS(S)</strong></div><div><span>Board path</span><strong>Wi-Fi Dev Board</strong></div><div><span>Runtime</span><strong>Local Node.js</strong></div><div><span>Policy</span><strong>Explicit capabilities</strong></div></div>
+    </section>
+    <section class="closing frame"><p class="eyebrow">Ready when you are</p><h2>Put the OS<br />where the work is.</h2><div class="closing-actions"><a class="button button-primary" href="/docs/">Read the documentation <span aria-hidden="true">→</span></a><a class="button button-secondary" href="https://github.com/LayerDynamics/poisoned_os">Inspect the source <span aria-hidden="true">↗</span></a></div></section>
+  </main>
+</SiteLayout>

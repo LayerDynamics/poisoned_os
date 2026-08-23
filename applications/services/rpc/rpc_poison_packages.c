@@ -565,21 +565,23 @@ static void rpc_poison_packages_operation_process(const PB_Main* request, void* 
     request_context.now_ms =
         ((uint64_t)furi_get_tick() * 1000u) / furi_kernel_get_tick_frequency();
 
-    PB_Main response = PB_Main_init_zero;
-    response.command_id = request->command_id;
-    response.command_status = PB_CommandStatus_OK;
-    response.which_content = PB_Main_poison_package_operation_status_tag;
+    PB_Main* response = rpc_message_alloc();
+    *response = (PB_Main)PB_Main_init_zero;
+    response->command_id = request->command_id;
+    response->command_status = PB_CommandStatus_OK;
+    response->which_content = PB_Main_poison_package_operation_status_tag;
     const bool operation_succeeded = rpc_poison_packages_process(
         &system->packages,
         operation,
         verified,
         &request_context,
-        &response.content.poison_package_operation_status);
+        &response->content.poison_package_operation_status);
     if(verified) {
         memset(verified, 0, sizeof(*verified));
         free(verified);
     }
-    if(response.content.poison_package_operation_status.result[0] == '\0') {
+    if(response->content.poison_package_operation_status.result[0] == '\0') {
+        free(response);
         rpc_send_and_release_empty(
             system->session, request->command_id, PB_CommandStatus_ERROR_INVALID_PARAMETERS);
         return;
@@ -611,7 +613,7 @@ static void rpc_poison_packages_operation_process(const PB_Main* request, void* 
                 sizeof(safe_metadata),
                 "id=%.24s;result=%.28s",
                 operation->package_id,
-                response.content.poison_package_operation_status.result);
+                response->content.poison_package_operation_status.result);
             (void)poison_audit_append(
                 poison_audit_get(),
                 actor_digest,
@@ -644,7 +646,8 @@ static void rpc_poison_packages_operation_process(const PB_Main* request, void* 
             memset(&event, 0, sizeof(event));
         }
     }
-    rpc_send_and_release(system->session, &response);
+    rpc_send_and_release(system->session, response);
+    free(response);
 }
 
 void* rpc_system_poison_packages_alloc(RpcSession* session) {

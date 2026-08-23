@@ -14,6 +14,8 @@
 extern "C" {
 #endif
 
+#define RPC_SESSION_STACK_SIZE 6144u
+
 typedef void* (*RpcSystemAlloc)(RpcSession* session);
 typedef void (*RpcSystemFree)(void* context);
 typedef void (*PBMessageHandler)(const PB_Main* msg_request, void* context);
@@ -41,6 +43,8 @@ typedef struct {
     PBMessageHandler message_handler;
     void* context;
 } RpcHandler;
+
+PB_Main* rpc_message_alloc(void);
 
 void rpc_send(RpcSession* session, PB_Main* main_message);
 

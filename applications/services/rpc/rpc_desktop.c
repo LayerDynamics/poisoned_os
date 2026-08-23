@@ -45,14 +45,16 @@ static void rpc_desktop_on_desktop_pubsub(const void* message, void* context) {
     RpcSession* session = rpc_desktop->session;
     const DesktopStatus* status = message;
 
-    PB_Main rpc_message = {
+    PB_Main* rpc_message = rpc_message_alloc();
+    *rpc_message = (PB_Main){
         .command_id = 0,
         .command_status = PB_CommandStatus_OK,
         .has_next = false,
         .which_content = PB_Main_desktop_status_tag,
         .content.desktop_status.locked = status->locked,
     };
-    rpc_send_and_release(session, &rpc_message);
+    rpc_send_and_release(session, rpc_message);
+    free(rpc_message);
 }
 
 static void rpc_desktop_on_status_subscribe_request(const PB_Main* request, void* context) {

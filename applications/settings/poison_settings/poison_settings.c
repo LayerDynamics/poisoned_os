@@ -55,36 +55,42 @@ static void poison_settings_show_result(PoisonSettingsApp* app, const char* resu
 
 static void poison_settings_menu_callback(void* context, uint32_t index) {
     PoisonSettingsApp* app = context;
-    PoisonProfile active;
-    PoisonProfile preview;
+    PoisonProfile* active = malloc(sizeof(*active));
+    PoisonProfile* preview = malloc(sizeof(*preview));
+    furi_check(active);
+    furi_check(preview);
     bool preview_valid = false;
-    if(!poison_profiles_copy_global(&active, &preview, &preview_valid)) {
+    if(!poison_profiles_copy_global(active, preview, &preview_valid)) {
+        free(preview);
+        free(active);
         poison_settings_show_result(app, "Profile service unavailable.\n");
         return;
     }
     switch((PoisonSettingsMenuItem)index) {
     case PoisonSettingsMenuInspect:
-        poison_settings_describe_profile(&active, app->text);
+        poison_settings_describe_profile(active, app->text);
         poison_settings_show_text(app);
         break;
     case PoisonSettingsMenuPreviewRecovery: {
-        PoisonProfileStore recovery;
-        poison_profile_store_init(&recovery);
-        if(poison_profiles_preview_global(&recovery.active, UINT64_MAX)) {
-            poison_settings_describe_changes(&active, &recovery.active, app->text);
+        PoisonProfileStore* recovery = malloc(sizeof(*recovery));
+        furi_check(recovery);
+        poison_profile_store_init(recovery);
+        if(poison_profiles_preview_global(&recovery->active, UINT64_MAX)) {
+            poison_settings_describe_changes(active, &recovery->active, app->text);
             poison_settings_show_text(app);
         } else {
             poison_settings_show_result(
                 app, "Known-good preview rejected.\nActive profile unchanged.\n");
         }
-        memset(&recovery, 0, sizeof(recovery));
+        memset(recovery, 0, sizeof(*recovery));
+        free(recovery);
         break;
     }
     case PoisonSettingsMenuApplyPreview:
         if(!preview_valid) {
             poison_settings_show_result(app, "No validated preview.\nPreview a profile first.\n");
         } else if(
-            poison_settings_confirm(app, "Apply profile?", preview.id) &&
+            poison_settings_confirm(app, "Apply profile?", preview->id) &&
             poison_profiles_apply_global()) {
             poison_settings_show_result(app, "Profile applied atomically.\n");
         } else {
@@ -102,8 +108,10 @@ static void poison_settings_menu_callback(void* context, uint32_t index) {
         }
         break;
     }
-    memset(&active, 0, sizeof(active));
-    memset(&preview, 0, sizeof(preview));
+    memset(active, 0, sizeof(*active));
+    memset(preview, 0, sizeof(*preview));
+    free(preview);
+    free(active);
 }
 
 static bool poison_settings_back_callback(void* context) {

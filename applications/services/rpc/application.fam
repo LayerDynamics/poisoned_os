@@ -15,7 +15,8 @@ App(
         "poison_vfs_start",
         "poison_evidence",
         "poison_workload",
+        "storage_start",
     ],
-    order=10,
+    order=133,
     sdk_headers=["rpc_app.h", "rpc_poison_crypto.h"],
 )

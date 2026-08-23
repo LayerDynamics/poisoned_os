@@ -1,3 +1,4 @@
+import glob
 import itertools
 
 from fbt.sdk.cache import LazySdkVersionLoader
@@ -266,6 +267,25 @@ if env["IS_BASE_FIRMWARE"]:
     if len(loader_services) != 1:
         raise UserError("Firmware must contain exactly one loader service")
     startup_hooks = fwenv["APPBUILD"].get_apps_of_type(FlipperAppType.STARTUP)
+    startup_apps_by_id = {app.appid: app for app in startup_hooks}
+    for app in startup_hooks:
+        for required_appid in app.requires:
+            if (
+                required_appid in startup_apps_by_id
+                and startup_apps_by_id[required_appid].order >= app.order
+            ):
+                raise UserError(
+                    f"Startup app {app.appid} (order {app.order}) requires "
+                    f"{required_appid} (order {startup_apps_by_id[required_appid].order}); "
+                    "required startup apps must run first"
+                )
+    rpc_stack_sources = [
+        fwenv.File(path)
+        for path in sorted(
+            glob.glob(f'{Dir("#/applications/services/rpc").abspath}/*.c')
+        )
+    ]
+    rpc_stack_budget_header = fwenv.File("#/applications/services/rpc/rpc_i.h")
     startup_stack_report = fwenv.FirmwareStackValidator(
         "${FIRMWARE_BUILD_CFG}.startup-stack.json",
         fwelf,
@@ -276,7 +296,22 @@ if env["IS_BASE_FIRMWARE"]:
                 ("--hook", app.entry_point) for app in startup_hooks
             )
         ),
+        STARTUP_STACK_APP_ARGS=list(
+            itertools.chain.from_iterable(
+                ("--startup-app", app.appid) for app in startup_hooks
+            )
+        ),
+        RPC_STACK_ROOT="rpc_session_worker",
+        RPC_STACK_BUDGET_HEADER=rpc_stack_budget_header.abspath,
+        RPC_STACK_BUDGET_MACRO="RPC_SESSION_STACK_SIZE",
+        RPC_STACK_NESTED_HANDLER="rpc_poison_session_envelope_process",
+        RPC_STACK_SOURCE_ARGS=list(
+            itertools.chain.from_iterable(
+                ("--rpc-source", source.abspath) for source in rpc_stack_sources
+            )
+        ),
     )
+    Depends(startup_stack_report, [rpc_stack_budget_header, *rpc_stack_sources])
     fw_artifacts.append(startup_stack_report)
 
 if env["IS_BASE_FIRMWARE"]:

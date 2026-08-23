@@ -29,21 +29,23 @@ static void rpc_system_system_ping_process(const PB_Main* request, void* context
         return;
     }
 
-    PB_Main response = PB_Main_init_default;
+    PB_Main* response = rpc_message_alloc();
+    *response = (PB_Main)PB_Main_init_default;
     // PB_CommandStatus_OK is 0 in current case, and var by default is 0 too, commenting PVS warn
-    response.command_status = PB_CommandStatus_OK; //-V1048
-    response.command_id = request->command_id;
-    response.which_content = PB_Main_system_ping_response_tag;
+    response->command_status = PB_CommandStatus_OK; //-V1048
+    response->command_id = request->command_id;
+    response->which_content = PB_Main_system_ping_response_tag;
 
     const PB_System_PingRequest* ping_request = &request->content.system_ping_request;
-    PB_System_PingResponse* ping_response = &response.content.system_ping_response;
+    PB_System_PingResponse* ping_response = &response->content.system_ping_response;
     if(ping_request->data && (ping_request->data->size > 0)) {
         ping_response->data = malloc(PB_BYTES_ARRAY_T_ALLOCSIZE(ping_request->data->size));
         memcpy(ping_response->data->bytes, ping_request->data->bytes, ping_request->data->size);
         ping_response->data->size = ping_request->data->size;
     }
 
-    rpc_send_and_release(session, &response);
+    rpc_send_and_release(session, response);
+    free(response);
 }
 
 static void rpc_system_system_reboot_process(const PB_Main* request, void* context) {

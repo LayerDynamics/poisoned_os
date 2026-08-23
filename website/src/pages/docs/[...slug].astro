@@ -1,0 +1,33 @@
+---
+import { getCollection, render } from "astro:content";
+import DocsSidebar from "../../components/DocsSidebar.astro";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+import { sortDocs, sourceUrl, toRepositoryDoc } from "../../lib/docs";
+
+export async function getStaticPaths() {
+  const docs = sortDocs((await getCollection("docs")).map(toRepositoryDoc));
+  return docs.map((doc) => ({ params: { slug: doc.slug }, props: { doc, docs } }));
+}
+
+const { doc, docs } = Astro.props;
+const { Content, headings } = await render(doc.entry);
+const currentIndex = docs.findIndex((entry) => entry.slug === doc.slug);
+const previous = docs[currentIndex - 1];
+const next = docs[currentIndex + 1];
+---
+<SiteLayout title={doc.title} description={doc.description}>
+  <div class="docs-layout frame">
+    <DocsSidebar docs={docs} currentSlug={doc.slug} />
+    <main class="docs-main">
+      <div class="doc-kicker"><span>{doc.section}</span><a href={sourceUrl(doc.sourcePath)}>Source: {doc.sourcePath} ↗</a></div>
+      <h1>{doc.title}</h1>
+      <p class="doc-intro">{doc.description}</p>
+      {headings.length > 0 && <nav class="toc" aria-label="On this page"><span>On this page</span>{headings.filter((heading) => heading.depth === 2).map((heading) => <a href={`#${heading.slug}`}>{heading.text}</a>)}</nav>}
+      <article class="markdown"><Content /></article>
+      <nav class="doc-pager" aria-label="Documentation pagination">
+        {previous ? <a href={`/docs/${previous.slug}/`}><span>Previous</span><strong>← {previous.title}</strong></a> : <span></span>}
+        {next ? <a href={`/docs/${next.slug}/`}><span>Next</span><strong>{next.title} →</strong></a> : <span></span>}
+      </nav>
+    </main>
+  </div>
+</SiteLayout>

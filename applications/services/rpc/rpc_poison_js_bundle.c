@@ -71,41 +71,45 @@ static void rpc_poison_js_bundle_send_status(
     uint32_t command_id,
     bool accepted,
     const char* message) {
-    PB_Main response = PB_Main_init_zero;
-    response.command_id = command_id;
-    response.command_status = PB_CommandStatus_OK;
-    response.which_content = PB_Main_poison_js_bundle_status_tag;
+    PB_Main* response = rpc_message_alloc();
+    *response = (PB_Main)PB_Main_init_zero;
+    response->command_id = command_id;
+    response->command_status = PB_CommandStatus_OK;
+    response->which_content = PB_Main_poison_js_bundle_status_tag;
     rpc_poison_js_bundle_fill_status(
-        system, accepted, message, &response.content.poison_js_bundle_status);
-    rpc_send_and_release(system->session, &response);
+        system, accepted, message, &response->content.poison_js_bundle_status);
+    rpc_send_and_release(system->session, response);
+    free(response);
 }
 
 static void rpc_poison_js_bundle_send_inventory(RpcPoisonJsBundle* system, uint32_t command_id) {
+    PB_Main* response = rpc_message_alloc();
     for(size_t index = 0u; index < system->bundle->metadata.capability_count; ++index) {
-        PB_Main response = PB_Main_init_zero;
-        response.command_id = command_id;
-        response.command_status = PB_CommandStatus_OK;
-        response.has_next = true;
-        response.which_content = PB_Main_poison_js_bundle_frame_tag;
-        PB_Poison_JsBundleFrame* frame = &response.content.poison_js_bundle_frame;
+        *response = (PB_Main)PB_Main_init_zero;
+        response->command_id = command_id;
+        response->command_status = PB_CommandStatus_OK;
+        response->has_next = true;
+        response->which_content = PB_Main_poison_js_bundle_frame_tag;
+        PB_Poison_JsBundleFrame* frame = &response->content.poison_js_bundle_frame;
         frame->kind = PB_Poison_JsBundleFrameKind_JS_BUNDLE_FRAME_CAPABILITY;
         strcpy(frame->capability, system->bundle->capabilities[index]);
-        rpc_send_and_release(system->session, &response);
+        rpc_send_and_release(system->session, response);
     }
     for(size_t index = 0u; index < system->bundle->asset_count; ++index) {
         const PoisonJsBundleAsset* asset = &system->bundle->assets[index];
-        PB_Main response = PB_Main_init_zero;
-        response.command_id = command_id;
-        response.command_status = PB_CommandStatus_OK;
-        response.has_next = true;
-        response.which_content = PB_Main_poison_js_bundle_frame_tag;
-        PB_Poison_JsBundleFrame* frame = &response.content.poison_js_bundle_frame;
+        *response = (PB_Main)PB_Main_init_zero;
+        response->command_id = command_id;
+        response->command_status = PB_CommandStatus_OK;
+        response->has_next = true;
+        response->which_content = PB_Main_poison_js_bundle_frame_tag;
+        PB_Poison_JsBundleFrame* frame = &response->content.poison_js_bundle_frame;
         frame->kind = PB_Poison_JsBundleFrameKind_JS_BUNDLE_FRAME_ASSET;
         strcpy(frame->asset_path, asset->path);
         strcpy(frame->asset_sha256, asset->sha256);
         frame->asset_size = asset->size;
-        rpc_send_and_release(system->session, &response);
+        rpc_send_and_release(system->session, response);
     }
+    free(response);
 }
 
 static bool rpc_poison_js_bundle_send_asset(
@@ -127,17 +131,18 @@ static bool rpc_poison_js_bundle_send_asset(
         request->length,
         &data_size,
         &eof);
+    PB_Main* response = rpc_message_alloc();
     for(size_t cursor = 0u; sent && cursor < data_size;) {
         const size_t remaining = data_size - cursor;
         const size_t chunk = remaining > POISON_JS_BUNDLE_RPC_CHUNK_BYTES ?
                                  POISON_JS_BUNDLE_RPC_CHUNK_BYTES :
                                  remaining;
-        PB_Main response = PB_Main_init_zero;
-        response.command_id = command_id;
-        response.command_status = PB_CommandStatus_OK;
-        response.has_next = true;
-        response.which_content = PB_Main_poison_js_bundle_frame_tag;
-        PB_Poison_JsBundleFrame* frame = &response.content.poison_js_bundle_frame;
+        *response = (PB_Main)PB_Main_init_zero;
+        response->command_id = command_id;
+        response->command_status = PB_CommandStatus_OK;
+        response->has_next = true;
+        response->which_content = PB_Main_poison_js_bundle_frame_tag;
+        PB_Poison_JsBundleFrame* frame = &response->content.poison_js_bundle_frame;
         frame->kind = PB_Poison_JsBundleFrameKind_JS_BUNDLE_FRAME_DATA;
         strcpy(frame->asset_path, asset->path);
         strcpy(frame->asset_sha256, asset->sha256);
@@ -146,9 +151,10 @@ static bool rpc_poison_js_bundle_send_asset(
         frame->data.size = chunk;
         memcpy(frame->data.bytes, data + cursor, chunk);
         frame->eof = eof && cursor + chunk == data_size;
-        rpc_send_and_release(system->session, &response);
+        rpc_send_and_release(system->session, response);
         cursor += chunk;
     }
+    free(response);
     memset(data, 0, request->length);
     free(data);
     return sent && data_size > 0u;

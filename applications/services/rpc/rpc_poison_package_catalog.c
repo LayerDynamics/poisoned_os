@@ -66,32 +66,35 @@ static void rpc_poison_package_catalog_process(const PB_Main* request, void* con
 
     const size_t remaining = catalog->count - input->offset;
     const size_t returned = remaining < input->max_records ? remaining : input->max_records;
+    PB_Main* response = rpc_message_alloc();
     for(size_t index = 0u; index < returned; ++index) {
         const size_t catalog_index = input->offset + index;
-        PB_Main response = PB_Main_init_zero;
-        response.command_id = request->command_id;
-        response.command_status = PB_CommandStatus_OK;
-        response.has_next = true;
-        response.which_content = PB_Main_poison_package_catalog_record_tag;
+        *response = (PB_Main)PB_Main_init_zero;
+        response->command_id = request->command_id;
+        response->command_status = PB_CommandStatus_OK;
+        response->has_next = true;
+        response->which_content = PB_Main_poison_package_catalog_record_tag;
         rpc_poison_package_catalog_record_encode(
-            &response.content.poison_package_catalog_record,
+            &response->content.poison_package_catalog_record,
             &catalog->records[catalog_index],
             (uint32_t)catalog_index,
             catalog->generation);
-        rpc_send(rpc_catalog->session, &response);
+        rpc_send(rpc_catalog->session, response);
     }
 
-    PB_Main end = PB_Main_init_zero;
-    end.command_id = request->command_id;
-    end.command_status = PB_CommandStatus_OK;
-    end.which_content = PB_Main_poison_package_catalog_end_tag;
-    end.content.poison_package_catalog_end.returned_records = (uint32_t)returned;
-    end.content.poison_package_catalog_end.total_records = (uint32_t)catalog->count;
-    end.content.poison_package_catalog_end.next_offset = (uint32_t)(input->offset + returned);
-    end.content.poison_package_catalog_end.generation = catalog->generation;
+    *response = (PB_Main)PB_Main_init_zero;
+    response->command_id = request->command_id;
+    response->command_status = PB_CommandStatus_OK;
+    response->which_content = PB_Main_poison_package_catalog_end_tag;
+    response->content.poison_package_catalog_end.returned_records = (uint32_t)returned;
+    response->content.poison_package_catalog_end.total_records = (uint32_t)catalog->count;
+    response->content.poison_package_catalog_end.next_offset =
+        (uint32_t)(input->offset + returned);
+    response->content.poison_package_catalog_end.generation = catalog->generation;
     memset(catalog, 0, sizeof(*catalog));
     free(catalog);
-    rpc_send(rpc_catalog->session, &end);
+    rpc_send(rpc_catalog->session, response);
+    free(response);
 }
 
 bool rpc_poison_package_catalog_list_authenticated(

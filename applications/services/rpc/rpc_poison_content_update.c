@@ -267,21 +267,26 @@ bool rpc_poison_content_update_promote_last_known_good(
 static bool rpc_poison_content_update_import(
     RpcPoisonContentUpdate* engine,
     const PB_Poison_ContentUpdateRequest* request) {
-    PoisonPackageVerifiedArchive verified = {0};
+    PoisonPackageVerifiedArchive* verified = malloc(sizeof(*verified));
+    if(!verified) return false;
+    memset(verified, 0, sizeof(*verified));
     PoisonContentUpdateType signed_type;
-    if(!engine->verification_callback ||
-       !engine->verification_callback(
-           engine->verification_context,
-           request->manifest_path,
-           request->candidate_digest,
-           &verified) ||
-       !rpc_poison_content_update_type(verified.content_type, &signed_type) ||
-       strcmp(verified.archive_sha256, request->candidate_digest) != 0 ||
-       (signed_type == PoisonContentUpdateFirmware &&
-        strcmp(verified.entrypoint, "update.fuf") != 0) ||
-       !rpc_poison_content_update_manifest_path_valid(request->manifest_path) ||
-       engine->hardware_target == 0u || engine->firmware_api == 0u ||
-       engine->available_storage_bytes == 0u || engine->available_storage_bytes > UINT32_MAX) {
+    const bool callback_valid = engine->verification_callback && engine->verification_callback(
+                                                                     engine->verification_context,
+                                                                     request->manifest_path,
+                                                                     request->candidate_digest,
+                                                                     verified);
+    const bool verified_valid =
+        callback_valid && rpc_poison_content_update_type(verified->content_type, &signed_type) &&
+        strcmp(verified->archive_sha256, request->candidate_digest) == 0 &&
+        (signed_type != PoisonContentUpdateFirmware ||
+         strcmp(verified->entrypoint, "update.fuf") == 0) &&
+        rpc_poison_content_update_manifest_path_valid(request->manifest_path) &&
+        engine->hardware_target != 0u && engine->firmware_api != 0u &&
+        engine->available_storage_bytes != 0u && engine->available_storage_bytes <= UINT32_MAX;
+    if(!verified_valid) {
+        memset(verified, 0, sizeof(*verified));
+        free(verified);
         return false;
     }
     Storage* storage = furi_record_open(RECORD_STORAGE);
@@ -291,14 +296,14 @@ static bool rpc_poison_content_update_import(
     furi_record_close(RECORD_STORAGE);
     const PoisonContentUpdateManifest manifest = {
         .content_type = signed_type,
-        .update_id = verified.package_id,
-        .candidate_digest = verified.archive_sha256,
+        .update_id = verified->package_id,
+        .candidate_digest = verified->archive_sha256,
         .previous_digest = engine->accepted_digest,
         .hardware_target = engine->hardware_target,
         .minimum_api = engine->firmware_api,
         .maximum_api = engine->firmware_api,
-        .release_sequence = verified.release_sequence,
-        .content_bytes = verified.archive_bytes,
+        .release_sequence = verified->release_sequence,
+        .content_bytes = verified->archive_bytes,
         .signature_valid = true,
         .rollback_available = rollback_available,
         .protected_target = rpc_poison_content_update_requires_confirmation(signed_type),
@@ -312,14 +317,18 @@ static bool rpc_poison_content_update_import(
     PoisonContentUpdate admitted;
     if(poison_content_update_admit(&admitted, &manifest, &environment) !=
        PoisonContentUpdateAdmissionOk) {
+        memset(verified, 0, sizeof(*verified));
+        free(verified);
         return false;
     }
     engine->update = admitted;
     memcpy(engine->manifest_path, request->manifest_path, strlen(request->manifest_path) + 1u);
-    engine->verified_archive = verified;
+    engine->verified_archive = *verified;
     engine->activation_manifest_path[0] = '\0';
     engine->active = true;
     memset(&engine->confirmation, 0, sizeof(engine->confirmation));
+    memset(verified, 0, sizeof(*verified));
+    free(verified);
     return true;
 }
 
@@ -341,23 +350,28 @@ static bool rpc_poison_content_update_verify(
     RpcPoisonContentUpdate* engine,
     const PB_Poison_ContentUpdateRequest* request,
     const RpcPoisonContentUpdateRequestContext* request_context) {
-    PoisonPackageVerifiedArchive verified = {0};
-    if(!engine->verification_callback ||
-       !engine->verification_callback(
-           engine->verification_context,
-           engine->manifest_path,
-           request->candidate_digest,
-           &verified) ||
-       strcmp(verified.content_type, engine->verified_archive.content_type) != 0 ||
-       strcmp(verified.package_id, engine->verified_archive.package_id) != 0 ||
-       strcmp(verified.version, engine->verified_archive.version) != 0 ||
-       strcmp(verified.entrypoint, engine->verified_archive.entrypoint) != 0 ||
-       strcmp(verified.archive_sha256, engine->verified_archive.archive_sha256) != 0 ||
-       verified.release_sequence != engine->verified_archive.release_sequence ||
-       verified.archive_bytes != engine->verified_archive.archive_bytes ||
-       !poison_content_update_verify_payload(&engine->update, request->candidate_digest) ||
-       !poison_content_update_transition(
-           &engine->update, PoisonContentUpdateAwaitingConfirmation)) {
+    PoisonPackageVerifiedArchive* verified = malloc(sizeof(*verified));
+    if(!verified) return false;
+    memset(verified, 0, sizeof(*verified));
+    const bool verified_valid =
+        engine->verification_callback &&
+        engine->verification_callback(
+            engine->verification_context,
+            engine->manifest_path,
+            request->candidate_digest,
+            verified) &&
+        strcmp(verified->content_type, engine->verified_archive.content_type) == 0 &&
+        strcmp(verified->package_id, engine->verified_archive.package_id) == 0 &&
+        strcmp(verified->version, engine->verified_archive.version) == 0 &&
+        strcmp(verified->entrypoint, engine->verified_archive.entrypoint) == 0 &&
+        strcmp(verified->archive_sha256, engine->verified_archive.archive_sha256) == 0 &&
+        verified->release_sequence == engine->verified_archive.release_sequence &&
+        verified->archive_bytes == engine->verified_archive.archive_bytes &&
+        poison_content_update_verify_payload(&engine->update, request->candidate_digest) &&
+        poison_content_update_transition(&engine->update, PoisonContentUpdateAwaitingConfirmation);
+    memset(verified, 0, sizeof(*verified));
+    free(verified);
+    if(!verified_valid) {
         return false;
     }
     if(engine->update.confirmation_required) {

@@ -740,14 +740,16 @@ static void rpc_poison_resume_request_process(const PB_Main* request, void* cont
     furi_assert(request);
     furi_assert(context);
     RpcPoisonSystem* system = context;
-    PB_Main response = PB_Main_init_zero;
-    response.command_id = request->command_id;
-    response.command_status = PB_CommandStatus_OK;
-    response.which_content = PB_Main_poison_resume_response_tag;
-    PB_Poison_ResumeResponse* resume_response = &response.content.poison_resume_response;
+    PB_Main* response = rpc_message_alloc();
+    *response = (PB_Main)PB_Main_init_zero;
+    response->command_id = request->command_id;
+    response->command_status = PB_CommandStatus_OK;
+    response->which_content = PB_Main_poison_resume_response_tag;
+    PB_Poison_ResumeResponse* resume_response = &response->content.poison_resume_response;
     if(request->which_content != PB_Main_poison_resume_request_tag || request->has_next) {
         strcpy(resume_response->error, POISON_RESUME_ERROR);
-        rpc_send_and_release(system->rpc_session, &response);
+        rpc_send_and_release(system->rpc_session, response);
+        free(response);
         return;
     }
 
@@ -774,7 +776,8 @@ static void rpc_poison_resume_request_process(const PB_Main* request, void* cont
         } else {
             strcpy(resume_response->error, POISON_RESUME_ERROR);
         }
-        rpc_send_and_release(system->rpc_session, &response);
+        rpc_send_and_release(system->rpc_session, response);
+        free(response);
         return;
     }
 
@@ -812,7 +815,8 @@ static void rpc_poison_resume_request_process(const PB_Main* request, void* cont
         strcpy(resume_response->error, POISON_RESUME_ERROR);
     }
     memset(rotated_token, 0, sizeof(rotated_token));
-    rpc_send_and_release(system->rpc_session, &response);
+    rpc_send_and_release(system->rpc_session, response);
+    free(response);
     if(resumed) {
         rpc_session_activate_secure_transport(system->rpc_session, &system->handshake.session);
     }
@@ -939,15 +943,17 @@ static void rpc_poison_pairing_hello_process(const PB_Main* request, void* conte
             system->rpc_session, request->command_id, PB_CommandStatus_ERROR_INVALID_PARAMETERS);
         return;
     }
-    PB_Main response = PB_Main_init_zero;
-    response.command_id = request->command_id;
-    response.command_status = PB_CommandStatus_OK;
-    response.which_content = PB_Main_poison_pairing_challenge_tag;
+    PB_Main* response = rpc_message_alloc();
+    *response = (PB_Main)PB_Main_init_zero;
+    response->command_id = request->command_id;
+    response->command_status = PB_CommandStatus_OK;
+    response->which_content = PB_Main_poison_pairing_challenge_tag;
     if(!poison_pairing_begin(
            &system->handshake,
            &request->content.poison_pairing_hello,
            rpc_poison_now_ms(),
-           &response.content.poison_pairing_challenge)) {
+           &response->content.poison_pairing_challenge)) {
+        free(response);
         rpc_send_and_release_empty(
             system->rpc_session, request->command_id, PB_CommandStatus_ERROR_INVALID_PARAMETERS);
         return;
@@ -958,8 +964,9 @@ static void rpc_poison_pairing_hello_process(const PB_Main* request, void* conte
             system->handshake.client_identity_digest, &trusted_record, NULL) &&
         trusted_record.role == system->handshake.requested_role &&
         strcmp(trusted_record.client_name, system->handshake.client_name) == 0;
-    response.content.poison_pairing_challenge.identity_trusted = system->trusted_identity;
-    rpc_send_and_release(system->rpc_session, &response);
+    response->content.poison_pairing_challenge.identity_trusted = system->trusted_identity;
+    rpc_send_and_release(system->rpc_session, response);
+    free(response);
 }
 
 static void rpc_poison_pairing_confirm_process(const PB_Main* request, void* context) {
@@ -1112,19 +1119,21 @@ static void rpc_poison_policy_request_process(const PB_Main* request, void* cont
         policy_request->device_locked,
         policy_request->physical_confirmation,
         policy_request->policy_version);
-    PB_Main response = PB_Main_init_zero;
-    response.command_id = request->command_id;
-    response.command_status = PB_CommandStatus_OK;
-    response.which_content = PB_Main_poison_policy_decision_tag;
-    response.content.poison_policy_decision.granted_capabilities = decision.granted;
-    response.content.poison_policy_decision.allowed = decision.allowed;
-    response.content.poison_policy_decision.policy_version = decision.policy_version;
+    PB_Main* response = rpc_message_alloc();
+    *response = (PB_Main)PB_Main_init_zero;
+    response->command_id = request->command_id;
+    response->command_status = PB_CommandStatus_OK;
+    response->which_content = PB_Main_poison_policy_decision_tag;
+    response->content.poison_policy_decision.granted_capabilities = decision.granted;
+    response->content.poison_policy_decision.allowed = decision.allowed;
+    response->content.poison_policy_decision.policy_version = decision.policy_version;
     if(!decision.allowed) {
         strcpy(
-            response.content.poison_policy_decision.denial_reason,
+            response->content.poison_policy_decision.denial_reason,
             "requested capabilities are not permitted in the current device state");
     }
-    rpc_send_and_release(system->rpc_session, &response);
+    rpc_send_and_release(system->rpc_session, response);
+    free(response);
 }
 
 static void rpc_poison_diagnostic_snapshot_request_process(const PB_Main* request, void* context) {
@@ -1172,22 +1181,23 @@ static void rpc_poison_diagnostic_snapshot_request_process(const PB_Main* reques
     }
     if(event_count > limit) event_count = limit;
 
-    PB_Main response = PB_Main_init_zero;
-    response.command_id = request->command_id;
-    response.command_status = PB_CommandStatus_OK;
-    response.has_next = event_count > 0u;
-    response.which_content = PB_Main_poison_diagnostic_counters_tag;
+    PB_Main* response = rpc_message_alloc();
+    *response = (PB_Main)PB_Main_init_zero;
+    response->command_id = request->command_id;
+    response->command_status = PB_CommandStatus_OK;
+    response->has_next = event_count > 0u;
+    response->which_content = PB_Main_poison_diagnostic_counters_tag;
     rpc_poison_diagnostic_fill_counters(
-        &response.content.poison_diagnostic_counters, poison_diagnostics_counters(diagnostics));
-    rpc_send_and_release(system->rpc_session, &response);
+        &response->content.poison_diagnostic_counters, poison_diagnostics_counters(diagnostics));
+    rpc_send_and_release(system->rpc_session, response);
 
     for(size_t index = 0u; index < event_count; ++index) {
-        response = (PB_Main)PB_Main_init_zero;
-        response.command_id = request->command_id;
-        response.command_status = PB_CommandStatus_OK;
-        response.has_next = index + 1u < event_count;
-        response.which_content = PB_Main_poison_diagnostic_event_tag;
-        PB_Poison_DiagnosticEvent* output = &response.content.poison_diagnostic_event;
+        *response = (PB_Main)PB_Main_init_zero;
+        response->command_id = request->command_id;
+        response->command_status = PB_CommandStatus_OK;
+        response->has_next = index + 1u < event_count;
+        response->which_content = PB_Main_poison_diagnostic_event_tag;
+        PB_Poison_DiagnosticEvent* output = &response->content.poison_diagnostic_event;
         output->event_id = events[index].event_id;
         const char* category = poison_diagnostics_category_name(events[index].category);
         if(category) strcpy(output->category, category);
@@ -1198,8 +1208,9 @@ static void rpc_poison_diagnostic_snapshot_request_process(const PB_Main* reques
             output->correlation_digest.bytes,
             events[index].correlation_digest,
             sizeof(events[index].correlation_digest));
-        rpc_send_and_release(system->rpc_session, &response);
+        rpc_send_and_release(system->rpc_session, response);
     }
+    free(response);
     memset(events, 0, POISON_DIAGNOSTICS_RING_SIZE * sizeof(PoisonDiagnosticEvent));
     free(events);
 }
@@ -1237,12 +1248,14 @@ static void rpc_poison_content_update_request_process(const PB_Main* request, vo
     }
     request_context.now_ms = rpc_poison_now_ms();
     request_context.physical_confirmed = physical_confirmed;
-    PB_Main response = PB_Main_init_zero;
-    response.command_id = request->command_id;
-    response.command_status = PB_CommandStatus_OK;
-    response.which_content = PB_Main_poison_content_update_status_tag;
+    PB_Main* response = rpc_message_alloc();
+    *response = (PB_Main)PB_Main_init_zero;
+    response->command_id = request->command_id;
+    response->command_status = PB_CommandStatus_OK;
+    response->which_content = PB_Main_poison_content_update_status_tag;
     RpcPoisonContentUpdate* previous = malloc(sizeof(*previous));
     if(!previous) {
+        free(response);
         rpc_send_and_release_empty(
             system->rpc_session, request->command_id, PB_CommandStatus_ERROR_INVALID_PARAMETERS);
         return;
@@ -1252,7 +1265,7 @@ static void rpc_poison_content_update_request_process(const PB_Main* request, vo
         system->content_update,
         update_request,
         &request_context,
-        &response.content.poison_content_update_status);
+        &response->content.poison_content_update_status);
     const bool persisted =
         processed &&
         (update_request->operation ==
@@ -1283,7 +1296,7 @@ static void rpc_poison_content_update_request_process(const PB_Main* request, vo
                 sizeof(metadata),
                 "id=%.24s;result=%.28s",
                 update_request->update_id,
-                persisted ? response.content.poison_content_update_status.result : "rejected");
+                persisted ? response->content.poison_content_update_status.result : "rejected");
             (void)poison_audit_append(
                 poison_audit_get(),
                 actor_digest,
@@ -1337,13 +1350,15 @@ static void rpc_poison_content_update_request_process(const PB_Main* request, vo
         *system->content_update = *previous;
         memset(previous, 0, sizeof(*previous));
         free(previous);
+        free(response);
         rpc_send_and_release_empty(
             system->rpc_session, request->command_id, PB_CommandStatus_ERROR_INVALID_PARAMETERS);
         return;
     }
     memset(previous, 0, sizeof(*previous));
     free(previous);
-    rpc_send_and_release(system->rpc_session, &response);
+    rpc_send_and_release(system->rpc_session, response);
+    free(response);
     if(update_request->operation ==
        PB_Poison_ContentUpdateOperation_CONTENT_UPDATE_OPERATION_ROLLBACK) {
         furi_timer_pending_callback(rpc_poison_content_update_reset, NULL, 0u);

@@ -19,11 +19,14 @@ PRODUCTION_ELF_CANDIDATES = (
 from fbt.stack_analyzer import (  # noqa: E402
     StackAnalysisError,
     analyze_startup_stack,
+    calculate_rpc_worker_stack,
     calculate_stack_path,
+    parse_rpc_handler_sources,
     parse_disassembly,
     parse_dwarf_frames,
     parse_noreturn_functions,
     validate_stack_report,
+    validate_startup_order,
 )
 
 POISON_STARTUP_HOOKS = (
@@ -110,10 +113,21 @@ class PoisonFirmwareStartupTests(unittest.TestCase):
             report.write_text(
                 json.dumps(
                     {
-                        "schema": "poison.startup-stack/v1",
+                        "schema": "poison.firmware-stack/v2",
                         "passed": True,
                         "stack_budget": 2048,
                         "maximum_stack": 1024,
+                        "startup_order": [
+                            "storage_start",
+                            "rpc_start",
+                            "expansion_start",
+                        ],
+                        "rpc_worker": {
+                            "passed": True,
+                            "stack_budget": 6144,
+                            "maximum_stack": 4096,
+                            "handlers": ["rpc_fixture_process"],
+                        },
                         "elf_sha256": hashlib.sha256(b"different").hexdigest(),
                     }
                 ),
@@ -177,6 +191,117 @@ FDE cie=00000000 pc=08000020..08000030
             path.functions, ("loader_srv", "startup_hook", "authority_load")
         )
 
+    def test_startup_order_rejects_rpc_before_storage(self) -> None:
+        with self.assertRaisesRegex(
+            StackAnalysisError, "storage_start must run before rpc_start"
+        ):
+            validate_startup_order(("cli", "rpc_start", "storage_start"))
+
+    def test_startup_order_rejects_expansion_before_rpc(self) -> None:
+        with self.assertRaisesRegex(
+            StackAnalysisError, "rpc_start must run before expansion_start"
+        ):
+            validate_startup_order(
+                ("cli", "storage_start", "expansion_start", "rpc_start")
+            )
+
+    def test_startup_order_accepts_storage_rpc_expansion_sequence(self) -> None:
+        validate_startup_order(("cli", "storage_start", "rpc_start", "expansion_start"))
+
+    def test_rpc_handler_parser_tracks_registered_callbacks(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "rpc_fixture.c"
+            source.write_text(
+                """
+RpcHandler handler = {
+    .message_handler = rpc_fixture_first_process,
+    .decode_submessage = rpc_fixture_decode,
+};
+handler.message_handler = rpc_fixture_second_process;
+handler.decode_submessage = NULL;
+""",
+                encoding="utf-8",
+            )
+            self.assertEqual(
+                parse_rpc_handler_sources((source,)),
+                (
+                    "rpc_fixture_decode",
+                    "rpc_fixture_first_process",
+                    "rpc_fixture_second_process",
+                ),
+            )
+
+    def test_rpc_worker_gate_includes_nested_secure_dispatch(self) -> None:
+        frames = parse_dwarf_frames(
+            """
+FDE cie=00000000 pc=08000000..08000010
+  DW_CFA_def_cfa_offset: 64
+FDE cie=00000000 pc=08000010..08000020
+  DW_CFA_def_cfa_offset: 192
+FDE cie=00000000 pc=08000020..08000030
+  DW_CFA_def_cfa_offset: 4096
+"""
+        )
+        functions = parse_disassembly(
+            """
+08000000 <rpc_session_worker>:
+ 8000000: blx r3
+08000010 <rpc_secure_envelope_process>:
+ 8000010: blx r3
+08000020 <rpc_large_handler_process>:
+ 8000020: bx lr
+""",
+            frames,
+        )
+        result = calculate_rpc_worker_stack(
+            functions,
+            "rpc_session_worker",
+            ("rpc_secure_envelope_process", "rpc_large_handler_process"),
+            "rpc_secure_envelope_process",
+            6144,
+        )
+        self.assertEqual(result["maximum_stack"], 4352)
+        self.assertEqual(
+            result["maximum_path"],
+            [
+                "rpc_session_worker",
+                "rpc_secure_envelope_process",
+                "rpc_large_handler_process",
+            ],
+        )
+
+        with self.assertRaisesRegex(
+            StackAnalysisError, "RPC worker stack requires 4352"
+        ):
+            calculate_rpc_worker_stack(
+                functions,
+                "rpc_session_worker",
+                ("rpc_secure_envelope_process", "rpc_large_handler_process"),
+                "rpc_secure_envelope_process",
+                4096,
+            )
+
+    def test_rpc_session_uses_the_shared_validated_stack_budget(self) -> None:
+        header = (REPOSITORY_ROOT / "applications/services/rpc/rpc_i.h").read_text(
+            encoding="utf-8"
+        )
+        source = (REPOSITORY_ROOT / "applications/services/rpc/rpc.c").read_text(
+            encoding="utf-8"
+        )
+        self.assertRegex(header, r"#define RPC_SESSION_STACK_SIZE\s+\d+u")
+        self.assertIn(
+            'furi_thread_alloc_ex(\n        "RpcSessionWorker", RPC_SESSION_STACK_SIZE,',
+            source,
+        )
+
+    def test_rpc_handlers_do_not_put_expanded_main_messages_on_stack(self) -> None:
+        for source in sorted(
+            (REPOSITORY_ROOT / "applications/services/rpc").glob("*.c")
+        ):
+            with self.subTest(source=source.name):
+                contents = source.read_text(encoding="utf-8")
+                self.assertNotRegex(contents, r"\bPB_Main\s+[A-Za-z_]\w*\s*[;=]")
+
     def test_authority_decoder_does_not_put_the_full_store_on_stack(self) -> None:
         source = (
             REPOSITORY_ROOT
@@ -186,8 +311,7 @@ FDE cie=00000000 pc=08000020..08000030
 
     def test_profile_startup_load_does_not_put_persisted_state_on_stack(self) -> None:
         source = (
-            REPOSITORY_ROOT
-            / "applications/services/poison_profiles/poison_profiles.c"
+            REPOSITORY_ROOT / "applications/services/poison_profiles/poison_profiles.c"
         ).read_text(encoding="utf-8")
         self.assertIn("PoisonProfileState* state = malloc(sizeof(*state));", source)
 
@@ -197,18 +321,30 @@ FDE cie=00000000 pc=08000020..08000030
     )
     def test_production_elf_startup_stack_fits_loader_budget(self) -> None:
         elf = next(path for path in PRODUCTION_ELF_CANDIDATES if path.exists())
-        objdump = (
-            REPOSITORY_ROOT
-            / "toolchain/arm64-darwin/bin/arm-none-eabi-objdump"
-        )
+        objdump = REPOSITORY_ROOT / "toolchain/arm64-darwin/bin/arm-none-eabi-objdump"
         report = analyze_startup_stack(
             elf,
             str(objdump),
             "loader_srv",
             tuple(hook[2] for hook in POISON_STARTUP_HOOKS),
             2048,
+            rpc_sources=tuple(
+                sorted((REPOSITORY_ROOT / "applications/services/rpc").glob("*.c"))
+            ),
+            rpc_root="rpc_session_worker",
+            rpc_stack_budget=6144,
+            rpc_nested_handler="rpc_poison_session_envelope_process",
+            startup_apps=(
+                "storage_start",
+                "rpc_start",
+                "expansion_start",
+            ),
         )
         self.assertTrue(report["passed"])
+        self.assertLessEqual(
+            report["rpc_worker"]["maximum_stack"],
+            report["rpc_worker"]["stack_budget"],
+        )
 
     def test_returning_poison_hooks_are_startup_apps_not_services(self) -> None:
         for manifest_name, source_name, expected_entry_point in POISON_STARTUP_HOOKS:
@@ -244,7 +380,7 @@ FDE cie=00000000 pc=08000020..08000030
                     else entry_point
                 )
                 definition = re.search(
-                    rf"\bvoid\s+{re.escape(guarded_function)}\s*\([^)]*\)\s*\{{",
+                    rf"\bvoid\s+{re.escape(guarded_function)}\s*\([^)]*\)" + r"\s*\{",
                     source,
                 )
                 self.assertIsNotNone(definition)
