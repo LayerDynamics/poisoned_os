@@ -20,6 +20,7 @@ root.innerHTML = `
         <span class="wordmark-mark" aria-hidden="true">P_</span>
         <span>Poisoned_Os</span>
       </a>
+      <nav class="installer-nav" aria-label="Poisoned OS links"><a href="https://poisoned-os-site-production.up.railway.app/">Product site <span aria-hidden="true">↗</span></a><a href="https://poisoned-os-site-production.up.railway.app/docs/">Documentation <span aria-hidden="true">↗</span></a></nav>
       <div class="masthead-meta"><span>Target F7</span><span>USB / 230400</span><span>Local execution</span></div>
     </header>
 
@@ -109,7 +110,7 @@ root.innerHTML = `
         <details class="technical-log"><summary>Technical log</summary><ol id="event-log"></ol></details>
       </section>
     </div>
-    <footer><span>Runs entirely in this browser tab</span><span>Chrome / Edge / Chromium · HTTPS or localhost</span></footer>
+    <footer><span>Runs entirely in this browser tab</span><span><a href="https://poisoned-os-site-production.up.railway.app/docs/">Read the docs ↗</a></span><span>Chrome / Edge / Chromium · HTTPS or localhost</span></footer>
   </main>
 `;
 

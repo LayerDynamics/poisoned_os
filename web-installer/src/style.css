@@ -25,6 +25,9 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .masthead, footer { display: flex; align-items: center; justify-content: space-between; min-height: 58px; padding: 0 28px; border-bottom: 1px solid var(--rule); }
 .wordmark { display: flex; align-items: center; gap: 10px; color: var(--graphite); text-decoration: none; font-family: "Arial Narrow", "Aptos Narrow", sans-serif; font-weight: 800; letter-spacing: .02em; text-transform: uppercase; }
 .wordmark-mark { display: grid; place-items: center; width: 30px; height: 30px; color: white; background: var(--graphite); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+.installer-nav { display: flex; gap: 16px; margin-left: auto; margin-right: 26px; font: 700 10px/1 ui-monospace, SFMono-Regular, Menlo, monospace; text-transform: uppercase; }
+.installer-nav a, footer a { color: var(--teal-dark); text-decoration: none; }
+.installer-nav a:hover, footer a:hover { color: var(--teal); text-decoration: underline; text-underline-offset: 3px; }
 .masthead-meta { display: flex; gap: 20px; color: var(--muted); font: 600 10px/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .08em; text-transform: uppercase; }
 .masthead-meta span + span { position: relative; }
 .masthead-meta span + span::before { content: "/"; position: absolute; left: -12px; color: var(--rule); }
@@ -109,6 +112,7 @@ footer { border-top: 1px solid var(--rule); border-bottom: 0; color: var(--muted
 @media (max-width: 560px) {
   .masthead, footer { padding: 0 18px; }
   .masthead-meta span:not(:last-child), footer span:last-child { display: none; }
+  .installer-nav { gap: 9px; margin-right: 12px; font-size: 9px; }
   .device-bay, .workflow { padding: 30px 20px; }
   h1 { font-size: 50px; }
   .device-figure { grid-template-columns: 126px 1fr 50px; min-height: 215px; }
