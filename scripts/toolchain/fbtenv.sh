@@ -371,7 +371,11 @@ fbtenv_main()
     export SAVED_PYTHONPATH="${PYTHONPATH:-""}";
     export SAVED_PYTHONHOME="${PYTHONHOME:-""}";
 
-    export SSL_CERT_FILE="$TOOLCHAIN_ARCH_DIR/lib/python3.11/site-packages/certifi/cacert.pem";
+    if [ "$SYS_TYPE" = "linux" ] && [ -f "/etc/ssl/certs/ca-certificates.crt" ]; then
+        export SSL_CERT_FILE="/etc/ssl/certs/ca-certificates.crt";
+    else
+        export SSL_CERT_FILE="$TOOLCHAIN_ARCH_DIR/lib/python3.11/site-packages/certifi/cacert.pem";
+    fi
     export REQUESTS_CA_BUNDLE="$SSL_CERT_FILE";
     export PYTHONNOUSERSITE=1;
     export PYTHONPATH=;
