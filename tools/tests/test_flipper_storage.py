@@ -3,6 +3,7 @@ from __future__ import annotations
 import importlib.util
 import hashlib
 import io
+import json
 from pathlib import Path
 from unittest import mock
 import sys
@@ -191,6 +192,36 @@ class SelfUpdateTests(unittest.TestCase):
 
 
 class DeviceInstallTests(unittest.TestCase):
+    @staticmethod
+    def write_passing_bundle(bundle: Path) -> Path:
+        manifest = bundle / "update.fuf"
+        manifest.write_text("Filetype: Flipper firmware upgrade configuration\n")
+        firmware = bundle / "firmware.dfu"
+        firmware.write_bytes(b"dfu")
+        (bundle / "startup-stack.json").write_text(
+            json.dumps(
+                {
+                    "schema": "poison.startup-stack/v1",
+                    "passed": True,
+                    "stack_budget": 2048,
+                    "maximum_stack": 1512,
+                    "startup_hooks": ["fixture_start"],
+                    "firmware_dfu_sha256": hashlib.sha256(b"dfu").hexdigest(),
+                }
+            ),
+            encoding="utf-8",
+        )
+        return manifest
+
+    def test_bundle_preflight_rejects_dfu_that_does_not_match_stack_report(self) -> None:
+        module = load_device_install_module()
+        with tempfile.TemporaryDirectory() as directory:
+            bundle = Path(directory)
+            manifest = self.write_passing_bundle(bundle)
+            (bundle / "firmware.dfu").write_bytes(b"changed")
+            with self.assertRaisesRegex(RuntimeError, "does not match firmware.dfu"):
+                module.validate_update_bundle(manifest)
+
     def test_rpc_install_retains_complete_bundle_at_bootstrap_lkg_path(self) -> None:
         module = load_device_install_module()
         rpc = mock.MagicMock()
@@ -202,9 +233,7 @@ class DeviceInstallTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             bundle = Path(directory) / "bundle"
             bundle.mkdir()
-            manifest = bundle / "update.fuf"
-            manifest.write_text("Filetype: Flipper firmware upgrade configuration\n")
-            (bundle / "firmware.dfu").write_bytes(b"dfu")
+            manifest = self.write_passing_bundle(bundle)
             with mock.patch.object(
                 module,
                 "detect_flipper_runtime",
@@ -232,8 +261,7 @@ class DeviceInstallTests(unittest.TestCase):
     def test_successful_normal_install_provisions_exact_marauder_target(self) -> None:
         module = load_device_install_module()
         with tempfile.TemporaryDirectory() as directory:
-            manifest = Path(directory) / "update.fuf"
-            manifest.write_text("fixture", encoding="utf-8")
+            manifest = self.write_passing_bundle(Path(directory))
             fap = Path(directory) / "flasher.fap"
             with mock.patch.object(module, "install", return_value=0), mock.patch.object(
                 module, "provision_marauder", return_value=0
@@ -256,8 +284,7 @@ class DeviceInstallTests(unittest.TestCase):
     def test_minimal_install_explicitly_skips_marauder_provisioning(self) -> None:
         module = load_device_install_module()
         with tempfile.TemporaryDirectory() as directory:
-            manifest = Path(directory) / "update.fuf"
-            manifest.write_text("fixture", encoding="utf-8")
+            manifest = self.write_passing_bundle(Path(directory))
             with mock.patch.object(module, "install", return_value=0), mock.patch.object(
                 module, "provision_marauder"
             ) as provision:
@@ -529,6 +556,53 @@ Found DFU: [0483:df11] alt=0 serial="2075308D4242"
 
         self.assertGreaterEqual(module.POST_INSTALL_TIMEOUT, 600.0)
 
+    def test_post_install_verification_requires_bundled_firmware_api(self) -> None:
+        module = load_device_install_module()
+        clock = [0.0]
+
+        def monotonic() -> float:
+            return clock[0]
+
+        def sleep(delay: float) -> None:
+            clock[0] += delay
+
+        rpc = mock.MagicMock()
+        rpc.__enter__.return_value = rpc
+        rpc.device_info.return_value = {
+            "hardware_model": "Flipper Zero",
+            "hardware_target": "7",
+            "firmware_version": "1.4.3",
+            "firmware_origin_fork": "PoisonedOS",
+            "firmware_api_major": "87",
+            "firmware_api_minor": "1",
+        }
+        stderr = io.StringIO()
+        with mock.patch.object(
+            module,
+            "detect_flipper_runtime",
+            return_value=("/dev/cu.fixture", "flip_fixture"),
+        ), mock.patch.object(
+            module, "FlipperRpc", return_value=rpc
+        ), mock.patch.object(
+            module.time, "monotonic", side_effect=monotonic
+        ), mock.patch.object(
+            module.time, "sleep", side_effect=sleep
+        ), mock.patch("sys.stderr", stderr):
+            result = module.verify_poisoned_os("/dev/cu.fixture", timeout=1.0)
+
+        self.assertFalse(result)
+        self.assertIn("firmware_api_major='87' (expected '88')", stderr.getvalue())
+
+    def test_expected_firmware_api_comes_from_target_api_symbols(self) -> None:
+        module = load_device_install_module()
+
+        self.assertEqual(
+            module.read_expected_firmware_api(
+                REPOSITORY_ROOT / "targets/f7/api_symbols.csv"
+            ),
+            ("88", "61"),
+        )
+
     def test_post_install_verification_bounds_rpc_attempt_by_remaining_time(self) -> None:
         module = load_device_install_module()
         clock = [0.0]
@@ -666,6 +740,8 @@ Found DFU: [0483:df11] alt=0 serial="2075308D4242"
             "hardware_target": "7",
             "firmware_version": "1.4.3",
             "firmware_origin_fork": "PoisonedOS",
+            "firmware_api_major": "88",
+            "firmware_api_minor": "61",
         }
         rpc.storage_info.return_value = {
             "total_space": 64 * 1024 * 1024,
@@ -689,6 +765,7 @@ Found DFU: [0483:df11] alt=0 serial="2075308D4242"
 
         self.assertTrue(result)
         self.assertIn("firmware_origin_fork=PoisonedOS", output.getvalue())
+        self.assertIn("firmware_api=88.61", output.getvalue())
         self.assertIn("free=8388608", output.getvalue())
         self.assertIn("backup.tar", output.getvalue())
         self.assertIn("marauder-s2=present", output.getvalue())

@@ -30,6 +30,21 @@ typedef struct {
     uint8_t digest[32u];
 } PoisonPackageStateFile;
 
+typedef struct {
+    PoisonPackageStorageLayout layout;
+    char active[POISON_PACKAGE_MANIFEST_PATH_MAX + 1u];
+    char candidate[POISON_PACKAGE_MANIFEST_PATH_MAX + 1u];
+    char rollback[POISON_PACKAGE_MANIFEST_PATH_MAX + 1u];
+    char quarantine[POISON_PACKAGE_MANIFEST_PATH_MAX + 1u];
+    char swap[POISON_PACKAGE_MANIFEST_PATH_MAX + 1u];
+} PoisonPackageRecoveryPaths;
+
+typedef struct {
+    char parent[POISON_PACKAGE_MANIFEST_PATH_MAX + 1u];
+    char partial[POISON_PACKAGE_MANIFEST_PATH_MAX + 1u];
+    PoisonPackageStateFile state;
+} PoisonPackageStatePaths;
+
 void poison_packages_on_system_start(void) {
     if(!poison_startup_is_runtime_boot()) return;
     poison_package_manager_init(&poison_package_service_manager);
@@ -62,28 +77,36 @@ static bool poison_package_authority_store_load(
     const char* path,
     PoisonPackageAuthorityStore* destination) {
     if(!path || !destination) return false;
-    uint8_t encoded[POISON_PACKAGE_AUTHORITY_FILE_MAX];
+    typedef struct {
+        uint8_t encoded[POISON_PACKAGE_AUTHORITY_FILE_MAX];
+        PoisonPackageAuthorityStore decoded;
+    } AuthorityLoadWorkspace;
+    AuthorityLoadWorkspace* workspace = malloc(sizeof(*workspace));
+    if(!workspace) {
+        poison_package_authority_store_init(destination);
+        return false;
+    }
     Storage* storage = furi_record_open(RECORD_STORAGE);
     File* file = storage_file_alloc(storage);
     FileInfo info;
     bool loaded = storage_common_stat(storage, path, &info) == FSE_OK && info.size >= 8u &&
-                  info.size <= sizeof(encoded) &&
+                  info.size <= POISON_PACKAGE_AUTHORITY_FILE_MAX &&
                   storage_file_open(file, path, FSAM_READ, FSOM_OPEN_EXISTING);
     size_t bytes_read = 0u;
-    if(loaded) bytes_read = storage_file_read(file, encoded, info.size);
+    if(loaded) bytes_read = storage_file_read(file, workspace->encoded, info.size);
     loaded = loaded && bytes_read == info.size && !storage_file_get_error(file);
-    PoisonPackageAuthorityStore decoded;
-    poison_package_authority_store_init(&decoded);
-    loaded = loaded && poison_package_authority_store_decode(&decoded, encoded, bytes_read);
+    poison_package_authority_store_init(&workspace->decoded);
+    loaded = loaded && poison_package_authority_store_decode(
+                           &workspace->decoded, workspace->encoded, bytes_read);
     storage_file_free(file);
     furi_record_close(RECORD_STORAGE);
-    memset(encoded, 0, sizeof(encoded));
     if(!loaded) {
         poison_package_authority_store_init(destination);
-        return false;
+    } else {
+        *destination = workspace->decoded;
     }
-    *destination = decoded;
-    return true;
+    free(workspace);
+    return loaded;
 }
 
 bool poison_packages_reload_authorities(void) {
@@ -718,49 +741,49 @@ size_t poison_package_manager_count(const PoisonPackageManager* manager) {
 
 static bool poison_package_storage_recover_record(
     const PoisonPackageStorageLayout* layout,
+    PoisonPackageRecoveryPaths* paths,
     const char* package_id,
     bool candidate_committed,
     bool had_previous,
     bool discard_candidate) {
-    char active[POISON_PACKAGE_MANIFEST_PATH_MAX + 1u];
-    char candidate[POISON_PACKAGE_MANIFEST_PATH_MAX + 1u];
-    char rollback[POISON_PACKAGE_MANIFEST_PATH_MAX + 1u];
-    char quarantine[POISON_PACKAGE_MANIFEST_PATH_MAX + 1u];
-    char swap[POISON_PACKAGE_MANIFEST_PATH_MAX + 1u];
-    if(!poison_package_storage_path(active, layout->active_root, package_id, NULL) ||
-       !poison_package_storage_path(candidate, layout->managed_root, package_id, "candidate") ||
-       !poison_package_storage_path(rollback, layout->managed_root, package_id, "rollback") ||
-       !poison_package_storage_path(quarantine, layout->managed_root, package_id, "quarantine") ||
-       !poison_package_storage_path(swap, layout->managed_root, package_id, "swap")) {
+    if(!paths) return false;
+    if(!poison_package_storage_path(paths->active, layout->active_root, package_id, NULL) ||
+       !poison_package_storage_path(
+           paths->candidate, layout->managed_root, package_id, "candidate") ||
+       !poison_package_storage_path(
+           paths->rollback, layout->managed_root, package_id, "rollback") ||
+       !poison_package_storage_path(
+           paths->quarantine, layout->managed_root, package_id, "quarantine") ||
+       !poison_package_storage_path(paths->swap, layout->managed_root, package_id, "swap")) {
         return false;
     }
     Storage* storage = furi_record_open(RECORD_STORAGE);
     bool ok = true;
-    bool has_active = poison_package_storage_exists(storage, active, true);
-    bool has_rollback = poison_package_storage_exists(storage, rollback, true);
-    bool has_swap = poison_package_storage_exists(storage, swap, true);
+    bool has_active = poison_package_storage_exists(storage, paths->active, true);
+    bool has_rollback = poison_package_storage_exists(storage, paths->rollback, true);
+    bool has_swap = poison_package_storage_exists(storage, paths->swap, true);
     if(has_swap && !has_active) {
-        ok = storage_common_rename(storage, swap, active) == FSE_OK;
+        ok = storage_common_rename(storage, paths->swap, paths->active) == FSE_OK;
     } else if(has_swap && has_active && !has_rollback) {
-        ok = storage_common_rename(storage, active, rollback) == FSE_OK &&
-             storage_common_rename(storage, swap, active) == FSE_OK;
+        ok = storage_common_rename(storage, paths->active, paths->rollback) == FSE_OK &&
+             storage_common_rename(storage, paths->swap, paths->active) == FSE_OK;
     } else if(has_swap) {
         ok = false;
     }
-    has_active = poison_package_storage_exists(storage, active, true);
-    has_rollback = poison_package_storage_exists(storage, rollback, true);
-    const bool has_candidate = poison_package_storage_exists(storage, candidate, true);
+    has_active = poison_package_storage_exists(storage, paths->active, true);
+    has_rollback = poison_package_storage_exists(storage, paths->rollback, true);
+    const bool has_candidate = poison_package_storage_exists(storage, paths->candidate, true);
     if(ok && !candidate_committed) {
         if(!has_active && has_rollback) {
-            ok = storage_common_rename(storage, rollback, active) == FSE_OK;
+            ok = storage_common_rename(storage, paths->rollback, paths->active) == FSE_OK;
             has_active = ok;
             has_rollback = false;
         }
         if(ok && !has_candidate && has_active && (!had_previous || has_rollback)) {
-            ok = poison_package_storage_remove_if_present(storage, quarantine) &&
-                 storage_common_rename(storage, active, quarantine) == FSE_OK;
+            ok = poison_package_storage_remove_if_present(storage, paths->quarantine) &&
+                 storage_common_rename(storage, paths->active, paths->quarantine) == FSE_OK;
             if(ok && has_rollback) {
-                ok = storage_common_rename(storage, rollback, active) == FSE_OK;
+                ok = storage_common_rename(storage, paths->rollback, paths->active) == FSE_OK;
                 has_active = ok;
                 has_rollback = false;
             } else {
@@ -768,12 +791,12 @@ static bool poison_package_storage_recover_record(
             }
         } else if(
             ok && has_candidate && discard_candidate &&
-            !poison_package_storage_exists(storage, quarantine, true)) {
-            ok = storage_common_rename(storage, candidate, quarantine) == FSE_OK;
+            !poison_package_storage_exists(storage, paths->quarantine, true)) {
+            ok = storage_common_rename(storage, paths->candidate, paths->quarantine) == FSE_OK;
         }
     }
     if(ok && candidate_committed && !has_active && has_rollback) {
-        ok = storage_common_rename(storage, rollback, active) == FSE_OK;
+        ok = storage_common_rename(storage, paths->rollback, paths->active) == FSE_OK;
         has_active = ok;
     }
     if(ok && candidate_committed && !has_active) ok = false;
@@ -782,8 +805,9 @@ static bool poison_package_storage_recover_record(
 }
 
 static bool poison_packages_recover_storage_state(void) {
-    PoisonPackageStorageLayout layout;
-    poison_package_storage_layout_default(&layout);
+    PoisonPackageRecoveryPaths* workspace = malloc(sizeof(*workspace));
+    if(!workspace) return false;
+    poison_package_storage_layout_default(&workspace->layout);
     bool changed = false;
     for(size_t index = 0; index < POISON_PACKAGE_MAX_RECORDS; ++index) {
         PoisonPackageRecord* record = &poison_package_service_manager.records[index];
@@ -796,7 +820,12 @@ static bool poison_packages_recover_storage_state(void) {
                                record->transaction.state == PoisonPackageInstalled;
         const bool had_previous = record->transaction.rollback_state != PoisonPackageRemoved;
         if(!poison_package_storage_recover_record(
-               &layout, record->package_id, committed && !activating, had_previous, activating)) {
+               &workspace->layout,
+               workspace,
+               record->package_id,
+               committed && !activating,
+               had_previous,
+               activating)) {
             record->transaction.state = PoisonPackageQuarantined;
             record->transaction.content_update.state = PoisonContentUpdateQuarantined;
             ++poison_package_service_manager.generation;
@@ -815,7 +844,9 @@ static bool poison_packages_recover_storage_state(void) {
             }
         }
     }
-    return !changed || poison_packages_save_state();
+    const bool recovered = !changed || poison_packages_save_state();
+    free(workspace);
+    return recovered;
 }
 
 static bool poison_package_state_digest(const PoisonPackageStateFile* state, uint8_t digest[32u]) {
@@ -892,14 +923,15 @@ static bool poison_package_state_parent(
 
 bool poison_package_manager_save(const PoisonPackageManager* manager, const char* state_path) {
     if(!poison_package_manager_persisted_valid(manager)) return false;
-    char parent[POISON_PACKAGE_MANIFEST_PATH_MAX + 1u];
-    char partial[POISON_PACKAGE_MANIFEST_PATH_MAX + 1u];
-    if(!poison_package_state_parent(state_path, parent) ||
-       snprintf(partial, sizeof(partial), "%s.partial", state_path) >= (int)sizeof(partial)) {
+    PoisonPackageStatePaths* workspace = malloc(sizeof(*workspace));
+    if(!workspace) return false;
+    if(!poison_package_state_parent(state_path, workspace->parent) ||
+       snprintf(workspace->partial, sizeof(workspace->partial), "%s.partial", state_path) >=
+           (int)sizeof(workspace->partial)) {
+        free(workspace);
         return false;
     }
-    PoisonPackageStateFile* state = malloc(sizeof(*state));
-    if(!state) return false;
+    PoisonPackageStateFile* state = &workspace->state;
     memset(state, 0, sizeof(*state));
     memcpy(state->magic, "PPKS", sizeof(state->magic));
     state->version = 1u;
@@ -907,18 +939,17 @@ bool poison_package_manager_save(const PoisonPackageManager* manager, const char
     state->manager = *manager;
     bool ok = poison_package_state_digest(state, state->digest);
     Storage* storage = furi_record_open(RECORD_STORAGE);
-    if(ok) ok = poison_package_storage_mkdir_tree(storage, parent);
+    if(ok) ok = poison_package_storage_mkdir_tree(storage, workspace->parent);
     File* file = storage_file_alloc(storage);
-    if(ok) ok = storage_file_open(file, partial, FSAM_WRITE, FSOM_CREATE_ALWAYS);
+    if(ok) ok = storage_file_open(file, workspace->partial, FSAM_WRITE, FSOM_CREATE_ALWAYS);
     if(ok) ok = storage_file_write(file, state, sizeof(*state)) == sizeof(*state);
     if(ok) ok = storage_file_sync(file);
     if(storage_file_is_open(file)) ok = storage_file_close(file) && ok;
-    if(ok) ok = storage_common_rename(storage, partial, state_path) == FSE_OK;
+    if(ok) ok = storage_common_rename(storage, workspace->partial, state_path) == FSE_OK;
     storage_file_free(file);
-    if(!ok) (void)storage_simply_remove(storage, partial);
+    if(!ok) (void)storage_simply_remove(storage, workspace->partial);
     furi_record_close(RECORD_STORAGE);
-    memset(state, 0, sizeof(*state));
-    free(state);
+    free(workspace);
     return ok;
 }
 

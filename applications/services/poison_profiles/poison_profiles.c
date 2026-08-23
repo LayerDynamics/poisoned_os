@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <stddef.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include <furi.h>
@@ -72,32 +73,25 @@ void poison_profile_store_init(PoisonProfileStore* store) {
     if(!store) return;
     memset(store, 0, sizeof(*store));
     store->active.format = 1;
-    snprintf(store->active.id, sizeof(store->active.id), "%s", POISON_PROFILE_KNOWN_GOOD_ID);
-    snprintf(store->active.version, sizeof(store->active.version), "1.0.0");
-    snprintf(store->active.role, sizeof(store->active.role), "field");
-    snprintf(store->active.policy_id, sizeof(store->active.policy_id), "builtin.field");
-    snprintf(store->active.theme_id, sizeof(store->active.theme_id), "builtin.field-console");
-    snprintf(store->active.font_pack_id, sizeof(store->active.font_pack_id), "builtin.default");
-    snprintf(store->active.icon_pack_id, sizeof(store->active.icon_pack_id), "builtin.default");
-    snprintf(store->active.menu_id, sizeof(store->active.menu_id), "builtin.field-console");
-    snprintf(
-        store->active.dashboard_layout, sizeof(store->active.dashboard_layout), "field-console");
-    snprintf(
-        store->active.home_presentation,
-        sizeof(store->active.home_presentation),
-        "builtin.field-console");
-    snprintf(
-        store->active.status_presentation,
-        sizeof(store->active.status_presentation),
-        "builtin.field-console");
-    snprintf(store->active.lock_behavior, sizeof(store->active.lock_behavior), "pin");
-    snprintf(store->active.tool_defaults_json, sizeof(store->active.tool_defaults_json), "{}");
-    snprintf(store->active.transport_policy, sizeof(store->active.transport_policy), "local-only");
-    snprintf(store->active.logging_policy, sizeof(store->active.logging_policy), "metadata");
-    snprintf(store->active.evidence_policy, sizeof(store->active.evidence_policy), "digest-only");
-    snprintf(store->active.radio_region, sizeof(store->active.radio_region), "device");
-    snprintf(store->active.peripheral_safety, sizeof(store->active.peripheral_safety), "guarded");
-    snprintf(store->active.classroom_policy, sizeof(store->active.classroom_policy), "none");
+    strcpy(store->active.id, POISON_PROFILE_KNOWN_GOOD_ID);
+    strcpy(store->active.version, "1.0.0");
+    strcpy(store->active.role, "field");
+    strcpy(store->active.policy_id, "builtin.field");
+    strcpy(store->active.theme_id, "builtin.field-console");
+    strcpy(store->active.font_pack_id, "builtin.default");
+    strcpy(store->active.icon_pack_id, "builtin.default");
+    strcpy(store->active.menu_id, "builtin.field-console");
+    strcpy(store->active.dashboard_layout, "field-console");
+    strcpy(store->active.home_presentation, "builtin.field-console");
+    strcpy(store->active.status_presentation, "builtin.field-console");
+    strcpy(store->active.lock_behavior, "pin");
+    strcpy(store->active.tool_defaults_json, "{}");
+    strcpy(store->active.transport_policy, "local-only");
+    strcpy(store->active.logging_policy, "metadata");
+    strcpy(store->active.evidence_policy, "digest-only");
+    strcpy(store->active.radio_region, "device");
+    strcpy(store->active.peripheral_safety, "guarded");
+    strcpy(store->active.classroom_policy, "none");
     store->active.contrast_ratio_x10 = 45;
     store->active.notifications_enabled = true;
     store->active.haptics_enabled = true;
@@ -219,22 +213,23 @@ bool poison_profile_store_save(const PoisonProfileStore* store, const char* path
 
 bool poison_profile_store_load(PoisonProfileStore* store, const char* path) {
     if(!store || !path || path[0] != '/' || strstr(path, "..")) return false;
-    PoisonProfileState state = {0};
+    PoisonProfileState* state = malloc(sizeof(*state));
+    if(!state) return false;
     Storage* storage = furi_record_open(RECORD_STORAGE);
     File* file = storage_file_alloc(storage);
     bool ok = storage_file_open(file, path, FSAM_READ, FSOM_OPEN_EXISTING) &&
-              storage_file_size(file) == sizeof(state) &&
-              storage_file_read(file, &state, sizeof(state)) == sizeof(state) &&
+              storage_file_size(file) == sizeof(*state) &&
+              storage_file_read(file, state, sizeof(*state)) == sizeof(*state) &&
               !storage_file_get_error(file);
     storage_file_free(file);
     furi_record_close(RECORD_STORAGE);
-    ok = ok && poison_profile_state_valid(&state);
+    ok = ok && poison_profile_state_valid(state);
     if(ok) {
-        store->active = state.active;
+        store->active = state->active;
         memset(&store->preview, 0, sizeof(store->preview));
         store->preview_valid = false;
     }
-    memset(&state, 0, sizeof(state));
+    free(state);
     return ok;
 }
 

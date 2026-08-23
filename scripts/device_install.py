@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import contextlib
 import glob
 import hashlib
+import json
 import logging
 import os
 from pathlib import Path
@@ -25,6 +27,17 @@ if str(SCRIPTS_ROOT) not in sys.path:
 from flipper.rpc import RPC_TIMEOUT, FlipperRpc, RpcError
 
 
+def read_expected_firmware_api(path: Path) -> tuple[str, str]:
+    with path.open(newline="", encoding="utf-8") as api_file:
+        for entry, status, name, *_rest in csv.reader(api_file):
+            if entry == "Version" and status == "+":
+                match = re.fullmatch(r"(\d+)\.(\d+)", name)
+                if not match:
+                    break
+                return match.group(1), match.group(2)
+    raise RuntimeError(f"Missing valid Version entry in firmware API: {path}")
+
+
 FLIPPER_DFU_VID_PID = "0483:df11"
 FLIPPER_RUNTIME_VID = 0x0483
 FLIPPER_RUNTIME_PID = 0x5740
@@ -40,10 +53,15 @@ POST_INSTALL_RETRY_DELAY = 1.0
 POST_INSTALL_STATUS_INTERVAL = 15.0
 RUNTIME_RECOVERY_TIMEOUT = 120.0
 MANUAL_DFU_TIMEOUT = 180.0
+EXPECTED_FIRMWARE_API = read_expected_firmware_api(
+    SCRIPTS_ROOT.parent / "targets/f7/api_symbols.csv"
+)
 EXPECTED_DEVICE_INFO = {
     "hardware_model": "Flipper Zero",
     "hardware_target": "7",
     "firmware_origin_fork": "PoisonedOS",
+    "firmware_api_major": EXPECTED_FIRMWARE_API[0],
+    "firmware_api_minor": EXPECTED_FIRMWARE_API[1],
 }
 DEFAULT_MARAUDER_FAP = (
     SCRIPTS_ROOT.parent / "build/f7-firmware-D/.extapps/poison_esp_flasher.fap"
@@ -53,8 +71,7 @@ UPDATE_ROOT = "/ext/update/poison-lkg"
 UPDATE_RESOURCE_MILESTONES = {
     "manifest": "/ext/Manifest",
     "marauder-s2": (
-        "/ext/apps_data/esp_flasher/assets/marauder/s2/"
-        "esp32_marauder.flipper.bin"
+        "/ext/apps_data/esp_flasher/assets/marauder/s2/" "esp32_marauder.flipper.bin"
     ),
     "marauder-s3": (
         "/ext/apps_data/esp_flasher/assets/marauder/s3/"
@@ -148,6 +165,38 @@ def sha256_file(path: Path) -> str:
         for chunk in iter(lambda: source.read(1024 * 1024), b""):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def validate_update_bundle(manifest: Path) -> None:
+    report_path = manifest.parent / "startup-stack.json"
+    firmware_path = manifest.parent / "firmware.dfu"
+    if not report_path.is_file() or not firmware_path.is_file():
+        raise RuntimeError(
+            "update bundle is missing startup-stack.json or firmware.dfu"
+        )
+    try:
+        report = json.loads(report_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as error:
+        raise RuntimeError(f"cannot read startup stack report: {error}") from error
+    maximum = report.get("maximum_stack")
+    budget = report.get("stack_budget")
+    if (
+        report.get("schema") != "poison.startup-stack/v1"
+        or report.get("passed") is not True
+        or not isinstance(maximum, int)
+        or not isinstance(budget, int)
+        or maximum > budget
+        or not report.get("startup_hooks")
+    ):
+        raise RuntimeError("update bundle has an invalid startup stack report")
+    expected_dfu_hash = report.get("firmware_dfu_sha256")
+    if not isinstance(expected_dfu_hash, str) or not re.fullmatch(
+        r"[0-9a-f]{64}", expected_dfu_hash
+    ):
+        raise RuntimeError("startup stack report has no valid firmware DFU digest")
+    actual_dfu_hash = sha256_file(firmware_path)
+    if actual_dfu_hash != expected_dfu_hash:
+        raise RuntimeError("startup stack report does not match firmware.dfu")
 
 
 def download_verified(url: str, destination: Path, expected_sha256: str) -> None:
@@ -284,6 +333,17 @@ def _require_flipper_identity(device_info: dict[str, str]) -> None:
         raise RpcError(", ".join(mismatches))
 
 
+def _require_poisoned_os(device_info: dict[str, str]) -> None:
+    _require_flipper_identity(device_info)
+    mismatches = [
+        f"{key}={device_info.get(key)!r} (expected {value!r})"
+        for key, value in EXPECTED_DEVICE_INFO.items()
+        if device_info.get(key) != value
+    ]
+    if mismatches:
+        raise RpcError(", ".join(mismatches))
+
+
 def run_rpc_update(port: str, manifest: Path, passthrough: list[str]) -> int:
     if passthrough:
         print(
@@ -291,6 +351,11 @@ def run_rpc_update(port: str, manifest: Path, passthrough: list[str]) -> int:
             + " ".join(passthrough),
             file=sys.stderr,
         )
+        return 2
+    try:
+        validate_update_bundle(manifest)
+    except RuntimeError as error:
+        print(f"PoisonedOS bundle preflight failed: {error}", file=sys.stderr)
         return 2
     runtime = detect_flipper_runtime(port)
     if not runtime:
@@ -345,13 +410,7 @@ def verify_poisoned_os(port: str, timeout: float = POST_INSTALL_TIMEOUT) -> bool
                 break
             with FlipperRpc(resolved_port, timeout=min(RPC_TIMEOUT, remaining)) as rpc:
                 device_info = rpc.device_info()
-            mismatches = [
-                f"{key}={device_info.get(key)!r} (expected {value!r})"
-                for key, value in EXPECTED_DEVICE_INFO.items()
-                if device_info.get(key) != value
-            ]
-            if mismatches:
-                raise RuntimeError(", ".join(mismatches))
+            _require_poisoned_os(device_info)
             if not device_info.get("firmware_version"):
                 raise RuntimeError("device_info did not report firmware_version")
             print(
@@ -397,7 +456,7 @@ def collect_runtime_diagnostics(port: str) -> bool:
     with FlipperRpc(port) as rpc:
         version = rpc.protobuf_version()
         device_info = rpc.device_info()
-        _require_flipper_identity(device_info)
+        _require_poisoned_os(device_info)
         storage_info = rpc.storage_info("/ext")
         update_entries = rpc.list_dir(UPDATE_ROOT)
         milestones = {
@@ -408,7 +467,9 @@ def collect_runtime_diagnostics(port: str) -> bool:
         "Doctor runtime: "
         f"port={port} protobuf={version[0]}.{version[1]} "
         f"firmware_version={device_info.get('firmware_version', 'unknown')} "
-        f"firmware_origin_fork={device_info.get('firmware_origin_fork', 'unknown')}"
+        f"firmware_origin_fork={device_info.get('firmware_origin_fork', 'unknown')} "
+        f"firmware_api={device_info.get('firmware_api_major', 'unknown')}."
+        f"{device_info.get('firmware_api_minor', 'unknown')}"
     )
     print(
         "Doctor storage: "
@@ -440,7 +501,10 @@ def _print_manual_recovery_sequence() -> None:
 
 
 def recover_after_failed_update(expected_runtime_serial: str | None) -> str | None:
-    print("Post-install verification failed; starting exact-device recovery", file=sys.stderr)
+    print(
+        "Post-install verification failed; starting exact-device recovery",
+        file=sys.stderr,
+    )
     recovery_device = None
     if dfu_serial := detect_flipper_dfu():
         recovery_device = ("dfu", dfu_serial)
@@ -503,9 +567,7 @@ def doctor(port: str, recover: bool = True) -> int:
             print("Doctor did not observe Flipper runtime or DFU", file=sys.stderr)
             return 3
         state, identifier = recovery_device
-        runtime_port = (
-            recover_flipper_dfu(identifier) if state == "dfu" else identifier
-        )
+        runtime_port = recover_flipper_dfu(identifier) if state == "dfu" else identifier
         collect_runtime_diagnostics(runtime_port)
         return 0
     except (OSError, RuntimeError, RpcError) as error:
@@ -679,7 +741,13 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("--diagnose-only requires --doctor")
     if args.manifest_path is None:
         parser.error("an update manifest is required")
-    result = install(args.port, args.manifest_path.resolve(), passthrough)
+    manifest = args.manifest_path.resolve()
+    try:
+        validate_update_bundle(manifest)
+    except RuntimeError as error:
+        print(f"PoisonedOS bundle preflight failed: {error}", file=sys.stderr)
+        return 2
+    result = install(args.port, manifest, passthrough)
     if result or args.skip_marauder:
         return result
     marauder_result = provision_marauder(

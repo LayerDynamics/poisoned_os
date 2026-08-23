@@ -96,8 +96,8 @@ bool esp_flasher_scene_start_on_event(void* context, SceneManagerEvent event) {
                 AlignCenter,
                 AlignCenter);
             dialog_message_set_buttons(message, "Cancel", NULL, "Install");
-            const bool approved =
-                dialog_message_show(app->dialogs, message) == DialogMessageButtonRight;
+            const bool approved = dialog_message_show(app->dialogs, message) ==
+                                  DialogMessageButtonRight;
             dialog_message_free(message);
             if(approved) esp_flasher_configure_marauder_flipper(app);
             consumed = true;

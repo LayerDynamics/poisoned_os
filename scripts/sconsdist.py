@@ -1,16 +1,19 @@
 #!/usr/bin/env python3
 
 import json
+import hashlib
 import shutil
 import tarfile
 import zipfile
 from os import makedirs, walk
 from os.path import basename, exists, join, relpath
+from pathlib import Path
 
 from ansi.color import fg
 from flipper.app import App
 from flipper.assets.tarball import FLIPPER_TAR_FORMAT, tar_sanitizer_filter
 from update import Main as UpdateMain
+from fbt.stack_analyzer import StackAnalysisError, validate_stack_report
 
 
 class ProjectDir:
@@ -54,7 +57,10 @@ class Main(App):
     def get_project_file_name(self, project: ProjectDir, filetype: str) -> str:
         #  Temporary fix
         project_name = project.project
-        if project_name == "firmware" and filetype != "elf":
+        if project_name == "firmware" and filetype not in (
+            "elf",
+            "startup-stack.json",
+        ):
             project_name = "full"
 
         dist_target_path = self.get_dist_file_name(project_name, filetype)
@@ -87,6 +93,14 @@ class Main(App):
                     src_file,
                     self.get_dist_path(self.get_project_file_name(project, filetype)),
                 )
+        stack_report = join(obj_directory, f"{project.project}.startup-stack.json")
+        if exists(stack_report):
+            shutil.copyfile(
+                stack_report,
+                self.get_dist_path(
+                    self.get_project_file_name(project, "startup-stack.json")
+                ),
+            )
         for foldertype in ("sdk_headers", "lib"):
             if exists(sdk_folder := join(obj_directory, foldertype)):
                 self.note_dist_component(foldertype, "dir", sdk_folder)
@@ -225,6 +239,22 @@ class Main(App):
             : self.DIST_FOLDER_MAX_NAME_LENGTH
         ]
         bundle_dir = self.get_dist_path(bundle_dir_name)
+        stack_report_path = self._dist_components.get("firmware.startup-stack.json")
+        firmware_elf_path = self._dist_components.get("firmware.elf")
+        if not stack_report_path or not firmware_elf_path:
+            self.logger.error(
+                "Firmware startup stack report is required for update bundles"
+            )
+            return 4
+        try:
+            stack_report = validate_stack_report(stack_report_path, firmware_elf_path)
+        except StackAnalysisError as error:
+            self.logger.error(f"Invalid firmware startup stack report: {error}")
+            return 4
+
+        firmware_dfu_path = self.get_dist_path(
+            self.get_project_file_name(self.projects["firmware"], "dfu")
+        )
         bundle_args = [
             "generate",
             "-d",
@@ -234,9 +264,7 @@ class Main(App):
             "-t",
             self.target,
             "--dfu",
-            self.get_dist_path(
-                self.get_project_file_name(self.projects["firmware"], "dfu")
-            ),
+            firmware_dfu_path,
             "--stage",
             self.get_dist_path(
                 self.get_project_file_name(self.projects["updater"], "bin")
@@ -252,6 +280,14 @@ class Main(App):
         bundle_args.extend(self.other_args)
 
         if (bundle_result := UpdateMain(no_exit=True)(bundle_args)) == 0:
+            stack_report["firmware_dfu_sha256"] = hashlib.sha256(
+                Path(firmware_dfu_path).read_bytes()
+            ).hexdigest()
+            with open(
+                join(bundle_dir, "startup-stack.json"), "w", encoding="utf-8"
+            ) as file:
+                json.dump(stack_report, file, indent=2, sort_keys=True)
+                file.write("\n")
             self.note_dist_component("update", "dir", bundle_dir)
             self.logger.info(
                 fg.boldgreen(

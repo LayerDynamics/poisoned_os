@@ -149,11 +149,14 @@ bool poison_package_authority_store_decode(
        input[5] > POISON_PACKAGE_AUTHORITY_MAX || input[6] != 0u || input[7] != 0u) {
         return false;
     }
-    PoisonPackageAuthorityStore decoded;
-    poison_package_authority_store_init(&decoded);
+    poison_package_authority_store_init(store);
+    bool valid = true;
     size_t cursor = 8u;
     for(size_t index = 0; index < input[5]; ++index) {
-        if(input_length - cursor < 4u + POISON_PACKAGE_PUBLIC_KEY_BYTES) return false;
+        if(input_length - cursor < 4u + POISON_PACKAGE_PUBLIC_KEY_BYTES) {
+            valid = false;
+            break;
+        }
         const size_t key_id_length = input[cursor++];
         const uint8_t flags = input[cursor++];
         const uint8_t reserved_a = input[cursor++];
@@ -161,7 +164,8 @@ bool poison_package_authority_store_decode(
         if(key_id_length == 0u || key_id_length > POISON_PACKAGE_KEY_ID_MAX || flags > 1u ||
            reserved_a != 0u || reserved_b != 0u ||
            input_length - cursor < POISON_PACKAGE_PUBLIC_KEY_BYTES + key_id_length) {
-            return false;
+            valid = false;
+            break;
         }
         const uint8_t* public_key = input + cursor;
         cursor += POISON_PACKAGE_PUBLIC_KEY_BYTES;
@@ -169,10 +173,12 @@ bool poison_package_authority_store_decode(
         memcpy(key_id, input + cursor, key_id_length);
         key_id[key_id_length] = '\0';
         cursor += key_id_length;
-        if(!poison_package_authority_store_add(&decoded, key_id, public_key, flags != 0u))
-            return false;
+        if(!poison_package_authority_store_add(store, key_id, public_key, flags != 0u)) {
+            valid = false;
+            break;
+        }
     }
-    if(cursor != input_length) return false;
-    *store = decoded;
-    return true;
+    valid = valid && cursor == input_length;
+    if(!valid) poison_package_authority_store_init(store);
+    return valid;
 }

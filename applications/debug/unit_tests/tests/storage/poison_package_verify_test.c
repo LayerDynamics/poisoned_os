@@ -106,6 +106,7 @@ MU_TEST(poison_package_authority_store_round_trips_bounded_binary_format) {
     mu_check(poison_package_authority_store_find(&decoded, "package-prod-1"));
     encoded[0] ^= 1u;
     mu_check(!poison_package_authority_store_decode(&decoded, encoded, encoded_size));
+    mu_check(poison_package_authority_store_count(&decoded) == 0u);
 }
 
 static uint8_t poison_package_test_hex_nibble(char value) {

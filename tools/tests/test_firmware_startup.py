@@ -1,11 +1,30 @@
 from __future__ import annotations
 
 import re
+import hashlib
+import json
 from pathlib import Path
+import sys
+import tempfile
 import unittest
 
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(REPOSITORY_ROOT / "scripts"))
+PRODUCTION_ELF_CANDIDATES = (
+    REPOSITORY_ROOT / "build/f7-firmware-C/firmware.elf",
+    REPOSITORY_ROOT / "dist/f7-C/flipper-z-f7-firmware-poisonedos.elf",
+)
+
+from fbt.stack_analyzer import (  # noqa: E402
+    StackAnalysisError,
+    analyze_startup_stack,
+    calculate_stack_path,
+    parse_disassembly,
+    parse_dwarf_frames,
+    parse_noreturn_functions,
+    validate_stack_report,
+)
 
 POISON_STARTUP_HOOKS = (
     (
@@ -82,6 +101,115 @@ POISON_STARTUP_HOOKS = (
 
 
 class PoisonFirmwareStartupTests(unittest.TestCase):
+    def test_bundler_rejects_stack_report_for_a_different_elf(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            elf = root / "firmware.elf"
+            elf.write_bytes(b"firmware")
+            report = root / "firmware.startup-stack.json"
+            report.write_text(
+                json.dumps(
+                    {
+                        "schema": "poison.startup-stack/v1",
+                        "passed": True,
+                        "stack_budget": 2048,
+                        "maximum_stack": 1024,
+                        "elf_sha256": hashlib.sha256(b"different").hexdigest(),
+                    }
+                ),
+                encoding="utf-8",
+            )
+            with self.assertRaisesRegex(
+                StackAnalysisError, "does not match the firmware ELF"
+            ):
+                validate_stack_report(report, elf)
+
+    def test_bundler_keeps_stack_report_attached_to_firmware_component(self) -> None:
+        source = (REPOSITORY_ROOT / "scripts/sconsdist.py").read_text(encoding="utf-8")
+        self.assertIn(
+            'filetype not in (\n            "elf",\n            "startup-stack.json",',
+            source,
+        )
+
+    def test_stack_analyzer_stops_at_compiler_marked_noreturn_functions(self) -> None:
+        self.assertEqual(
+            parse_noreturn_functions(
+                """
+ <1><123>: Abbrev Number: 1 (DW_TAG_subprogram)
+  DW_AT_name : (indirect string): fatal
+  DW_AT_noreturn : 1
+ <2><124>: Abbrev Number: 2 (DW_TAG_formal_parameter)
+  DW_AT_name : argument
+ <1><125>: Abbrev Number: 1 (DW_TAG_subprogram)
+  DW_AT_name : ordinary
+"""
+            ),
+            {"fatal"},
+        )
+
+    def test_stack_analyzer_calculates_direct_and_synthetic_call_paths(self) -> None:
+        frames = parse_dwarf_frames(
+            """
+FDE cie=00000000 pc=08000000..08000010
+  DW_CFA_def_cfa_offset: 40
+FDE cie=00000000 pc=08000010..08000020
+  DW_CFA_def_cfa_offset: 48
+FDE cie=00000000 pc=08000020..08000030
+  DW_CFA_def_cfa_offset: 3584
+"""
+        )
+        functions = parse_disassembly(
+            """
+08000000 <loader_srv>:
+ 8000000: bl 8000010 <startup_hook>
+08000010 <startup_hook>:
+ 8000010: bl 8000020 <authority_load>
+08000020 <authority_load>:
+ 8000020: bx lr
+""",
+            frames,
+        )
+        path, _, _ = calculate_stack_path(
+            functions, "loader_srv", {"loader_srv": ("startup_hook",)}
+        )
+        self.assertEqual(path.bytes, 3672)
+        self.assertEqual(
+            path.functions, ("loader_srv", "startup_hook", "authority_load")
+        )
+
+    def test_authority_decoder_does_not_put_the_full_store_on_stack(self) -> None:
+        source = (
+            REPOSITORY_ROOT
+            / "applications/services/poison_packages/poison_package_authority.c"
+        ).read_text(encoding="utf-8")
+        self.assertNotIn("PoisonPackageAuthorityStore decoded;", source)
+
+    def test_profile_startup_load_does_not_put_persisted_state_on_stack(self) -> None:
+        source = (
+            REPOSITORY_ROOT
+            / "applications/services/poison_profiles/poison_profiles.c"
+        ).read_text(encoding="utf-8")
+        self.assertIn("PoisonProfileState* state = malloc(sizeof(*state));", source)
+
+    @unittest.skipUnless(
+        any(path.exists() for path in PRODUCTION_ELF_CANDIDATES),
+        "production ELF has not been built",
+    )
+    def test_production_elf_startup_stack_fits_loader_budget(self) -> None:
+        elf = next(path for path in PRODUCTION_ELF_CANDIDATES if path.exists())
+        objdump = (
+            REPOSITORY_ROOT
+            / "toolchain/arm64-darwin/bin/arm-none-eabi-objdump"
+        )
+        report = analyze_startup_stack(
+            elf,
+            str(objdump),
+            "loader_srv",
+            tuple(hook[2] for hook in POISON_STARTUP_HOOKS),
+            2048,
+        )
+        self.assertTrue(report["passed"])
+
     def test_returning_poison_hooks_are_startup_apps_not_services(self) -> None:
         for manifest_name, source_name, expected_entry_point in POISON_STARTUP_HOOKS:
             with self.subTest(manifest=manifest_name):
