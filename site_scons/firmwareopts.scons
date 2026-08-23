@@ -12,14 +12,19 @@ if ENV["DEBUG"]:
         ],
     )
 elif ENV["COMPACT"]:
+    compact_ccflags = ["-Oz"]
+    compact_linkflags = []
+    if ENV["IS_BASE_FIRMWARE"]:
+        compact_ccflags.append("-flto")
+        compact_linkflags.append("-flto")
+
     ENV.Append(
         CPPDEFINES=[
             "FURI_NDEBUG",
             "NDEBUG",
         ],
-        CCFLAGS=[
-            "-Os",
-        ],
+        CCFLAGS=compact_ccflags,
+        LINKFLAGS=compact_linkflags,
     )
 else:
     ENV.Append(

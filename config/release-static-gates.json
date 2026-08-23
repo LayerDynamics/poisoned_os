@@ -1,0 +1,22 @@
+{
+  "schema": "poison.release-static-gates/v1",
+  "profiles": {
+    "stable": [
+      { "id": "host-tools", "command": ["python3", "-m", "unittest", "discover", "tools/tests"] },
+      { "id": "rust-tools", "command": ["python3", "-m", "unittest", "discover", "tools/rust/tests"] },
+      { "id": "javascript-tools", "command": ["python3", "-m", "unittest", "discover", "tools/javascript/tests"] },
+      { "id": "release-tools", "command": ["python3", "-m", "unittest", "discover", "tools/release/tests"] },
+      { "id": "security-tools", "command": ["python3", "-m", "unittest", "discover", "tools/security/tests"] },
+      { "id": "fuzz-matrix", "command": ["python3", "tools/security/run_fuzz_matrix.py", "--profile", "release"] },
+      { "id": "adversarial-security", "command": ["python3", "tools/security/run_adversarial_suite.py", "--release-candidate"] },
+      { "id": "migration-tools", "command": ["python3", "-m", "unittest", "discover", "tools/migration/tests"] },
+      { "id": "rust-vendor", "command": ["python3", "tools/rust/verify_vendor.py", "--locked"] },
+      { "id": "bridge", "command": ["python3", "tools/rust/cargo.py", "test", "--manifest-path", "bridge/Cargo.toml", "--offline"] },
+      { "id": "bridge-clippy", "command": ["python3", "tools/rust/cargo.py", "clippy", "--manifest-path", "bridge/Cargo.toml", "--offline", "--", "-D", "warnings"] },
+      { "id": "dashboard", "command": ["pnpm", "--dir", "dashboard", "verify"] },
+      { "id": "catalog", "command": ["python3", "tools/catalog/validate_catalog.py", "data/poison/catalog/tools.json"] },
+      { "id": "documentation", "command": ["python3", "tools/verify_docs.py"] },
+      { "id": "diff-hygiene", "command": ["git", "diff", "--check"] }
+    ]
+  }
+}

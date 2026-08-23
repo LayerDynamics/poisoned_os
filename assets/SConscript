@@ -20,15 +20,37 @@ proto_src = assetsenv.Glob("protobuf/*.proto", source=True)
 proto_options = assetsenv.Glob("protobuf/*.options", source=True)
 proto = assetsenv.ProtoBuilder(assetsenv["ASSETS_WORK_DIR"], proto_src)
 assetsenv.Depends(proto, proto_options)
+protocol_alias_targets = [proto]
+if assetsenv["IS_BASE_FIRMWARE"]:
+    protocol_governance_inputs = [
+        assetsenv.File("#/tools/protocol/generate.py"),
+        assetsenv.File("#/tools/protocol/check_generated.py"),
+        assetsenv.File("#/tools/protocol/compatibility.py"),
+        assetsenv.File("#/tools/protocol/package.json"),
+        assetsenv.File("#/tools/protocol/pnpm-lock.yaml"),
+        assetsenv.File("#/tools/protocol/Cargo.toml"),
+        assetsenv.File("#/tools/protocol/Cargo.lock"),
+        assetsenv.File("#/tools/protocol/rust-toolchain.toml"),
+        assetsenv.File("#/tools/protocol/src/main.rs"),
+        assetsenv.File("#/schemas/protocol/bounds.yaml"),
+        assetsenv.File("#/provenance/protocol-previous.json"),
+    ]
+    protocol_governance = assetsenv.GenerateProtocolBindings(
+        assetsenv.File("#/generated/protocol/manifest.json"),
+        proto_src + proto_options + protocol_governance_inputs,
+    )
+    protocol_alias_targets.append(protocol_governance)
 # Precious(proto)
-assetsenv.Alias("proto", proto)
+assetsenv.Alias("proto", protocol_alias_targets)
 
 
 # Internal animations
 
+poison_animation_source = assetsenv["ASSETS_SRC_DIR"].Dir("poison")
+
 dolphin_internal = assetsenv.DolphinSymBuilder(
     assetsenv["ASSETS_WORK_DIR"],
-    assetsenv["ASSETS_SRC_DIR"].Dir("dolphin"),
+    poison_animation_source,
     DOLPHIN_RES_TYPE="internal",
 )
 assetsenv.Alias("dolphin_internal", dolphin_internal)
@@ -38,7 +60,7 @@ assetsenv.Alias("dolphin_internal", dolphin_internal)
 
 dolphin_blocking = assetsenv.DolphinSymBuilder(
     assetsenv["ASSETS_WORK_DIR"],
-    assetsenv["ASSETS_SRC_DIR"].Dir("dolphin"),
+    poison_animation_source,
     DOLPHIN_RES_TYPE="blocking",
 )
 assetsenv.Alias("dolphin_blocking", dolphin_blocking)
@@ -66,7 +88,7 @@ if assetsenv["IS_BASE_FIRMWARE"]:
     # External dolphin animations
     dolphin_external = assetsenv.DolphinExtBuilder(
         dolphin_external_out_dir,
-        assetsenv["ASSETS_SRC_DIR"].Dir("dolphin"),
+        poison_animation_source,
         DOLPHIN_RES_TYPE="external",
     )
     if assetsenv["FORCE"]:

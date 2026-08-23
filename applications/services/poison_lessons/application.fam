@@ -1,0 +1,9 @@
+App(
+    appid="poison_lessons",
+    name="Poison Lessons",
+    apptype=FlipperAppType.STARTUP,
+    entry_point="poison_lessons_on_system_start",
+    order=131,
+    sources=["*.c"],
+    sdk_headers=["poison_lessons.h"],
+)

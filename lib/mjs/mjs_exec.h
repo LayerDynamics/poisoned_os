@@ -20,6 +20,13 @@ extern "C" {
 
 MJS_PRIVATE mjs_err_t mjs_execute(struct mjs* mjs, size_t off, mjs_val_t* res);
 
+MJS_PRIVATE mjs_err_t mjs_debug_eval(
+    struct mjs* mjs,
+    const char* src,
+    mjs_val_t* res,
+    char* error,
+    size_t error_size);
+
 #if defined(__cplusplus)
 }
 #endif /* __cplusplus */

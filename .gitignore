@@ -6,6 +6,7 @@ build/
 dist/
 .fbt/
 .cache/
+.sconsign.dblite
 /toolchain/
 artifacts/**/*.tmp
 artifacts/sbom/*.json
@@ -13,8 +14,13 @@ artifacts/sbom/*.json
 dashboard/node_modules/
 dashboard/.vite/
 dashboard/coverage/
+web-installer/node_modules/
+web-installer/.vite/
+web-installer/dist/
 bridge/target/
 tools/protocol/target/
+tools/protocol/node_modules/
+applications/system/js_app/packages/fz-sdk/node_modules/
 rust/target/
 
 # Generated signing material and local secrets

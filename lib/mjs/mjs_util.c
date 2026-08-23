@@ -140,6 +140,7 @@ MJS_PRIVATE const char* opcodetostr(uint8_t opcode) {
         "BCODE_HDR",
         "ARGS",
         "FOR_IN_NEXT",
+        "DEBUGGER",
     };
     const char* name = "???";
     assert(ARRAY_SIZE(names) == OP_MAX);

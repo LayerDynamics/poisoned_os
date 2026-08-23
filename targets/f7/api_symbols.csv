@@ -1,5 +1,6 @@
 entry,status,name,type,params
-Version,+,88.2,,
+Version,+,88.61,,
+Header,+,applications/drivers/esp32marauder/esp32_marauder_driver.h,,
 Header,+,applications/drivers/subghz/cc1101_ext/cc1101_ext_interconnect.h,,
 Header,+,applications/services/bt/bt_service/bt.h,,
 Header,+,applications/services/bt/bt_service/bt_keys_storage.h,,
@@ -39,9 +40,46 @@ Header,+,applications/services/loader/loader.h,,
 Header,+,applications/services/locale/locale.h,,
 Header,+,applications/services/notification/notification.h,,
 Header,+,applications/services/notification/notification_messages.h,,
+Header,+,applications/services/poison_app/poison_app.h,,
+Header,+,applications/services/poison_app/poison_app_sdk.h,,
+Header,+,applications/services/poison_audit/poison_audit.h,,
+Header,+,applications/services/poison_diagnostics/poison_diagnostics.h,,
+Header,+,applications/services/poison_evidence/poison_case.h,,
+Header,+,applications/services/poison_evidence/poison_evidence.h,,
+Header,+,applications/services/poison_evidence/poison_tool_run.h,,
+Header,+,applications/services/poison_lessons/poison_lessons.h,,
+Header,+,applications/services/poison_packages/poison_content_update.h,,
+Header,+,applications/services/poison_packages/poison_package_catalog.h,,
+Header,+,applications/services/poison_packages/poison_package_verify.h,,
+Header,+,applications/services/poison_packages/poison_packages.h,,
+Header,+,applications/services/poison_profiles/poison_profile_assets.h,,
+Header,+,applications/services/poison_profiles/poison_profiles.h,,
+Header,+,applications/services/poison_rust_api/poison_rust_api.h,,
+Header,+,applications/services/poison_tools/poison_ble_adapter.h,,
+Header,+,applications/services/poison_tools/poison_esp_adapter.h,,
+Header,+,applications/services/poison_tools/poison_gpio_adapter.h,,
+Header,+,applications/services/poison_tools/poison_ibutton_adapter.h,,
+Header,+,applications/services/poison_tools/poison_infrared_adapter.h,,
+Header,+,applications/services/poison_tools/poison_lfrfid_adapter.h,,
+Header,+,applications/services/poison_tools/poison_marauder_adapter.h,,
+Header,+,applications/services/poison_tools/poison_nfc_adapter.h,,
+Header,+,applications/services/poison_tools/poison_serial_adapter.h,,
+Header,+,applications/services/poison_tools/poison_storage_adapter.h,,
+Header,+,applications/services/poison_tools/poison_subghz_adapter.h,,
+Header,+,applications/services/poison_tools/poison_tool_adapters.h,,
+Header,+,applications/services/poison_tools/poison_tools.h,,
+Header,+,applications/services/poison_tools/poison_usb_hid_adapter.h,,
+Header,+,applications/services/poison_vfs/poison_vfs.h,,
+Header,+,applications/services/poison_vfs/poison_vfs_paths.h,,
+Header,+,applications/services/poison_workload/poison_js_bundle.h,,
+Header,+,applications/services/poison_workload/poison_workload.h,,
+Header,+,applications/services/poison_workload/poison_workload_js_adapter.h,,
+Header,+,applications/services/poison_workload/poison_workload_native_adapter.h,,
 Header,+,applications/services/power/power_service/power.h,,
 Header,+,applications/services/rpc/rpc_app.h,,
+Header,+,applications/services/rpc/rpc_poison_crypto.h,,
 Header,+,applications/services/storage/storage.h,,
+Header,+,applications/system/poison_recovery/poison_recovery.h,,
 Header,+,lib/bit_lib/bit_lib.h,,
 Header,+,lib/ble_profile/extra_profiles/hid_profile.h,,
 Header,+,lib/ble_profile/extra_services/hid_service.h,,
@@ -1045,6 +1083,11 @@ Function,-,erfcf,float,float
 Function,-,erfcl,long double,long double
 Function,-,erff,float,float
 Function,-,erfl,long double,long double
+Function,+,esp32_marauder_command_at,const Esp32MarauderCommandDescriptor*,size_t
+Function,+,esp32_marauder_command_count,size_t,
+Function,+,esp32_marauder_command_find,const Esp32MarauderCommandDescriptor*,const char*
+Function,+,esp32_marauder_command_format,_Bool,"const char*, const char*, char*, size_t"
+Function,+,esp32_marauder_driver_on_system_start,void,void*
 Function,-,exit,void,int
 Function,-,exp,double,double
 Function,-,exp10,double,double
@@ -2291,6 +2334,16 @@ Function,-,j1f,float,float
 Function,-,jn,double,"int, double"
 Function,-,jnf,float,"int, float"
 Function,-,jrand48,long,unsigned short[3]
+Function,+,js_limits_account,_Bool,"JsLimits*, const JsLimitsUsage*"
+Function,+,js_limits_init,void,"JsLimits*, const JsLimitsConfig*, uint32_t"
+Function,+,js_limits_poll,_Bool,"JsLimits*, uint32_t, uint32_t"
+Function,+,js_limits_reason,JsLimitReason,const JsLimits*
+Function,+,js_limits_reason_text,const char*,JsLimitReason
+Function,+,js_limits_triggered,_Bool,const JsLimits*
+Function,+,js_thread_account,_Bool,"mjs*, const JsLimitsUsage*"
+Function,+,js_thread_run,JsThread*,"const char*, JsThreadCallback, void*"
+Function,+,js_thread_run_limited,JsThread*,"const char*, JsThreadCallback, void*, const JsLimitsConfig*"
+Function,+,js_thread_stop,void,JsThread*
 Function,+,keys_dict_add_key,_Bool,"KeysDict*, const uint8_t*, size_t"
 Function,+,keys_dict_alloc,KeysDict*,"const char*, KeysDictMode, size_t"
 Function,+,keys_dict_check_presence,_Bool,const char*
@@ -2625,6 +2678,7 @@ Function,+,menu_alloc,Menu*,
 Function,+,menu_free,void,Menu*
 Function,+,menu_get_view,View*,Menu*
 Function,+,menu_reset,void,Menu*
+Function,+,menu_set_header,void,"Menu*, const char*"
 Function,+,menu_set_selected_item,void,"Menu*, uint32_t"
 Function,+,mf_classic_alloc,MfClassicData*,
 Function,+,mf_classic_block_to_value,_Bool,"const MfClassicBlock*, int32_t*, uint8_t*"
@@ -2826,6 +2880,7 @@ Function,+,mjs_is_string,int,mjs_val_t
 Function,+,mjs_is_truthy,int,"mjs*, mjs_val_t"
 Function,+,mjs_is_typed_array,int,mjs_val_t
 Function,+,mjs_is_undefined,int,mjs_val_t
+Function,+,mjs_memory_usage,size_t,const mjs*
 Function,+,mjs_mk_array,mjs_val_t,mjs*
 Function,+,mjs_mk_array_buf,mjs_val_t,"mjs*, char*, size_t"
 Function,+,mjs_mk_boolean,mjs_val_t,"mjs*, int"
@@ -3062,6 +3117,206 @@ Function,+,plugin_manager_get_count,uint32_t,PluginManager*
 Function,+,plugin_manager_get_ep,const void*,"PluginManager*, uint32_t"
 Function,+,plugin_manager_load_all,PluginManagerError,"PluginManager*, const char*"
 Function,+,plugin_manager_load_single,PluginManagerError,"PluginManager*, const char*"
+Function,+,poison_app_accept_event,_Bool,"PoisonAppRun*, const PoisonAppEvent*"
+Function,+,poison_app_cancel,_Bool,PoisonAppRun*
+Function,+,poison_app_endpoint_register,_Bool,"const char*, const char*, PoisonAppCommandCallback, void*"
+Function,+,poison_app_endpoint_unregister,void,void*
+Function,+,poison_app_on_system_start,void,
+Function,+,poison_app_publish_event,_Bool,const PoisonAppEvent*
+Function,+,poison_app_run_start,_Bool,"PoisonAppRun*, const char*, const char*"
+Function,+,poison_audit_append,_Bool,"PoisonAuditChain*, const uint8_t[( 32u )], const char*, const char*, PoisonAuditDecision, uint64_t, const uint8_t[( 32u )], const char*, PoisonAuditEvent*"
+Function,+,poison_audit_get,PoisonAuditChain*,
+Function,+,poison_audit_init,void,PoisonAuditChain*
+Function,+,poison_audit_on_system_start,void,
+Function,+,poison_ble_close,void,PoisonBleHandle*
+Function,+,poison_ble_consumer_press,_Bool,"PoisonBleHandle*, uint16_t"
+Function,+,poison_ble_consumer_release,_Bool,"PoisonBleHandle*, uint16_t"
+Function,+,poison_ble_is_active,_Bool,
+Function,+,poison_ble_key_press,_Bool,"PoisonBleHandle*, uint16_t"
+Function,+,poison_ble_key_release,_Bool,"PoisonBleHandle*, uint16_t"
+Function,+,poison_ble_mouse_move,_Bool,"PoisonBleHandle*, int8_t, int8_t"
+Function,+,poison_ble_mouse_press,_Bool,"PoisonBleHandle*, uint8_t"
+Function,+,poison_ble_mouse_release,_Bool,"PoisonBleHandle*, uint8_t"
+Function,+,poison_ble_mouse_scroll,_Bool,"PoisonBleHandle*, int8_t"
+Function,+,poison_ble_open,PoisonBleHandle*,
+Function,+,poison_ble_release_all,void,PoisonBleHandle*
+Function,+,poison_ble_start_advertising,_Bool,PoisonBleHandle*
+Function,+,poison_ble_stop_advertising,void,PoisonBleHandle*
+Function,+,poison_case_close,_Bool,PoisonEvidenceCase*
+Function,+,poison_case_create,_Bool,"PoisonEvidenceCase*, const char*, const char*"
+Function,+,poison_content_update_admit,PoisonContentUpdateAdmission,"PoisonContentUpdate*, const PoisonContentUpdateManifest*, const PoisonContentUpdateEnvironment*"
+Function,+,poison_content_update_begin,_Bool,"PoisonContentUpdate*, const char*, const char*, const char*, uint32_t"
+Function,+,poison_content_update_can_activate,_Bool,const PoisonContentUpdate*
+Function,+,poison_content_update_cancel,_Bool,PoisonContentUpdate*
+Function,+,poison_content_update_confirm,_Bool,"PoisonContentUpdate*, _Bool"
+Function,+,poison_content_update_receive,_Bool,"PoisonContentUpdate*, uint32_t"
+Function,+,poison_content_update_recover,_Bool,"PoisonContentUpdate*, _Bool"
+Function,+,poison_content_update_report_health,_Bool,"PoisonContentUpdate*, _Bool"
+Function,+,poison_content_update_rollback,_Bool,PoisonContentUpdate*
+Function,+,poison_content_update_transition,_Bool,"PoisonContentUpdate*, PoisonContentUpdateState"
+Function,+,poison_content_update_verify_payload,_Bool,"PoisonContentUpdate*, const char*"
+Function,+,poison_crypto_ensure_device_key,_Bool,
+Function,+,poison_crypto_gcm_decrypt,PoisonCryptoResult,"const uint8_t[( 32u )], const uint8_t[( 12u )], const uint8_t*, size_t, const uint8_t*, uint8_t*, size_t, const uint8_t[( 16u )]"
+Function,+,poison_crypto_gcm_encrypt,PoisonCryptoResult,"const uint8_t[( 32u )], const uint8_t[( 12u )], const uint8_t*, size_t, const uint8_t*, uint8_t*, size_t, uint8_t[( 16u )]"
+Function,+,poison_crypto_generate_p256_keypair,PoisonCryptoResult,"uint8_t[( 32u )], uint8_t[( 65u )]"
+Function,+,poison_crypto_hkdf_sha256,PoisonCryptoResult,"const uint8_t*, size_t, const uint8_t*, size_t, const uint8_t*, size_t, uint8_t*, size_t"
+Function,+,poison_crypto_hmac_sha256,PoisonCryptoResult,"const uint8_t*, size_t, const uint8_t*, size_t, uint8_t[( 32u )]"
+Function,+,poison_crypto_p256_shared_secret,PoisonCryptoResult,"const uint8_t[( 32u )], const uint8_t[( 65u )], uint8_t[( 32u )]"
+Function,+,poison_crypto_sha256,PoisonCryptoResult,"const uint8_t*, size_t, uint8_t[( 32u )]"
+Function,+,poison_crypto_sign_p256_sha256,PoisonCryptoResult,"const uint8_t[( 32u )], const uint8_t[( 32u )], uint8_t[( 72u )], size_t*"
+Function,+,poison_crypto_verify_p256_sha256,PoisonCryptoResult,"const uint8_t[( 65u )], const uint8_t[( 32u )], const uint8_t*, size_t"
+Function,+,poison_diagnostics_category_name,const char*,PoisonDiagnosticCategory
+Function,+,poison_diagnostics_counters,const PoisonDiagnosticCounters*,const PoisonDiagnostics*
+Function,+,poison_diagnostics_get,PoisonDiagnostics*,
+Function,+,poison_diagnostics_increment,void,"PoisonDiagnostics*, PoisonDiagnosticCategory"
+Function,+,poison_diagnostics_init,void,PoisonDiagnostics*
+Function,+,poison_diagnostics_on_system_start,void,
+Function,+,poison_diagnostics_record,_Bool,"PoisonDiagnostics*, PoisonDiagnosticCategory, const char*, uint64_t, const uint8_t[32]"
+Function,+,poison_esp_target_id,const char*,PoisonEspTarget
+Function,+,poison_esp_target_parse,_Bool,"const char*, PoisonEspTarget*"
+Function,+,poison_evidence_abort,void,PoisonEvidenceTransaction*
+Function,+,poison_evidence_append,_Bool,"PoisonEvidenceTransaction*, const uint8_t*, size_t"
+Function,+,poison_evidence_begin,_Bool,"PoisonEvidenceStore*, PoisonEvidenceTransaction*, const char*, const char*, size_t, _Bool, const uint8_t[32]"
+Function,+,poison_evidence_capture,_Bool,"PoisonEvidenceStore*, const char*, const char*, const uint8_t*, size_t, _Bool, const uint8_t[32]"
+Function,+,poison_evidence_commit,_Bool,"PoisonEvidenceStore*, PoisonEvidenceTransaction*"
+Function,+,poison_evidence_find,const PoisonEvidenceRecord*,"const PoisonEvidenceStore*, const char*"
+Function,+,poison_evidence_on_system_start,void,
+Function,+,poison_evidence_store_init,void,PoisonEvidenceStore*
+Function,+,poison_gpio_configure,_Bool,"PoisonGpioPin, PoisonGpioMode, PoisonGpioPull"
+Function,+,poison_gpio_pin_name,const char*,PoisonGpioPin
+Function,+,poison_gpio_pin_parse,_Bool,"const char*, PoisonGpioPin*"
+Function,+,poison_gpio_read,_Bool,"PoisonGpioPin, _Bool*"
+Function,+,poison_gpio_release,void,PoisonGpioPin
+Function,+,poison_gpio_sample,_Bool,"PoisonGpioPin, uint32_t, uint32_t, PoisonGpioSample*"
+Function,+,poison_gpio_write,_Bool,"PoisonGpioPin, _Bool"
+Function,+,poison_ibutton_close,void,PoisonIbuttonHandle*
+Function,+,poison_ibutton_emulate_start,_Bool,PoisonIbuttonHandle*
+Function,+,poison_ibutton_emulate_stop,void,PoisonIbuttonHandle*
+Function,+,poison_ibutton_open,PoisonIbuttonHandle*,
+Function,+,poison_ibutton_read,_Bool,"PoisonIbuttonHandle*, PoisonIbuttonReadResult*"
+Function,+,poison_ibutton_write_id,_Bool,PoisonIbuttonHandle*
+Function,+,poison_infrared_close,void,PoisonInfraredHandle*
+Function,+,poison_infrared_open,PoisonInfraredHandle*,
+Function,+,poison_infrared_receive,_Bool,"PoisonInfraredHandle*, uint32_t, PoisonInfraredResult*"
+Function,+,poison_infrared_stop,void,PoisonInfraredHandle*
+Function,+,poison_infrared_transmit,_Bool,PoisonInfraredHandle*
+Function,+,poison_js_bundle_digest_valid,_Bool,const char*
+Function,+,poison_js_bundle_metadata_valid,_Bool,const PoisonJsBundleMetadata*
+Function,+,poison_lesson_add_step,_Bool,"PoisonLesson*, const char*, PoisonLessonStepKind, const char*, const char*"
+Function,+,poison_lesson_advance,_Bool,"PoisonLessonProgress*, const PoisonLesson*, const char*"
+Function,+,poison_lesson_init,_Bool,"PoisonLesson*, const char*, uint32_t, _Bool"
+Function,+,poison_lesson_progress_init,_Bool,"PoisonLessonProgress*, const PoisonLesson*, const char*"
+Function,+,poison_lesson_reset,_Bool,PoisonLessonProgress*
+Function,+,poison_lessons_on_system_start,void,
+Function,+,poison_lfrfid_session_alloc,PoisonLfRfidSession*,
+Function,+,poison_lfrfid_session_free,void,PoisonLfRfidSession*
+Function,+,poison_lfrfid_session_start,_Bool,PoisonLfRfidSession*
+Function,+,poison_lfrfid_session_stop,void,PoisonLfRfidSession*
+Function,+,poison_lfrfid_session_wait,_Bool,"PoisonLfRfidSession*, uint32_t, PoisonLfRfidDetection*"
+Function,+,poison_marauder_command_encode,_Bool,"PoisonMarauderCommand, char*, size_t"
+Function,+,poison_marauder_session_alloc,PoisonMarauderSession*,"FuriHalSerialId, uint32_t"
+Function,+,poison_marauder_session_free,void,PoisonMarauderSession*
+Function,+,poison_marauder_session_receive,size_t,"PoisonMarauderSession*, uint8_t*, size_t, uint32_t"
+Function,+,poison_marauder_session_send,_Bool,"PoisonMarauderSession*, PoisonMarauderCommand"
+Function,+,poison_marauder_session_send_command,_Bool,"PoisonMarauderSession*, const char*, const char*"
+Function,+,poison_marauder_session_start,_Bool,PoisonMarauderSession*
+Function,+,poison_marauder_session_stop,void,PoisonMarauderSession*
+Function,+,poison_marauder_session_take_dropped,uint32_t,PoisonMarauderSession*
+Function,+,poison_nfc_protocol_name,const char*,NfcProtocol
+Function,+,poison_nfc_session_alloc,PoisonNfcSession*,
+Function,+,poison_nfc_session_free,void,PoisonNfcSession*
+Function,+,poison_nfc_session_start,_Bool,PoisonNfcSession*
+Function,+,poison_nfc_session_stop,void,PoisonNfcSession*
+Function,+,poison_nfc_session_wait,_Bool,"PoisonNfcSession*, uint32_t, PoisonNfcDetection*"
+Function,+,poison_package_catalog_add,_Bool,"PoisonPackageCatalog*, const PoisonPackageCatalogRecord*"
+Function,+,poison_package_catalog_find,const PoisonPackageCatalogRecord*,"const PoisonPackageCatalog*, const char*, const char*, PoisonPackageCatalogSource"
+Function,+,poison_package_catalog_init,void,PoisonPackageCatalog*
+Function,+,poison_package_catalog_is_installable,_Bool,const PoisonPackageCatalogRecord*
+Function,+,poison_package_catalog_mark_source_missing,_Bool,"PoisonPackageCatalog*, PoisonPackageCatalogSource, const char*"
+Function,+,poison_package_verify_manifest,PoisonPackageVerifyResult,"const char*, const char*, const char*, const char*, const char*, _Bool, const char*"
+Function,+,poison_packages_on_system_start,void,
+Function,+,poison_policy_evaluate,PoisonPolicyDecision,"PoisonRole, PoisonCapability, _Bool, _Bool, uint32_t"
+Function,+,poison_policy_role_capabilities,PoisonCapability,PoisonRole
+Function,+,poison_profile_apply,_Bool,PoisonProfileStore*
+Function,+,poison_profile_asset_contrast_valid,_Bool,unsigned int
+Function,+,poison_profile_asset_identifier_valid,_Bool,"const char*, size_t"
+Function,+,poison_profile_preview,_Bool,"PoisonProfileStore*, const PoisonProfile*, uint64_t"
+Function,+,poison_profile_reset,_Bool,PoisonProfileStore*
+Function,+,poison_profile_store_init,void,PoisonProfileStore*
+Function,+,poison_profile_validate,_Bool,"const PoisonProfile*, uint64_t"
+Function,+,poison_profiles_on_system_start,void,
+Function,+,poison_recovery_begin_firmware,_Bool,PoisonRecovery*
+Function,+,poison_recovery_begin_profile,_Bool,PoisonRecovery*
+Function,+,poison_recovery_begin_reindex,_Bool,PoisonRecovery*
+Function,+,poison_recovery_boot_init,void,"PoisonRecovery*, _Bool, _Bool"
+Function,+,poison_recovery_cancel,_Bool,PoisonRecovery*
+Function,+,poison_recovery_complete,_Bool,"PoisonRecovery*, _Bool"
+Function,+,poison_recovery_enter_menu,_Bool,PoisonRecovery*
+Function,+,poison_recovery_on_system_start,void,
+Function,+,poison_rust_api_on_system_start,void,
+Function,+,poison_rust_byte_slice_valid,_Bool,"PoisonRustByteSlice, size_t"
+Function,+,poison_rust_check_capability,PoisonRustStatus,"uint32_t, _Bool"
+Function,+,poison_rust_validate_path,PoisonRustStatus,PoisonRustByteSlice
+Function,+,poison_serial_session_alloc,PoisonSerialSession*,"FuriHalSerialId, uint32_t, FuriHalSerialDataBits, FuriHalSerialParity, FuriHalSerialStopBits"
+Function,+,poison_serial_session_free,void,PoisonSerialSession*
+Function,+,poison_serial_session_receive,_Bool,"PoisonSerialSession*, uint8_t*, size_t, uint32_t, PoisonSerialReceiveResult*"
+Function,+,poison_serial_session_start,_Bool,PoisonSerialSession*
+Function,+,poison_serial_session_stop,void,PoisonSerialSession*
+Function,+,poison_serial_session_write,_Bool,"PoisonSerialSession*, const uint8_t*, size_t"
+Function,+,poison_storage_read,_Bool,"const char*, PoisonRole, uint32_t, uint8_t*, size_t, PoisonStorageReadResult*"
+Function,+,poison_storage_sha256,_Bool,"const char*, PoisonRole, char[65]"
+Function,+,poison_storage_sha256_cancellable,_Bool,"const char*, PoisonRole, char[65], PoisonStorageCancelCallback, void*"
+Function,+,poison_subghz_close,void,PoisonSubGhzHandle*
+Function,+,poison_subghz_frequency_valid,_Bool,"PoisonSubGhzHandle*, uint32_t"
+Function,+,poison_subghz_open,PoisonSubGhzHandle*,uint32_t
+Function,+,poison_subghz_receive,_Bool,"PoisonSubGhzHandle*, uint32_t, PoisonSubGhzResult*"
+Function,+,poison_subghz_stop,void,PoisonSubGhzHandle*
+Function,+,poison_subghz_transmit_complete,_Bool,PoisonSubGhzHandle*
+Function,+,poison_subghz_transmit_raw,_Bool,"PoisonSubGhzHandle*, uint32_t, const LevelDuration*, size_t"
+Function,+,poison_tool_adapter_for_family,_Bool,"const char*, PoisonToolAdapter*"
+Function,+,poison_tool_adapter_supports_capability,_Bool,"PoisonToolAdapter, const char*"
+Function,+,poison_tool_can_execute,_Bool,"const PoisonToolDescriptor*, const char*"
+Function,+,poison_tool_definition_authorized,_Bool,"const PoisonToolDefinition*, PoisonRole"
+Function,+,poison_tool_definition_find,const PoisonToolDefinition*,const char*
+Function,+,poison_tool_descriptor_valid,_Bool,const PoisonToolDescriptor*
+Function,+,poison_tool_run_finish,_Bool,"PoisonToolRun*, PoisonToolRunState"
+Function,+,poison_tool_run_start,_Bool,"PoisonToolRun*, const char*"
+Function,+,poison_tools_on_system_start,void,
+Function,+,poison_tools_run_is_active,_Bool,const char*
+Function,+,poison_tools_run_start,_Bool,"const char*, const char*, PoisonRole"
+Function,+,poison_tools_run_stop,_Bool,const char*
+Function,+,poison_usb_hid_close,void,PoisonUsbHidHandle*
+Function,+,poison_usb_hid_connected,_Bool,
+Function,+,poison_usb_hid_consumer_press,_Bool,uint16_t
+Function,+,poison_usb_hid_consumer_release,_Bool,uint16_t
+Function,+,poison_usb_hid_key_press,_Bool,uint16_t
+Function,+,poison_usb_hid_key_release,_Bool,uint16_t
+Function,+,poison_usb_hid_mouse_move,_Bool,"int8_t, int8_t"
+Function,+,poison_usb_hid_mouse_press,_Bool,uint8_t
+Function,+,poison_usb_hid_mouse_release,_Bool,uint8_t
+Function,+,poison_usb_hid_mouse_scroll,_Bool,int8_t
+Function,+,poison_usb_hid_open,PoisonUsbHidHandle*,
+Function,+,poison_usb_hid_release_all,void,
+Function,+,poison_vfs_normalize_path,_Bool,"const char*, char[( 256u ) + 1u]"
+Function,+,poison_vfs_on_system_start,void,
+Function,+,poison_vfs_resolve_path,_Bool,"const char*, PoisonRole, PoisonVfsOperation, PoisonVfsResolvedPath*"
+Function,+,poison_workload_account,_Bool,"PoisonWorkload*, const PoisonWorkloadUsage*, PoisonWorkloadTerminalReason"
+Function,+,poison_workload_append_console,_Bool,"PoisonWorkload*, PoisonWorkloadConsoleType, const char*"
+Function,+,poison_workload_authorize,_Bool,"const PoisonWorkloadAuthorization*, PoisonWorkloadOperation"
+Function,+,poison_workload_finalize_artifact,_Bool,"PoisonWorkload*, _Bool"
+Function,+,poison_workload_finish,_Bool,"PoisonWorkload*, _Bool"
+Function,+,poison_workload_force_terminate,_Bool,"PoisonWorkload*, PoisonWorkloadTerminalReason"
+Function,+,poison_workload_get,const PoisonWorkload*,const PoisonWorkload*
+Function,+,poison_workload_init,_Bool,"PoisonWorkload*, const char*, const char*, const char*, const PoisonWorkloadLimits*"
+Function,+,poison_workload_js_cancel,_Bool,PoisonWorkloadJsAdapter*
+Function,+,poison_workload_js_cleanup,void,PoisonWorkloadJsAdapter*
+Function,+,poison_workload_js_start,_Bool,"PoisonWorkloadJsAdapter*, PoisonWorkload*, const char*"
+Function,+,poison_workload_native_cancel,_Bool,PoisonWorkloadNativeAdapter*
+Function,+,poison_workload_native_cleanup,void,PoisonWorkloadNativeAdapter*
+Function,+,poison_workload_native_start,_Bool,"PoisonWorkloadNativeAdapter*, PoisonWorkload*, const char*"
+Function,+,poison_workload_on_system_start,void,
+Function,+,poison_workload_request_cancel,_Bool,PoisonWorkload*
+Function,+,poison_workload_start,_Bool,PoisonWorkload*
 Function,-,popen,FILE*,"const char*, const char*"
 Function,+,popup_alloc,Popup*,
 Function,+,popup_disable_timeout,void,Popup*

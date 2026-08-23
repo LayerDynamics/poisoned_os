@@ -35,9 +35,12 @@ IGNORED_ROOT_PREFIXES = {
 IGNORED_PATH_PREFIXES = {
     "bridge/target",
     "dashboard/node_modules",
+    "tools/protocol/node_modules",
     "tools/protocol/target",
 }
 IGNORED_EXACT_PATHS = {
+    ".sconsign.dblite",
+    "lib/nanopb/generator/proto/nanopb_pb2.py",
     "tools/hil/inventory.json",
 }
 SHA256_PATTERN = re.compile(r"[0-9a-f]{64}\Z")
@@ -216,6 +219,51 @@ def scan_paths(root: Path, lock_path: Path) -> dict[str, Path]:
     return paths
 
 
+def refresh_lock(root: Path, lock_path: Path, lock: dict[str, Any]) -> dict[str, Any]:
+    previous = {entry["path"]: entry for entry in validate_lock(lock)}
+    dependency_paths = tuple(
+        sorted(
+            (dependency["path"] for dependency in lock["dependencies"]),
+            key=len,
+            reverse=True,
+        )
+    )
+    files: list[dict[str, str]] = []
+    for path, source in sorted(scan_paths(root, lock_path).items()):
+        mode = file_mode(source)
+        digest = file_digest(source)
+        if old := previous.get(path):
+            classification = old["classification"]
+            if classification == "upstream" and (
+                old["mode"] != mode or old["sha256"] != digest
+            ):
+                classification = "poison-modified"
+        elif any(
+            path == dependency or path.startswith(f"{dependency}/")
+            for dependency in dependency_paths
+        ):
+            classification = "dependency"
+        else:
+            classification = "poison-added"
+        files.append(
+            {
+                "classification": classification,
+                "mode": mode,
+                "path": path,
+                "sha256": digest,
+            }
+        )
+
+    refreshed = dict(lock)
+    refreshed["files"] = files
+    refreshed["upstreamTreeSha256"] = tree_digest(files)
+    return refreshed
+
+
+def canonical_json(value: dict[str, Any]) -> str:
+    return json.dumps(value, indent=2, sort_keys=True) + "\n"
+
+
 def verify(root: Path, lock_path: Path) -> list[str]:
     lock = load_lock(lock_path)
     expected_entries = validate_lock(lock)
@@ -250,6 +298,7 @@ def parse_arguments() -> argparse.Namespace:
     parser.add_argument(
         "--lock", type=Path, default=repository_root / "provenance" / "baseline.lock.json"
     )
+    parser.add_argument("--write", action="store_true")
     return parser.parse_args()
 
 
@@ -258,8 +307,14 @@ def main() -> int:
     root = arguments.root.resolve()
     lock_path = arguments.lock.resolve()
     try:
+        if arguments.write:
+            lock = load_lock(lock_path)
+            refreshed = refresh_lock(root, lock_path, lock)
+            lock_path.write_text(canonical_json(refreshed), encoding="utf-8")
+            print(f"wrote {lock_path}")
+            return 0
         errors = verify(root, lock_path)
-    except BaselineError as error:
+    except (BaselineError, OSError, UnicodeError) as error:
         print(error, file=sys.stderr)
         return 1
     if errors:

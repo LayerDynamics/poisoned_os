@@ -59,12 +59,13 @@ static void variable_item_list_draw_callback(Canvas* canvas, void* _model) {
 
             if(position == model->position) {
                 canvas_set_color(canvas, ColorBlack);
-                elements_slightly_rounded_box(canvas, 0, item_y + 1, item_width, item_height - 2);
+                canvas_draw_box(canvas, 0, item_y, item_width, item_height);
                 canvas_set_color(canvas, ColorWhite);
             } else {
                 canvas_set_color(canvas, ColorBlack);
             }
 
+            canvas_draw_line(canvas, 68, item_y, 68, item_y + item_height - 1);
             canvas_draw_str(canvas, 6, item_text_y, item->label);
 
             if(item->current_value_index > 0) {

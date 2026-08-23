@@ -1,0 +1,28 @@
+var eventLoop = require("@flipperdevices/fz-sdk/event_loop");
+var os = require("./os.js");
+var queue = [];
+var queued = false;
+function drain() { queued = false; var items = queue.splice(0, queue.length); for (var i = 0; i < items.length; i++) items[i](); }
+module.exports = {
+    platform: os.platform(),
+    arch: os.arch(),
+    version: "poison-mjs-1",
+    cwd: function() { return "/ext"; },
+    env: {},
+    nextTick: function(callback) {
+        if (typeof callback !== "function") throw new TypeError("nextTick callback must be a function");
+        queue.push(callback);
+        if (!queued) {
+            queued = true;
+            __poison_async_acquire();
+            var timer = eventLoop.timer("oneshot", 1);
+            eventLoop.subscribe(timer, function(subscription) {
+                subscription.cancel();
+                if (__poison_async_release()) eventLoop.stop();
+                drain();
+            });
+        }
+    },
+    uptime: function() { return 0; },
+    exit: function(code) { throw new Error("process.exit(" + (code || 0) + ")"); },
+};

@@ -24,7 +24,11 @@ void desktop_debug_render(Canvas* canvas, void* model) {
     char buffer[64];
 
     canvas_set_color(canvas, ColorBlack);
-    canvas_set_font(canvas, FontPrimary);
+    canvas_draw_box(canvas, 0, STATUS_BAR_Y_SHIFT, 128, 13);
+    canvas_set_color(canvas, ColorWhite);
+    canvas_set_font(canvas, FontSecondary);
+    canvas_draw_str(canvas, 4, STATUS_BAR_Y_SHIFT + 10, "POISON // DIAGNOSTIC");
+    canvas_set_color(canvas, ColorBlack);
 
     uint32_t uptime = furi_get_tick() / furi_kernel_get_tick_frequency();
     snprintf(
@@ -34,9 +38,8 @@ void desktop_debug_render(Canvas* canvas, void* model) {
         uptime / 60 / 60,
         uptime / 60 % 60,
         uptime % 60);
-    canvas_draw_str_aligned(canvas, 64, 1 + STATUS_BAR_Y_SHIFT, AlignCenter, AlignTop, buffer);
-
     canvas_set_font(canvas, FontSecondary);
+    canvas_draw_str(canvas, 0, 33, buffer);
 
     // Hardware version
     const char* my_name = furi_hal_version_get_name_ptr();
@@ -51,7 +54,7 @@ void desktop_debug_render(Canvas* canvas, void* model) {
         furi_hal_version_get_hw_region_name(),
         furi_hal_region_get_name(),
         my_name ? my_name : "Unknown");
-    canvas_draw_str(canvas, 0, 19 + STATUS_BAR_Y_SHIFT, buffer);
+    canvas_draw_str(canvas, 0, 41, buffer);
 
     ver = furi_hal_version_get_firmware_version();
     const BleGlueC2Info* c2_ver = NULL;
@@ -59,13 +62,13 @@ void desktop_debug_render(Canvas* canvas, void* model) {
     c2_ver = ble_glue_get_c2_info();
 #endif
     if(!ver) { //-V1051
-        canvas_draw_str(canvas, 0, 30 + STATUS_BAR_Y_SHIFT, "No info");
+        canvas_draw_str(canvas, 0, 49, "No info");
         return;
     }
 
     snprintf(
         buffer, sizeof(buffer), "%s [%s]", version_get_version(ver), version_get_builddate(ver));
-    canvas_draw_str(canvas, 0, 30 + STATUS_BAR_Y_SHIFT, buffer);
+    canvas_draw_str(canvas, 0, 49, buffer);
 
     uint16_t api_major, api_minor;
     furi_hal_info_get_api_version(&api_major, &api_minor);
@@ -78,11 +81,11 @@ void desktop_debug_render(Canvas* canvas, void* model) {
         api_major,
         api_minor,
         c2_ver ? c2_ver->StackTypeString : "<none>");
-    canvas_draw_str(canvas, 0, 40 + STATUS_BAR_Y_SHIFT, buffer);
+    canvas_draw_str(canvas, 0, 57, buffer);
 
     snprintf(
         buffer, sizeof(buffer), "[%d] %s", version_get_target(ver), version_get_gitbranch(ver));
-    canvas_draw_str(canvas, 0, 50 + STATUS_BAR_Y_SHIFT, buffer);
+    canvas_draw_str(canvas, 0, 63, buffer);
 }
 
 View* desktop_debug_get_view(DesktopDebugView* debug_view) {

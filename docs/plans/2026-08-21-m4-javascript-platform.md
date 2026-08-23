@@ -15,15 +15,29 @@
 
 | Achievement | Status before implementation | Required closing evidence |
 |---|---|---|
-| A4.1 Project/workload contracts | Not started | Cross-language manifest/lifecycle/bounds/current-previous compatibility fixtures pass. |
-| A4.2 Capability-safe runtime | Not started | Every existing plugin is mapped and privilege/resource/termination attacks fail closed. |
-| A4.3 Workload management | Not started | Ordered isolated console/artifact lifecycle survives retry, disconnect, cancel, and crash. |
-| A4.4 Offline browser IDE | Not started | Versioned edit/validate/run/debug/package works after WAN removal. |
-| A4.5 Served interfaces | Not started | Physical bundle delivery succeeds and every browser/device sandbox escape probe fails. |
-| A4.6 Dependencies and physical workflow | Not started | Locked vendoring and full offline source-to-device workflow pass on hardware. |
-| A4.7 Wasm decision | Not started | Physical measurements generate a reviewed ADR-0006 go/no-go result. |
+| A4.1 Project/workload contracts | In progress | Existing workload contract foundations are present; cross-language lifecycle fixtures and physical execution remain. |
+| A4.2 Capability-safe runtime | In progress: all current JS plugin families are mapped to explicit capability bits with default-deny checks and firmware regression coverage; managed-runner capability propagation, complete allocation accounting, and physical attack coverage remain. | Every existing plugin is mapped and privilege/resource/termination attacks fail closed. |
+| A4.3 Workload management | In progress: `poison_workload` now owns bounded lifecycle, accounting, authorization, ordered console frames, artifact limits, and a single `js_thread` adapter with firmware regression coverage; authenticated RPC wiring, M2 evidence persistence, diagnostics counters, and disconnect/reconnect integration remain. | Ordered isolated console/artifact lifecycle survives retry, disconnect, cancel, and crash. |
+| A4.4 Offline browser IDE | In progress: manifest validation, syntax diagnostics, deterministic project packaging, file explorer/editor, run controls, console, and diagnostics components are implemented with dashboard tests; revision persistence, M2 transfer wiring, and physical offline E2E remain. | Versioned edit/validate/run/debug/package works after WAN removal. |
+| A4.5 Served interfaces | In progress: dashboard bundle digest verification, CSP, opaque-origin iframe, broker foundations, and firmware-side bounded bundle metadata validation are present; authenticated physical delivery and escape probes remain. | Browser-side digest verification, CSP, opaque-origin iframe, and broker foundations are present; physical bundle delivery and escape probes remain. |
+| A4.6 Dependencies and physical workflow | In progress: deterministic lock validation, official SDK bundler boundary, registered JavaScript HIL suites, and a dashboard `verify` gate are present; device execution and physical E2E remain. | Deterministic lock validation and official SDK bundler boundary are present; device workflow and physical E2E remain. |
+| A4.7 Wasm decision | In progress: ADR-0006 now records the measured-runtime gate and the fail-closed boundary; target/runtime measurements and reviewed go/no-go evidence remain. | Physical measurements generate a reviewed ADR-0006 go/no-go result. |
 
 **Canonical task commands:** firmware tasks run `./fbt FIRMWARE_APP_SET=unit_tests` and `python3 tools/hil/run_suite.py --suite firmware-units`; dashboard tests run `pnpm --dir dashboard verify`; JavaScript tool tests run `python3 -m unittest discover tools/javascript/tests`; physical/sandbox workflows run the exact HIL and Playwright commands named below. Record command, runtime/firmware/browser versions, physical IDs, exit code, and evidence digest before changing a ledger row.
+
+**Implementation evidence (Task 2 foundation):** `applications/system/js_app/js_capabilities.c/.h` maps the current flipper, event-loop, GUI/view, notification, BadUSB, serial, GPIO, math, storage, and crypto plugins to explicit capability bits. Unknown modules and missing grants fail closed; `poison_js_capabilities_test.c` covers allow, denial, and unknown-module cases, and the unit firmware image passed on 2026-08-21. Managed-runner capability-mask propagation, complete allocation accounting, and physical attack coverage remain open.
+
+`js_developer_policy.c/.h` now binds locally trusted native access to signer ID, project digest, symbol scope, owner confirmation, bounded expiry, and explicit revocation. `poison_js_developer_policy_test.c` covers denied activation, binding mismatch, expiry, and revocation, and the unit firmware image rebuilt successfully.
+
+**Implementation evidence (Task 3):** `applications/system/js_app/js_limits.c/.h` provides bounded fuel, wrap-safe wall-time polling, and reusable accounting for heap, source, modules, parser/stack depth, callbacks, timers, handles, logs, and artifacts. `lib/mjs/mjs_core_public.h/.c` exposes the complete reserved interpreter footprint (all mJS buffers, bytecode parts, GC arenas, FFI callback records, and owned error strings); `js_thread` samples its growth at every mJS execution safe point and charges it to the heap limit. The public `js_thread_account()` hook accounts console logs and event-loop callbacks/timers/handles, and the event-loop FAP resolves the hook through SDK API version 88.29. `poison_js_limits_test.c` covers mJS footprint reporting, fuel exhaustion, wall-time expiry, tick wrap, and resource-limit termination; the unit firmware image and event-loop FAP build passed on 2026-08-21. Physical infinite-loop recovery evidence remains a hardware test requirement.
+
+**Implementation evidence (Task 4 foundation):** `applications/services/poison_workload/poison_workload.c` implements queued/running/cancelling and explicit terminal states, per-workload bounded usage, independent operation authorization, monotonic typed console frames with truncation, artifact limits, and terminal reasons. `poison_workload_js_adapter.c` owns the existing `js_thread` instance for start/cancel/cleanup; `poison_workload_test.c` covers lifecycle, accounting-limit termination, authorization, cancellation, and artifact finalization, and `./fbt FIRMWARE_APP_SET=unit_tests` passed with API version 88.20. Authenticated RPC transport, M2 evidence commit integration, diagnostics counters, and reconnect/physical evidence remain open.
+
+**Implementation evidence (Task 5 foundation):** `dashboard/src/workloads/javascript/` now provides manifest validation and policy clamping, mJS-specific syntax diagnostics, deterministic file ordering/package canonicalization, project explorer/editor, run/stop controls, ordered console, diagnostics views, and an ordered revision store with IndexedDB persistence plus an offline memory path. Dashboard typecheck and 23-file/27-test Vitest verification passed; M2 transfer/workload RPC wiring and physical offline E2E remain open.
+
+**Implementation evidence (Task 6 foundation):** `applications/services/poison_workload/poison_js_bundle.c/.h` and `rpc_poison_js_bundle.c` validate bounded IDs, safe entrypoints, API versions, SHA-256 digests, capability counts, and the 4 MiB bundle ceiling. `dashboard/src/workloads/javascript/served/csp.ts` centralizes the no-network CSP used by `BundleVerifier`; firmware unit build and dashboard typecheck/tests pass. Authenticated bundle streaming, signature verification, and physical browser escape coverage remain open.
+
+**Implementation evidence (Task 7 foundation):** `tools/hil/suites/javascript_limits.py` and `javascript_workflow.py` provide registered physical suites for limiter/recovery and dashboard/device workflow checks; `dashboard/package.json` now exposes the documented `pnpm --dir dashboard verify` command, which passed typecheck, 23 dashboard test files/27 tests, and production build. Device execution and physical escape/recovery evidence remain open.
 
 ## Achievement A4.1: JavaScript Project and Workload Contracts
 
@@ -79,7 +93,7 @@
 
 **Files:**
 - Modify: `applications/system/js_app/js_thread.c:16-23,163-288,334-341`
-- Modify: `applications/system/js_app/js_thread.h:1-49`
+- Modify: `applications/system/js_app/js_thread.h:1-24`
 - Modify: `applications/system/js_app/js_modules.c:33-45,47-178`
 - Modify: `applications/system/js_app/js_modules.h:1-47`
 - Create: `applications/system/js_app/js_capabilities.c`
@@ -206,6 +220,24 @@
 ## Achievement A4.6: Offline Dependencies and Physical Workflow
 
 ### Task 7: Add deterministic dependency import and hardware E2E
+
+Implementation note: `tools/javascript/vendor_package.py` validates the
+`poison.javascript.lock/v1` contract, rejects unsafe Node built-ins and
+unapproved SDK externals, bounds source files and bundle size, and invokes the official
+`applications/system/js_app/packages/fz-sdk/sdk.js` esbuild configuration.
+`tools/javascript/tests/test_vendor_package.py` covers pure-JavaScript
+acceptance, supported `assert`/`events`/`path` built-ins, storage-backed `fs`
+operations, callback and promise filesystem forms, native `crypto.randomBytes`/`crypto.hkdfSync`/`crypto.createHash`/
+`crypto.createHmac`, and the extended
+`buffer`/`os`/`url`/`util`/`string_decoder` set, plus unsafe-module rejection,
+SDK allowlisting, and duplicate-lock rejection. The SDK aliases these modules
+to device-compatible implementations under
+`applications/system/js_app/packages/fz-sdk/shims/`; `fs` delegates to the
+native storage plugin (`js_storage.c`) and crypto delegates to the native
+Furi/mbedTLS service. Network and socket adapters are being added through the
+ESP32 serial transport contract, rather than being represented as host-only
+Node services. This is a compatibility runtime, not an unbundled
+`node_modules` tree.
 
 **Files:**
 - Create: `tools/javascript/vendor_package.py`

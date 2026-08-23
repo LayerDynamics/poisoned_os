@@ -1,0 +1,11 @@
+App(
+    appid="poison_marauder",
+    name="Poison Marauder",
+    fap_version=(1, 0),
+    apptype=FlipperAppType.EXTERNAL,
+    entry_point="poison_marauder_app",
+    requires=["gui", "dialogs", "poison_tools", "esp32_marauder_driver"],
+    stack_size=4 * 1024,
+    order=90,
+    fap_category="GPIO",
+)

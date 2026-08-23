@@ -1,0 +1,129 @@
+{
+  "schema": "poison.features/v1",
+  "product": "PoisonedOS",
+  "defaultProfile": "local-only",
+  "profiles": {
+    "local-only": {
+      "accountRequired": false,
+      "externalRequests": false,
+      "endpointPolicy": "none"
+    },
+    "self-hosted": {
+      "accountRequired": false,
+      "externalRequests": true,
+      "endpointPolicy": "explicit-configured"
+    },
+    "hosted": {
+      "accountRequired": true,
+      "externalRequests": true,
+      "endpointPolicy": "signed-managed"
+    }
+  },
+  "features": [
+    {
+      "id": "device-control",
+      "owner": "firmware",
+      "local": "enabled",
+      "selfHosted": "enabled",
+      "hosted": "enabled",
+      "accountRequired": false,
+      "dataBoundary": "device-and-local-client",
+      "hostedDependency": "none"
+    },
+    {
+      "id": "files",
+      "owner": "firmware-data",
+      "local": "enabled",
+      "selfHosted": "enabled",
+      "hosted": "enabled",
+      "accountRequired": false,
+      "dataBoundary": "device-and-local-client",
+      "hostedDependency": "none"
+    },
+    {
+      "id": "evidence-export",
+      "owner": "data",
+      "local": "enabled",
+      "selfHosted": "enabled",
+      "hosted": "enabled",
+      "accountRequired": false,
+      "dataBoundary": "device-and-local-client",
+      "hostedDependency": "none"
+    },
+    {
+      "id": "customization",
+      "owner": "product",
+      "local": "enabled",
+      "selfHosted": "enabled",
+      "hosted": "enabled",
+      "accountRequired": false,
+      "dataBoundary": "local-project",
+      "hostedDependency": "none"
+    },
+    {
+      "id": "installed-workloads",
+      "owner": "firmware",
+      "local": "enabled",
+      "selfHosted": "enabled",
+      "hosted": "enabled",
+      "accountRequired": false,
+      "dataBoundary": "device-and-local-client",
+      "hostedDependency": "none"
+    },
+    {
+      "id": "catalog",
+      "owner": "product",
+      "local": "disabled",
+      "selfHosted": "configurable",
+      "hosted": "enabled",
+      "accountRequired": true,
+      "dataBoundary": "catalog-metadata",
+      "hostedDependency": "optional"
+    },
+    {
+      "id": "hosted-build",
+      "owner": "release",
+      "local": "disabled",
+      "selfHosted": "configurable",
+      "hosted": "enabled",
+      "accountRequired": true,
+      "dataBoundary": "submitted-source-and-build-logs",
+      "hostedDependency": "optional"
+    },
+    {
+      "id": "synchronization",
+      "owner": "data",
+      "local": "disabled",
+      "selfHosted": "configurable",
+      "hosted": "enabled",
+      "accountRequired": true,
+      "dataBoundary": "user-selected-project-data",
+      "hostedDependency": "optional"
+    },
+    {
+      "id": "organization-management",
+      "owner": "product",
+      "local": "disabled",
+      "selfHosted": "configurable",
+      "hosted": "enabled",
+      "accountRequired": true,
+      "dataBoundary": "organization-metadata",
+      "hostedDependency": "optional"
+    }
+  ],
+  "localOnlyScanPaths": [
+    "dashboard",
+    "bridge"
+  ],
+  "hostedImportPatterns": [
+    "hosted_client",
+    "managed_service",
+    "account_session"
+  ],
+  "externalRequestPatterns": [
+    "fetch(",
+    "XMLHttpRequest",
+    "reqwest::",
+    "reqwest ="
+  ]
+}

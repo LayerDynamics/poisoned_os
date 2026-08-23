@@ -44,6 +44,15 @@ static void gpio_scene_start_var_list_change_callback(VariableItem* item) {
 
 void gpio_scene_start_on_enter(void* context) {
     GpioApp* app = context;
+
+    if(app->marauder_bridge) {
+        power_enable_otg(app->power, true);
+        furi_hal_usb_unlock();
+        scene_manager_set_scene_state(app->scene_manager, GpioSceneStart, GpioItemUsbUart);
+        scene_manager_next_scene(app->scene_manager, GpioSceneUsbUart);
+        return;
+    }
+
     VariableItemList* var_item_list = app->var_item_list;
 
     VariableItem* item;

@@ -1,0 +1,8 @@
+App(
+    appid="poison_audit_start",
+    apptype=FlipperAppType.STARTUP,
+    entry_point="poison_audit_on_system_start",
+    sources=["poison_audit.c"],
+    order=25,
+    sdk_headers=["poison_audit.h"],
+)

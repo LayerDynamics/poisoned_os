@@ -1,0 +1,14 @@
+[package]
+name = "poison-builder"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "poison-builder"
+path = "src/main.rs"
+
+[dependencies]
+poison-build = { path = "../rust-sdk/crates/poison-build" }

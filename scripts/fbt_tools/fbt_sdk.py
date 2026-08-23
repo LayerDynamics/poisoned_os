@@ -3,8 +3,9 @@ import os.path
 import pathlib
 import posixpath
 import shutil
+import subprocess
 
-from fbt.sdk.cache import SdkCache
+from fbt.sdk.cache import SdkCache, encode_external_api_table
 from fbt.sdk.collector import SdkCollector
 from fbt.util import PosixPathWrapper
 from SCons.Action import Action
@@ -194,31 +195,37 @@ def _deploy_sdk_header_tree_emitter(target, source, env):
 
 
 def gen_sdk_data(sdk_cache: SdkCache):
-    api_def = []
-    api_def.extend(
-        (f"#include <{h.name}>" for h in sdk_cache.get_headers()),
-    )
-    api_def.append('#pragma GCC diagnostic ignored "-Wdeprecated-declarations"')
+    return [
+        "#pragma once",
+        f"const int elf_api_version = {sdk_cache.version.as_int()};",
+    ]
 
-    api_def.append(f"const int elf_api_version = {sdk_cache.version.as_int()};")
 
-    api_def.append(
-        "static constexpr auto elf_api_table = sort(create_array_t<sym_entry>("
-    )
+def _flatten_flags(values):
+    for value in values:
+        if isinstance(value, (list, tuple)):
+            yield from _flatten_flags(value)
+        else:
+            yield str(value)
 
-    api_lines = []
-    for fun_def in sdk_cache.get_functions():
-        api_lines.append(
-            f"API_METHOD({fun_def.name}, {fun_def.returns}, ({fun_def.params}))"
-        )
 
-    for var_def in sdk_cache.get_variables():
-        api_lines.append(f"API_VARIABLE({var_def.name}, {var_def.var_type })")
+def _wrapped_symbol_names(env):
+    wrapped = set()
+    for flag in _flatten_flags(env.get("LINKFLAGS", [])):
+        if flag.startswith("-Wl,--wrap,"):
+            wrapped.add(flag.removeprefix("-Wl,--wrap,"))
+        elif flag.startswith("-Wl,--wrap="):
+            wrapped.add(flag.removeprefix("-Wl,--wrap="))
+    return wrapped
 
-    api_def.append(",\n".join(api_lines))
 
-    api_def.append("));")
-    return api_def
+def _actual_symbol_name(name, wrapped_names):
+    return f"__wrap_{name}" if name in wrapped_names else name
+
+
+def _api_table_emitter(target, source, env):
+    target.append(env.ChangeFileExtension(target[0], ".keep.rsp"))
+    return target, source
 
 
 def _check_sdk_is_up2date(sdk_cache: SdkCache):
@@ -249,6 +256,73 @@ def _generate_api_table(source, target, env):
     with open(target[0].path, "wt") as f:
         f.write("\n".join(api_def))
 
+    wrapped_names = _wrapped_symbol_names(env)
+    symbol_names = sorted(sdk_cache.get_valid_names())
+    with open(target[1].path, "wt") as f:
+        f.write(
+            "\n".join(
+                f"-Wl,--undefined={_actual_symbol_name(name, wrapped_names)}"
+                for name in symbol_names
+            )
+        )
+        f.write("\n")
+
+
+def _generate_external_api_table(source, target, env):
+    sdk_cache = SdkCache(source[1].path)
+    _check_sdk_is_up2date(sdk_cache)
+
+    nm_result = subprocess.run(
+        [env.subst("$NM"), "--defined-only", "--format=posix", source[0].path],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if nm_result.returncode:
+        raise UserError(f"cannot read firmware symbols: {nm_result.stderr.strip()}")
+
+    wrapped_names = _wrapped_symbol_names(env)
+    required_names = sorted(sdk_cache.get_valid_names())
+    linked_names = {
+        name: _actual_symbol_name(name, wrapped_names) for name in required_names
+    }
+    required_linked_names = set(linked_names.values())
+
+    addresses = {}
+    for line in nm_result.stdout.splitlines():
+        fields = line.split()
+        if len(fields) < 3:
+            continue
+        name, symbol_type, address_text = fields[:3]
+        if name not in required_linked_names or symbol_type.upper() == "U":
+            continue
+        try:
+            address = int(address_text, 16)
+        except ValueError:
+            continue
+        if name in addresses and addresses[name] != address:
+            raise UserError(f"firmware ELF contains conflicting definitions for {name}")
+        addresses[name] = address
+
+    missing = [
+        name
+        for name, linked_name in linked_names.items()
+        if linked_name not in addresses
+    ]
+    if missing:
+        preview = ", ".join(missing[:8])
+        suffix = "" if len(missing) <= 8 else f" and {len(missing) - 8} more"
+        raise UserError(
+            f"firmware ELF is missing exported API symbols: {preview}{suffix}"
+        )
+
+    encoded = encode_external_api_table(
+        sdk_cache.version.as_int(),
+        ((name, addresses[linked_names[name]]) for name in required_names),
+    )
+    with open(target[0].path, "wb") as table_file:
+        table_file.write(encoded)
+
 
 def generate(env, **kw):
     if not env["VERBOSE"]:
@@ -257,6 +331,7 @@ def generate(env, **kw):
             SDK_AMALGAMATE_PP_COMSTR="\tAPIPP\t${TARGET}",
             SDKSYM_UPDATER_COMSTR="\tSDKCHK\t${TARGET}",
             APITABLE_GENERATOR_COMSTR="\tAPITBL\t${TARGET}",
+            APIEXTERNAL_GENERATOR_COMSTR="\tAPIEXT\t${TARGET}",
             SDKTREE_COMSTR="\tSDKTREE\t${TARGET}",
         )
 
@@ -326,8 +401,15 @@ def generate(env, **kw):
                     _generate_api_table,
                     "$APITABLE_GENERATOR_COMSTR",
                 ),
+                emitter=_api_table_emitter,
                 suffix=".h",
                 src_suffix=".csv",
+            ),
+            "ApiExternalTable": Builder(
+                action=Action(
+                    _generate_external_api_table,
+                    "$APIEXTERNAL_GENERATOR_COMSTR",
+                ),
             ),
         }
     )

@@ -186,6 +186,10 @@ bool desktop_scene_main_on_event(void* context, SceneManagerEvent event) {
             desktop_scene_main_open_app_or_profile(
                 desktop, &desktop->settings.dummy_apps[DummyAppLeft]);
             break;
+        case DesktopDummyEventOpenRight:
+            desktop_scene_main_open_app_or_profile(
+                desktop, &desktop->settings.dummy_apps[DummyAppRight]);
+            break;
         case DesktopDummyEventOpenDown:
             desktop_scene_main_open_app_or_profile(
                 desktop, &desktop->settings.dummy_apps[DummyAppDown]);

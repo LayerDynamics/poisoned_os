@@ -90,13 +90,29 @@ static void emit_op(struct pstate* pstate, int tok) {
 #define BINOP_STACK_FRAME_SIZE 16
 #define STACK_LIMIT            8192
 
+static bool parser_depth_exceeded(const struct pstate* p) {
+    const size_t default_limit = STACK_LIMIT / BINOP_STACK_FRAME_SIZE;
+    const size_t limit = p->mjs->max_parser_depth ? p->mjs->max_parser_depth : default_limit;
+    return p->depth < 0 || (size_t)p->depth > limit;
+}
+
+static bool parser_depth_poll(struct pstate* p) {
+    p->mjs->parser_depth = p->depth < 0 ? 0u : (size_t)p->depth;
+    if(p->mjs->exec_flags_poller) p->mjs->exec_flags_poller(p->mjs);
+    return p->mjs->error != MJS_OK;
+}
+
 // Intentionally left as macro rather than a function, to let the
 // compiler to inline calls and mimimize runtime stack usage.
 #define PARSE_LTR_BINOP(p, f1, f2, ops, prev_op)                                    \
     do {                                                                            \
         mjs_err_t res = MJS_OK;                                                     \
         p->depth++;                                                                 \
-        if(p->depth > (STACK_LIMIT / BINOP_STACK_FRAME_SIZE)) {                     \
+        if(parser_depth_poll(p)) {                                                  \
+            res = p->mjs->error;                                                    \
+            goto binop_clean;                                                       \
+        }                                                                           \
+        if(parser_depth_exceeded(p)) {                                              \
             mjs_set_errorf(p->mjs, MJS_SYNTAX_ERROR, "parser stack overflow");      \
             res = MJS_SYNTAX_ERROR;                                                 \
             goto binop_clean;                                                       \
@@ -129,6 +145,7 @@ static void emit_op(struct pstate* pstate, int tok) {
         }                                                                           \
     binop_clean:                                                                    \
         p->depth--;                                                                 \
+        parser_depth_poll(p);                                                       \
         return res;                                                                 \
     } while(0)
 
@@ -184,16 +201,30 @@ static mjs_err_t parse_statement_list(struct pstate* p, int et) {
 static mjs_err_t parse_block(struct pstate* p, int mkscope) {
     mjs_err_t res = MJS_OK;
     p->depth++;
-    if(p->depth > (STACK_LIMIT / BINOP_STACK_FRAME_SIZE)) {
+    if(parser_depth_poll(p)) {
+        --p->depth;
+        parser_depth_poll(p);
+        return p->mjs->error;
+    }
+    if(parser_depth_exceeded(p)) {
         mjs_set_errorf(p->mjs, MJS_SYNTAX_ERROR, "parser stack overflow");
-        res = MJS_SYNTAX_ERROR;
-        return res;
+        --p->depth;
+        parser_depth_poll(p);
+        return MJS_SYNTAX_ERROR;
     }
     LOG(LL_VERBOSE_DEBUG, ("[%.*s]", 10, p->tok.ptr));
     if(mkscope) emit_byte(p, OP_NEW_SCOPE);
     res = parse_statement_list(p, TOK_CLOSE_CURLY);
-    EXPECT(p, TOK_CLOSE_CURLY);
-    if(mkscope) emit_byte(p, OP_DEL_SCOPE);
+    if(res == MJS_OK && p->tok.tok != TOK_CLOSE_CURLY) {
+        mjs_set_errorf(
+            p->mjs, MJS_SYNTAX_ERROR, "parse error at line %d: [%.*s]", p->line_no, 10, p->tok.ptr);
+        res = MJS_SYNTAX_ERROR;
+    } else if(res == MJS_OK) {
+        pnext1(p);
+        if(mkscope) emit_byte(p, OP_DEL_SCOPE);
+    }
+    --p->depth;
+    parser_depth_poll(p);
     return res;
 }
 
@@ -934,6 +965,11 @@ static mjs_err_t parse_statement(struct pstate* p) {
         return MJS_OK;
     case TOK_KEYWORD_CONTINUE:
         emit_byte(p, OP_CONTINUE);
+        pnext1(p);
+        return MJS_OK;
+    case TOK_KEYWORD_DEBUGGER:
+        emit_byte(p, OP_DEBUGGER);
+        emit_byte(p, OP_PUSH_UNDEF);
         pnext1(p);
         return MJS_OK;
     case TOK_KEYWORD_IF:

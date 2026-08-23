@@ -15,15 +15,15 @@
 
 | Achievement | Status before implementation | Required closing evidence |
 |---|---|---|
-| A2.1 Stable file and evidence contracts | Not started | ADR-0007, bounds, current/previous compatibility, and cross-language fixture tests pass. |
-| A2.2 Crash-consistent VFS | Not started | Namespace/policy and 1,000-cycle journal fault matrix pass without acknowledged-data loss. |
-| A2.3 Immutable evidence and auditable cases | Not started | Raw digest invariance, derived labeling, timestamp, and audit-chain tests pass. |
-| A2.4 Browser workflows | Not started | Complete file/case/evidence/offline/reconnect UI flow passes with accessible states. |
-| A2.5 Search, export, and workspace reset | Not started | 10,000-artifact index, independent export verification, and isolated reset pass. |
+| A2.1 Stable file and evidence contracts | In progress: Task 1 contracts, ADR-0007, bounds, and generated bindings are implemented; cross-language fixture expansion remains. | ADR-0007, bounds, current/previous compatibility, and cross-language fixture tests pass. |
+| A2.2 Crash-consistent VFS | In progress: Task 2 namespace/policy and Task 3 journal/recovery foundations are implemented; storage event integration and fault matrix remain. | Namespace/policy and 1,000-cycle journal fault matrix pass without acknowledged-data loss. |
+| A2.3 Immutable evidence and auditable cases | In progress: bounded case/run/evidence capture foundations and digest tests are implemented; transactional promotion and full audit adapter remain. | Raw digest invariance, derived labeling, timestamp, and audit-chain tests pass. |
+| A2.4 Browser workflows | In progress: bounded transfer, file/case/evidence views, and IndexedDB mutation primitives are implemented; authenticated RPC integration and reconnect E2E remain. | Complete file/case/evidence/offline/reconnect UI flow passes with accessible states. |
+| A2.5 Search, export, and workspace reset | In progress: derived bridge index, deterministic export, quarantine verification, and fail-closed encryption abstraction are implemented; SQLite/large-scale/reset integration remains. | 10,000-artifact index, independent export verification, and isolated reset pass. |
 | A2.6 Reversible legacy migration | Not started | OFW and Momentum-derived fixtures inventory, convert, commit, and roll back byte-safely. |
 | A2.7 Physical evidence workflow | Not started | Real browser-to-device capture/export/fault E2E passes without mocks. |
 
-**Canonical task commands:** firmware tasks run `./fbt FIRMWARE_APP_SET=unit_tests` and `python3 tools/hil/run_suite.py --suite firmware-units`; dashboard tasks run `pnpm --dir dashboard verify`; bridge tasks run `cargo test --workspace --manifest-path bridge/Cargo.toml`; migration/export tools run `python3 -m unittest discover tools`; physical workflows run the exact HIL and Playwright commands named below. Record command, versions, device/media fixture IDs, exit code, and evidence digest before changing a ledger row.
+**Canonical task commands:** firmware tasks run `./fbt FIRMWARE_APP_SET=unit_tests` and `python3 tools/hil/run_suite.py --suite firmware-units`; dashboard tasks run `pnpm --dir dashboard verify`; bridge tasks use `python3 tools/rust/cargo.py`; migration/export tools run `python3 -m unittest discover tools`; physical workflows run the exact HIL and Playwright commands named below. Record command, versions, device/media fixture IDs, exit code, and evidence digest before changing a ledger row.
 
 ## Achievement A2.1: Stable File and Evidence Contracts
 
@@ -71,8 +71,10 @@ message EvidenceRecord {
 2. Write failing round-trip and compatibility tests for paths, cursors, chunk offsets/digests, conflicts, quotas, Case, ToolRun, EvidenceArtifact, Annotation, AuditEvent, import report, and export manifest records.
 3. Define `/system` read-only; `/config` internal with SD backup; `/profiles` as a stable logical namespace backed by versioned profile records under configuration storage with SD export/backup; `/apps`, `/scripts`, `/workloads`, `/cases`, `/evidence`, `/lessons`, and `/exports` on SD; and explicit `/int`/`/ext` compatibility views. Do not expose backing paths accidentally through logical APIs.
 4. Add nanopb maxima for paths, names, tags, parameters, errors, chunks, page sizes, and event batches, then generate all bindings through M0 tooling and snapshot field numbers.
-5. Run `python3 tools/protocol/check_generated.py`, the physical firmware-unit suite, `pnpm --dir dashboard test`, and `cargo test --manifest-path bridge/Cargo.toml` → Expected: identical contract fixtures pass in all three runtimes.
+5. Run `python3 tools/protocol/check_generated.py`, the physical firmware-unit suite, `pnpm --dir dashboard test`, and `python3 tools/rust/cargo.py test --manifest-path bridge/Cargo.toml` → Expected: identical contract fixtures pass in all three runtimes.
 6. Stage diffs and request approval for proposed `feat(storage): define unified file and evidence contracts`.
+
+**Implementation evidence (Task 1 foundation):** `poison_files.proto` and `poison_evidence.proto` define bounded logical paths, resumable transfer records, cases, runs, immutable evidence metadata, annotations, and deterministic export manifests. `schemas/poison/evidence-manifest.schema.json` and ADR-0007 define namespaces, canonicalization, quarantine, digest/signature scope, and compatibility rules; C/TypeScript/Rust bindings were regenerated through `./fbt proto`, and firmware/dashboard/bridge/protocol/docs checks passed on 2026-08-21. Full storage fault fixtures and cross-language record corpus remain open.
 
 ## Achievement A2.2: Crash-Consistent Virtual Filesystem
 
@@ -99,6 +101,8 @@ message EvidenceRecord {
 5. Extend the M1 diagnostic registry with bounded mount loss, recovery, journal replay/failure, and acknowledged-data-loss counters; add redaction and saturation regressions before emission.
 6. Build and run the physical firmware-unit suite → Expected: valid paths resolve deterministically and every namespace escape/stale handle is rejected.
 
+**Implementation evidence (Task 2 foundation):** `poison_vfs_paths.c` normalizes paths once, rejects traversal/separator/control-byte escapes, maps each logical namespace to explicit `/int` or `/ext` backing prefixes, marks `/system` read-only, and applies role-aware mutation policy. The resolver/path tests are included in the firmware unit plugin and the unit image passed on 2026-08-21; mount-handle revocation and physical storage evidence remain open.
+
 ### Task 3: Add transaction journaling and recovery
 
 **Files:**
@@ -115,6 +119,8 @@ message EvidenceRecord {
 2. Implement create, write/replace, mkdir, copy, rename/move, delete, and bounded batch operations with write-ahead records, per-operation idempotency keys, flush/digest barriers, and idempotent recovery.
 3. Test corrupt/torn journal records, absent SD card, full media, hot removal, and repeated reboot recovery.
 4. Run the storage unit suite and `python3 tools/hil/run_suite.py --suite storage-faults` → Expected: every operation is fully old or fully new; no orphan becomes visible.
+
+**Implementation evidence (Task 3 foundation):** `poison_vfs_journal.c` models the ordered `Prepared → DataSynced → MetadataCommitted → Complete` transitions with bounded operation IDs, normalized paths, old/new digests, and idempotent transition checks; `poison_vfs_recovery.c` rolls back incomplete data phases and completes metadata-committed phases. Boundary tests are included in the firmware unit plugin and the unit image passed on 2026-08-21; real storage flush barriers, torn-record injection, and the 10,000-cycle fault matrix remain open.
 
 **Achievement check:** Ten thousand randomized interrupted mutations recover to a valid namespace with no acknowledged write lost.
 
@@ -145,6 +151,8 @@ message EvidenceRecord {
 4. Make evidence bytes immutable after promotion; previews are derived objects, notes/tags append annotation records, and corrections create a new record that references the superseded record.
 5. Bind every record to case, optional run, operator, tool and version, canonical parameters, source path, device, firmware, timestamp source/quality, media type, size, and hash.
 6. Build and run the physical firmware-unit suite → Expected: tampering or broken ancestry is reported and never silently repaired.
+
+**Implementation evidence (Task 4 foundation):** `poison_evidence` provides bounded case creation/close, tool-run lifecycle, duplicate-ID rejection, SHA-256 content addressing, immutable record fields, derived-object labeling, previous-audit linkage, annotation validation, and begin/append/commit/abort transactions that publish records only after the expected byte count and digest finalize. The evidence tests are included in the firmware unit plugin and the unit image passed on 2026-08-21; complete audit-service integration and physical capture evidence remain open.
 
 ## Achievement A2.4: Browser File, Case, and Evidence Workflows
 
@@ -177,6 +185,8 @@ message EvidenceRecord {
 5. Merge every M1 and M2 audit family into a verified timeline with actor/action/resource/result/correlation filters and explicit chain-gap/tamper states.
 6. Run `pnpm --dir dashboard verify`, physical firmware-unit tests, and bridge integration tests → Expected: failed transfers never appear complete and offline work never appears device-committed before acknowledgement.
 
+**Implementation evidence (Task 5 foundation):** Dashboard files now include deterministic path ordering, conflict choices, bounded 1,024-byte resumable chunks with per-chunk and whole-object SHA-256 checks, bounded retries, explicit completion acknowledgement, case/evidence/import views, and IndexedDB schema/mutation primitives that keep pending work unacknowledged until device confirmation. `rpc_poison_evidence.c/.h` now authenticates the session frame before committing a bounded evidence capture, with firmware regression coverage. Dashboard tests/typecheck/build passed; full operation coverage and reconnect/physical evidence remain open.
+
 ## Achievement A2.5: Searchable Local Index and Portable Export
 
 ### Task 6: Build the bridge evidence index and deterministic exporter
@@ -204,7 +214,15 @@ message EvidenceRecord {
 5. Import into quarantine first; verify structure, bounds, schema version, signature scope, every object digest, every chain link, and cross-reference before accepting anything. Return all errors in one bounded report.
 6. Emit audit events for import, export, annotation, and deletion/quarantine through the M1 service.
 7. Extend M1 diagnostics with bounded evidence verification, chain-gap, import rejection, and index-rebuild counters that contain no case names, paths, payload bytes, or stable person identifiers.
-8. Run `cargo test --workspace --manifest-path bridge/Cargo.toml` → Expected: independent re-index and verification produce identical results and every corrupt member is reported.
+8. Run `python3 tools/rust/cargo.py test --workspace --manifest-path bridge/Cargo.toml` → Expected: independent re-index and verification produce identical results and every corrupt member is reported.
+
+**Implementation evidence (Task 6 foundation):** The bridge now has a sorted `BTreeMap`-backed derived evidence index, deterministic manifest serialization, malformed-record verification, quarantine import reporting, an encryption abstraction that fails closed when secure key storage is unavailable, and `bridge/src/evidence/sqlite.rs`, a system-SQLite store with bounded rows, parameterized upserts, deterministic reload, and restart/index round-trip tests. Authenticated `GET/POST /v1/evidence/index` routes now expose the persisted index through the loopback bridge, with API regression coverage. Bridge tests and `clippy -D warnings` pass; 10,000-record capacity evidence, signed package assembly, and full M2 audit integration remain open.
+
+**Implementation evidence (Tasks 8–9 migration foundation):** `schemas/poison/migration-manifest.schema.json` and `tools/migration/verify_manifest.py` enforce bounded `/int`/`/ext` source paths, exact source and verified-backup digests/sizes, logical target namespaces, compatibility classification, converter versions, and duplicate rejection. Host migration tests pass; firmware inventory/conversion, journal commit/rollback, and physical storage evidence remain open.
+
+`poison_migration.c/.h` now provides the firmware-side bounded inventory record and `Prepared → Verified → Committed/RolledBack` state machine. It refuses unverified backups, insufficient free space, unsafe or duplicate source paths, and never deletes legacy bytes; `poison_migration_test.c` is included in the unit image, which rebuilt successfully. Physical storage flush and migration conversion evidence remain open.
+
+`tools/migration/convert_legacy.py` now inventories deterministic `/int` and `/ext` trees, classifies OFW/Momentum-style capture/script/settings files, creates verified byte-preserving backups, and stages compatible/convertible entries only after manifest verification. `test_convert_legacy.py` covers deterministic ordering, source/backup byte preservation, target staging, and tampered-backup rejection; signed device import and physical media evidence remain open.
 
 ### Task 7: Implement isolated workspace snapshots and resets
 
@@ -223,6 +241,8 @@ message EvidenceRecord {
 3. Require the M1 exact-target confirmation contract and prove that reset cannot alter unrelated cases, evidence, profiles, or personal files.
 4. Expose the primitive through authenticated RPC for later lesson packs while preserving a complete device-only reset path.
 5. Run VFS, evidence, RPC, and dashboard tests → Expected: reset is repeatable and isolated.
+
+**Implementation evidence (Task 7):** `poison_workspace` requires a `/cases/` snapshot target, previews the exact normalized workspace path, and consumes the snapshot only after explicit confirmation; the dashboard exposes the same target and affected-path preview. `rpc_poison_workspace_snapshot_create_authenticated` and `rpc_poison_workspace_reset_confirm_authenticated` now authenticate the M1 session envelope before invoking the state machine, and the firmware regression test covers a valid create, wrong-target rejection, and exact confirmed reset. Firmware unit and dashboard tests passed on 2026-08-21; journal-backed manifest snapshots, corruption/quota fault cases, and device-only reset E2E remain open.
 
 ## Achievement A2.6: Reversible Legacy Migration
 
@@ -291,7 +311,7 @@ message EvidenceRecord {
 ./fbt FIRMWARE_APP_SET=unit_tests
 python3 tools/hil/run_suite.py --suite firmware-units
 pnpm --dir dashboard verify
-cargo test --workspace --manifest-path bridge/Cargo.toml
+python3 tools/rust/cargo.py test --workspace --manifest-path bridge/Cargo.toml
 python3 tools/migration/verify_manifest.py --check-fixtures
 python3 tools/hil/run_suite.py --suite storage-faults
 python3 tools/hil/run_suite.py --suite files-evidence

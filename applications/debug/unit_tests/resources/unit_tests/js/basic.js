@@ -1,5 +1,6 @@
 let tests = require("tests");
 let flipper = require("flipper");
+tests.assert_eq(flipper, require("flipper"));
 
 tests.assert_eq(1337, 1337);
 tests.assert_eq("hello", "hello");

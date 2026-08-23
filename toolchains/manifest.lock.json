@@ -1,0 +1,113 @@
+{
+  "buildInputs": [
+    {
+      "path": "SConstruct",
+      "sha256": "e8dad96ce3c5dc08761ab4ff9ba0f73f7e99b257f55eaec4415f506443f9b218"
+    },
+    {
+      "path": "fbt_options.py",
+      "sha256": "15ce77c6550114d0cd92f4bbc75dbc86021601d58cd6910b9adf1bdcd7a5adf1"
+    },
+    {
+      "path": "firmware.scons",
+      "sha256": "210829de2936b0a275accd362fea21967905db60adffde6169fcfe870f93bddb"
+    },
+    {
+      "path": "lib/nanopb/generator/nanopb_generator.py",
+      "sha256": "25a3db4069e3a17311c84c1c0efcca887ba8add4e3dfd544169b52d3154a439f"
+    },
+    {
+      "path": "scripts/toolchain/fbtenv.sh",
+      "sha256": "d8fab758cb4073da5035cf3ee592572ba5fe175843992d2392081350670f4a70"
+    },
+    {
+      "path": "scripts/fbt_tools/fbt_assets.py",
+      "sha256": "bb17dbd07586268c5aaa9ce8e829e2bd3ddeb6dc79151343d656994e1e537628"
+    },
+    {
+      "path": "scripts/fbt_tools/sconsrecursiveglob.py",
+      "sha256": "21f96a06851cd2012a9f46d2a11d8808d2c3d3f5f6704f2e176754266b4ed5ea"
+    },
+    {
+      "path": "site_scons/cc.scons",
+      "sha256": "fdac1ab4fb3c18b94d7c3fafa329c33d318ff653d233ff00a68f3166c7be38bd"
+    },
+    {
+      "path": "site_scons/firmwareopts.scons",
+      "sha256": "4f33dce4dd1f53e5c995f8537516794c5694f50dcd659e5bb87a8db3037d2699"
+    }
+  ],
+  "bundle": {
+    "archivePath": "toolchain/gcc-arm-none-eabi-12.3-arm64-darwin-flipper-39.tar.gz",
+    "archiveSha256": "d6c6fc35607af9aa357d549d29f230799c91b973b938ce776e55e1a8b99daea0",
+    "archiveUrl": "https://update.flipperzero.one/builds/toolchain/gcc-arm-none-eabi-12.3-arm64-darwin-flipper-39.tar.gz",
+    "host": "arm64-darwin",
+    "path": "toolchain/arm64-darwin",
+    "version": "39"
+  },
+  "schema": "poison.toolchain/v1",
+  "tools": [
+    {
+      "name": "Python",
+      "path": "bin/python3.11",
+      "sha256": "80421ca8de2b3a8816a9f85fa20b0e801e5a29c06666a04c166f7abf74178be7",
+      "versionCommand": [
+        "bin/python3",
+        "--version"
+      ],
+      "versionPattern": "Python 3\\.11\\.9"
+    },
+    {
+      "name": "SCons",
+      "path": "bin/scons",
+      "sha256": "c3b09b549f8cd2440574510513672fc2a2cc9ebe2be5e8d86d75943dd2ce1624",
+      "versionCommand": [
+        "bin/python3",
+        "-m",
+        "SCons",
+        "--version"
+      ],
+      "versionPattern": "SCons: v4\\.7\\.0"
+    },
+    {
+      "name": "GNU Arm compiler",
+      "path": "bin/arm-none-eabi-gcc",
+      "sha256": "25617da37f35fefd8ba57ded45a8e33669c8a84327f7d81ddcc7768eea9db046",
+      "versionCommand": [
+        "bin/arm-none-eabi-gcc",
+        "--version"
+      ],
+      "versionPattern": "GCC.*12\\.3\\.1"
+    },
+    {
+      "name": "GNU Arm linker",
+      "path": "bin/arm-none-eabi-ld",
+      "sha256": "384a6ea89f63df8524b81aea7782f6361878c554e4e2b9597ce96c7295b9b9ea",
+      "versionCommand": [
+        "bin/arm-none-eabi-ld",
+        "--version"
+      ],
+      "versionPattern": "GNU ld.*2\\.40\\.0\\.20230627"
+    },
+    {
+      "name": "GNU Arm objcopy",
+      "path": "bin/arm-none-eabi-objcopy",
+      "sha256": "2ba6e25737b2fa1c828638ca5b68ac661aae24d772c11988e419bdd60c668479",
+      "versionCommand": [
+        "bin/arm-none-eabi-objcopy",
+        "--version"
+      ],
+      "versionPattern": "GNU objcopy.*2\\.40\\.0\\.20230627"
+    },
+    {
+      "name": "Protocol Buffers compiler",
+      "path": "bin/protoc",
+      "sha256": "7b7c6e58b83c81630d86e17a16242d43a71d41889554a23907a4f87db85551c4",
+      "versionCommand": [
+        "bin/protoc",
+        "--version"
+      ],
+      "versionPattern": "libprotoc 3\\.21\\.7"
+    }
+  ]
+}

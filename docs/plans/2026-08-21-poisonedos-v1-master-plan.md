@@ -16,7 +16,7 @@
 - Product specification: `docs/specs/SPEC-1-poisonedos-for-the-flipper-zero.md`
 - Firmware comparison: `documentation/development/Momentum_Vs_Flipper.md`
 - Verified official baseline snapshot: `do_not_include/flipperzero-firmware` at `a55e39395ff31bd5fdf3929c70720a7fb76e5968`
-- Current constraint: the workspace root is not a Git worktree and lacks normal root build/release entrypoints; M0 resolves this before feature implementation.
+- Resolved baseline constraint: M0 restored the Git worktree metadata and root build/release entrypoints; subsequent milestones use the verified root `fbt`/SCons workflow.
 
 ## Baseline Strategy Derived from the Firmware Comparison
 
@@ -199,7 +199,7 @@ Run at the end of every milestone after M0:
 python3 tools/verify_baseline.py
 python3 tools/verify_docs.py
 pnpm --dir dashboard verify
-cargo test --workspace --manifest-path bridge/Cargo.toml
+python3 tools/rust/cargo.py test --workspace --manifest-path bridge/Cargo.toml
 python3 tools/hil/run_suite.py --suite firmware-units
 python3 tools/hil/run_suite.py --suite milestone
 ```

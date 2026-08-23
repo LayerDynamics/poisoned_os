@@ -1,14 +1,15 @@
 #include "power_settings_app.h"
 
+static SubmenuSettingsHelperOption power_settings_options[] = {
+    {.name = "Battery Info", .scene_id = PowerSettingsAppSceneBatteryInfo},
+    {.name = "Reboot", .scene_id = PowerSettingsAppSceneReboot},
+    {.name = "Power OFF", .scene_id = PowerSettingsAppScenePowerOff},
+};
+
 const SubmenuSettingsHelperDescriptor settings_helper_descriptor = {
     .app_name = "Power",
-    .options_cnt = 3,
-    .options =
-        {
-            {.name = "Battery Info", .scene_id = PowerSettingsAppSceneBatteryInfo},
-            {.name = "Reboot", .scene_id = PowerSettingsAppSceneReboot},
-            {.name = "Power OFF", .scene_id = PowerSettingsAppScenePowerOff},
-        },
+    .options_cnt = COUNT_OF(power_settings_options),
+    .options = power_settings_options,
 };
 
 static bool power_settings_custom_event_callback(void* context, uint32_t event) {

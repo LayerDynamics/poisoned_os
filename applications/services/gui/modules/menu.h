@@ -37,6 +37,13 @@ void menu_free(Menu* menu);
  */
 View* menu_get_view(Menu* menu);
 
+/** Set the operational header displayed above menu items.
+ *
+ * @param      menu    Menu instance
+ * @param      header  Header text
+ */
+void menu_set_header(Menu* menu, const char* header);
+
 /** Add item to menu
  *
  * @param      menu      Menu instance

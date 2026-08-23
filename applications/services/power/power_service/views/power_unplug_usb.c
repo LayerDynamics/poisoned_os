@@ -1,7 +1,5 @@
 #include "power_unplug_usb.h"
 #include <furi.h>
-#include <gui/elements.h>
-#include <assets_icons.h>
 
 struct PowerUnplugUsb {
     View* view;
@@ -10,15 +8,22 @@ struct PowerUnplugUsb {
 static void power_unplug_usb_draw_callback(Canvas* canvas, void* _model) {
     UNUSED(_model);
 
+    canvas_clear(canvas);
     canvas_set_color(canvas, ColorBlack);
-    canvas_draw_icon(canvas, 0, 0, &I_Unplug_bg_top_128x14);
-    canvas_draw_box(canvas, 0, 14, 128, (64 - 10 - 14));
-    canvas_draw_icon(canvas, 0, (64 - 10), &I_Unplug_bg_bottom_128x10);
-
+    canvas_draw_box(canvas, 0, 0, 128, 64);
+    canvas_set_color(canvas, ColorWhite);
+    canvas_draw_box(canvas, 0, 0, 15, 64);
+    canvas_set_color(canvas, ColorBlack);
+    for(uint8_t y = 4; y < 61; y += 9) {
+        canvas_draw_box(canvas, 4, y, 7, 3);
+    }
     canvas_set_color(canvas, ColorWhite);
     canvas_set_font(canvas, FontPrimary);
-    elements_multiline_text_aligned(
-        canvas, 64, 32, AlignCenter, AlignCenter, "It's now safe to unplug\nthe USB cable");
+    canvas_draw_str(canvas, 21, 27, "POWER ISOLATED");
+    canvas_set_font(canvas, FontSecondary);
+    canvas_draw_str(canvas, 21, 41, "SAFE TO DISCONNECT USB");
+    canvas_draw_line(canvas, 21, 47, 123, 47);
+    canvas_draw_str(canvas, 21, 58, "POISONEDOS / LOCAL");
 }
 
 PowerUnplugUsb* power_unplug_usb_alloc(void) {

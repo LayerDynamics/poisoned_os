@@ -1,0 +1,91 @@
+{
+  "schema": "poison.clients/v1",
+  "sessionContract": "poison.rpc/v2",
+  "defaultRoute": "web-runtime",
+  "clients": [
+    {
+      "id": "macos-chrome",
+      "os": "macOS",
+      "osVersionFloor": "14.0",
+      "architecture": "arm64",
+      "browser": "Chrome",
+      "browserVersionFloor": "120",
+      "status": "planned",
+      "routes": ["web-runtime"],
+      "installation": "local-node-web-runtime",
+      "hardwareEvidence": null
+    },
+    {
+      "id": "macos-safari",
+      "os": "macOS",
+      "osVersionFloor": "14.0",
+      "architecture": "arm64",
+      "browser": "Safari",
+      "browserVersionFloor": "17",
+      "status": "planned",
+      "routes": ["web-runtime"],
+      "installation": "local-node-web-runtime",
+      "hardwareEvidence": null
+    },
+    {
+      "id": "windows-chrome",
+      "os": "Windows",
+      "osVersionFloor": "11",
+      "architecture": "x64",
+      "browser": "Chrome",
+      "browserVersionFloor": "120",
+      "status": "planned",
+      "routes": ["web-runtime"],
+      "installation": "local-node-web-runtime",
+      "hardwareEvidence": null
+    },
+    {
+      "id": "ubuntu-chrome",
+      "os": "Ubuntu",
+      "osVersionFloor": "22.04",
+      "architecture": "x64",
+      "browser": "Chrome",
+      "browserVersionFloor": "120",
+      "status": "planned",
+      "routes": ["web-runtime"],
+      "installation": "local-node-web-runtime",
+      "hardwareEvidence": null
+    },
+    {
+      "id": "android-chrome",
+      "os": "Android",
+      "osVersionFloor": "14",
+      "architecture": "arm64",
+      "browser": "Chrome",
+      "browserVersionFloor": "120",
+      "status": "planned",
+      "routes": ["web-runtime"],
+      "installation": "local-node-web-runtime",
+      "hardwareEvidence": null
+    },
+    {
+      "id": "ios-safari",
+      "os": "iOS",
+      "osVersionFloor": "17",
+      "architecture": "arm64",
+      "browser": "Safari",
+      "browserVersionFloor": "17",
+      "status": "planned",
+      "routes": ["web-runtime"],
+      "installation": "local-node-web-runtime",
+      "hardwareEvidence": null
+    },
+    {
+      "id": "firefox-desktop",
+      "os": "macOS",
+      "osVersionFloor": "14.0",
+      "architecture": "arm64",
+      "browser": "Firefox",
+      "browserVersionFloor": "120",
+      "status": "planned",
+      "routes": ["web-runtime"],
+      "installation": "local-node-web-runtime",
+      "hardwareEvidence": null
+    }
+  ]
+}

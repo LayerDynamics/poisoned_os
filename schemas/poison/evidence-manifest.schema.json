@@ -1,0 +1,40 @@
+{
+  "$id": "https://poisoned.invalid/schemas/evidence-manifest.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PoisonedOS evidence manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "exportId", "records"],
+  "properties": {
+    "schema": {"const": "poison.evidence-manifest/v1"},
+    "exportId": {"type": "string", "minLength": 1, "maxLength": 64},
+    "records": {"type": "array", "maxItems": 10000, "items": {"$ref": "#/$defs/record"}},
+    "signature": {"type": "string", "maxLength": 256}
+  },
+  "$defs": {
+    "record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evidenceId", "caseId", "capturedAtUnixMs", "contentSha256", "contentLength", "mediaType", "auditSha256", "sourcePath"],
+      "properties": {
+        "evidenceId": {"type": "string", "maxLength": 64},
+        "caseId": {"type": "string", "maxLength": 64},
+        "sourceAppId": {"type": "string", "maxLength": 64},
+        "capturedAtUnixMs": {"type": "integer", "minimum": 1},
+        "deviceId": {"type": "string", "maxLength": 64},
+        "firmwareVersion": {"type": "string", "maxLength": 64},
+        "contentSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "contentLength": {"type": "integer", "minimum": 0},
+        "mediaType": {"type": "string", "maxLength": 128},
+        "labels": {"type": "object", "maxProperties": 32, "additionalProperties": {"type": "string", "maxLength": 128}},
+        "previousAuditSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "auditSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "operatorId": {"type": "string", "maxLength": 64},
+        "toolId": {"type": "string", "maxLength": 64},
+        "toolVersion": {"type": "string", "maxLength": 64},
+        "canonicalParameters": {"type": "string", "contentEncoding": "base64", "maxLength": 1368},
+        "sourcePath": {"type": "string", "pattern": "^/(cases|evidence|ext)/", "maxLength": 256}
+      }
+    }
+  }
+}

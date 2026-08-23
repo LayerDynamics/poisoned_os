@@ -14,6 +14,21 @@
 
 typedef DialogMessageButton (*AboutDialogScreen)(DialogsApp* dialogs, DialogMessage* message);
 
+static DialogMessageButton about_screen_poisonedos(DialogsApp* dialogs, DialogMessage* message) {
+    dialog_message_set_icon(message, &I_PoisonFlask_32x32, 4, 15);
+    dialog_message_set_header(message, "PoisonedOS", 43, 4, AlignLeft, AlignTop);
+    dialog_message_set_text(
+        message,
+        "FIELD FIRMWARE\n"
+        "NATIVE / LOCAL\n"
+        "TARGET F7",
+        43,
+        20,
+        AlignLeft,
+        AlignTop);
+    return dialog_message_show(dialogs, message);
+}
+
 static DialogMessageButton about_screen_product(DialogsApp* dialogs, DialogMessage* message) {
     DialogMessageButton result;
 
@@ -188,7 +203,7 @@ static DialogMessageButton about_screen_fw_version(DialogsApp* dialogs, DialogMe
             version_get_gitbranch(ver));
     }
 
-    dialog_message_set_header(message, "FW Version Info:", 0, 0, AlignLeft, AlignTop);
+    dialog_message_set_header(message, "PoisonedOS Firmware:", 0, 0, AlignLeft, AlignTop);
     dialog_message_set_text(message, furi_string_get_cstr(buffer), 0, 13, AlignLeft, AlignTop);
     result = dialog_message_show(dialogs, message);
     furi_string_free(buffer);
@@ -197,6 +212,7 @@ static DialogMessageButton about_screen_fw_version(DialogsApp* dialogs, DialogMe
 }
 
 const AboutDialogScreen about_screens[] = {
+    about_screen_poisonedos,
     about_screen_product,
     about_screen_compliance,
     about_screen_address,

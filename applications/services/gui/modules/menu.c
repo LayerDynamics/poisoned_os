@@ -23,12 +23,26 @@ ARRAY_DEF(MenuItemArray, MenuItem, M_POD_OPLIST); //-V658
 
 typedef struct {
     MenuItemArray_t items;
+    FuriString* header;
     size_t position;
 } MenuModel;
 
 static void menu_process_up(Menu* menu);
 static void menu_process_down(Menu* menu);
 static void menu_process_ok(Menu* menu);
+
+static void menu_draw_fitted_label(
+    Canvas* canvas,
+    int32_t x,
+    int32_t y,
+    size_t width,
+    Align horizontal,
+    const char* label) {
+    FuriString* text = furi_string_alloc_set(label);
+    elements_string_fit_width(canvas, text, width);
+    canvas_draw_str_aligned(canvas, x, y, horizontal, AlignBottom, furi_string_get_cstr(text));
+    furi_string_free(text);
+}
 
 static void menu_draw_callback(Canvas* canvas, void* _model) {
     MenuModel* model = _model;
@@ -38,30 +52,41 @@ static void menu_draw_callback(Canvas* canvas, void* _model) {
     size_t position = model->position;
     size_t items_count = MenuItemArray_size(model->items);
     if(items_count) {
-        MenuItem* item;
-        size_t shift_position;
-        // First line
-        canvas_set_font(canvas, FontSecondary);
-        shift_position = (0 + position + items_count - 1) % items_count;
-        item = MenuItemArray_get(model->items, shift_position);
-        canvas_draw_icon_animation(canvas, 4, 3, item->icon);
-        canvas_draw_str(canvas, 22, 14, item->label);
-        // Second line main
+        const uint8_t header_height = furi_string_empty(model->header) ? 0 : 13;
+        if(header_height) {
+            canvas_draw_box(canvas, 0, 0, 128, header_height);
+            canvas_set_color(canvas, ColorWhite);
+            canvas_set_font(canvas, FontSecondary);
+            canvas_draw_str(canvas, 4, 10, furi_string_get_cstr(model->header));
+            canvas_set_color(canvas, ColorBlack);
+        }
+
+        MenuItem* item = MenuItemArray_get(model->items, position);
+        const uint8_t card_y = header_height + 4;
+        canvas_draw_box(canvas, 0, card_y, 123, 31);
+        canvas_set_color(canvas, ColorWhite);
+        canvas_draw_icon_animation(canvas, 7, card_y + 8, item->icon);
         canvas_set_font(canvas, FontPrimary);
-        shift_position = (1 + position + items_count - 1) % items_count;
-        item = MenuItemArray_get(model->items, shift_position);
-        canvas_draw_icon_animation(canvas, 4, 25, item->icon);
-        canvas_draw_str(canvas, 22, 36, item->label);
-        // Third line
+        menu_draw_fitted_label(canvas, 27, card_y + 20, 91, AlignLeft, item->label);
+
+        char position_text[24];
+        snprintf(
+            position_text,
+            sizeof(position_text),
+            "%02u / %02u",
+            (unsigned)(position + 1),
+            (unsigned)items_count);
         canvas_set_font(canvas, FontSecondary);
-        shift_position = (2 + position + items_count - 1) % items_count;
-        item = MenuItemArray_get(model->items, shift_position);
-        canvas_draw_icon_animation(canvas, 4, 47, item->icon);
-        canvas_draw_str(canvas, 22, 58, item->label);
-        // Frame and scrollbar
-        elements_frame(canvas, 0, 21, 128 - 5, 21);
+        canvas_draw_str_aligned(canvas, 118, card_y + 28, AlignRight, AlignBottom, position_text);
+        canvas_set_color(canvas, ColorBlack);
+
+        const size_t next_position = (position + 1) % items_count;
+        item = MenuItemArray_get(model->items, next_position);
+        canvas_draw_str(canvas, 7, 60, "> NEXT");
+        menu_draw_fitted_label(canvas, 119, 60, 75, AlignRight, item->label);
         elements_scrollbar(canvas, position, items_count);
     } else {
+        canvas_set_font(canvas, FontSecondary);
         canvas_draw_str(canvas, 2, 32, "Empty");
         elements_scrollbar(canvas, 0, 0);
     }
@@ -138,6 +163,7 @@ Menu* menu_alloc(void) {
         MenuModel * model,
         {
             MenuItemArray_init(model->items);
+            model->header = furi_string_alloc();
             model->position = 0;
         },
         true);
@@ -149,7 +175,14 @@ void menu_free(Menu* menu) {
     furi_check(menu);
 
     menu_reset(menu);
-    with_view_model(menu->view, MenuModel * model, { MenuItemArray_clear(model->items); }, false);
+    with_view_model(
+        menu->view,
+        MenuModel * model,
+        {
+            furi_string_free(model->header);
+            MenuItemArray_clear(model->items);
+        },
+        false);
     view_free(menu->view);
 
     free(menu);
@@ -158,6 +191,14 @@ void menu_free(Menu* menu) {
 View* menu_get_view(Menu* menu) {
     furi_check(menu);
     return menu->view;
+}
+
+void menu_set_header(Menu* menu, const char* header) {
+    furi_check(menu);
+    furi_check(header);
+
+    with_view_model(
+        menu->view, MenuModel * model, { furi_string_set_str(model->header, header); }, true);
 }
 
 void menu_add_item(

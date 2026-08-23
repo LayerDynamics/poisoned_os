@@ -1,0 +1,10 @@
+App(
+    appid="poison_recovery",
+    name="Poison Device Recovery",
+    apptype=FlipperAppType.STARTUP,
+    entry_point="poison_recovery_on_system_start",
+    requires=["storage", "poison_diagnostics_start"],
+    sources=["*.c"],
+    sdk_headers=["poison_recovery.h"],
+    order=132,
+)

@@ -151,6 +151,9 @@ static LoaderMenuApp* loader_menu_app_alloc(LoaderMenu* loader_menu) {
     app->primary_menu = menu_alloc();
     app->settings_menu = submenu_alloc();
 
+    menu_set_header(app->primary_menu, "POISON // APPS");
+    submenu_set_header(app->settings_menu, "POISON // SETTINGS");
+
     loader_menu_build_menu(app, loader_menu);
     loader_menu_build_submenu(app, loader_menu);
 

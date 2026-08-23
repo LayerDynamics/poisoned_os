@@ -1,0 +1,8 @@
+[package]
+name = "poison-fuzz-packages"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "package_manifest"
+path = "fuzz_targets/package_manifest.rs"

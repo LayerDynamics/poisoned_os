@@ -1,0 +1,47 @@
+{
+  "$id": "https://poisoned.invalid/schemas/feature-matrix.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "type": "object",
+  "required": ["schema", "product", "defaultProfile", "profiles", "features", "localOnlyScanPaths", "hostedImportPatterns", "externalRequestPatterns"],
+  "properties": {
+    "schema": {"const": "poison.features/v1"},
+    "product": {"const": "PoisonedOS"},
+    "defaultProfile": {"const": "local-only"},
+    "profiles": {
+      "type": "object",
+      "required": ["local-only", "self-hosted", "hosted"],
+      "additionalProperties": {
+        "type": "object",
+        "required": ["accountRequired", "externalRequests", "endpointPolicy"],
+        "properties": {
+          "accountRequired": {"type": "boolean"},
+          "externalRequests": {"type": "boolean"},
+          "endpointPolicy": {"type": "string"}
+        }
+      }
+    },
+    "features": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "owner", "local", "selfHosted", "hosted", "accountRequired", "dataBoundary", "hostedDependency"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^[a-z][a-z0-9-]*$"},
+          "owner": {"type": "string", "minLength": 1},
+          "local": {"enum": ["enabled", "disabled", "configurable"]},
+          "selfHosted": {"enum": ["enabled", "disabled", "configurable"]},
+          "hosted": {"enum": ["enabled", "disabled", "configurable"]},
+          "accountRequired": {"type": "boolean"},
+          "dataBoundary": {"type": "string", "minLength": 1},
+          "hostedDependency": {"enum": ["none", "optional", "required"]}
+        }
+      }
+    },
+    "localOnlyScanPaths": {"type": "array", "items": {"type": "string"}},
+    "hostedImportPatterns": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "externalRequestPatterns": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+  }
+}

@@ -13,15 +13,15 @@
 
 ## Achievement Ledger
 
-| Achievement | Status before implementation | Required closing evidence |
+| Achievement | Current execution status | Required closing evidence |
 |---|---|---|
-| A0.1 Repository and baseline identity | Not started | Baseline/upstream verifiers pass and repository status is captured without a commit. |
-| A0.2 Build and license restoration | Not started | Root build entrypoint works; SPDX/CycloneDX output has zero unknown licenses. |
-| A0.3 Reproducible build and quality gates | Not started | Two clean builds match and all local/CI commands pass from pinned tools. |
-| A0.4 Security and hardware readiness | Not started | Signing/revocation vectors pass and both physical HIL roles recover. |
-| A0.5 Shared protocol and compatibility tooling | Not started | C/TypeScript/Rust generation is deterministic and official API/parity checks pass. |
+| A0.1 Repository and baseline identity | Complete: baseline and upstream verifiers pass against OFW `a55e39395ff31bd5fdf3929c70720a7fb76e5968`. | Baseline/upstream verifiers pass and repository status is captured without a commit. |
+| A0.2 Build and license restoration | Complete for inventory/build restoration: 20 components, zero unknown licenses, and two explicit distribution blockers. | Root build entrypoint works; SPDX/CycloneDX output has zero unknown licenses. |
+| A0.3 Reproducible build and quality gates | In progress: Task 7 is complete; Task 6 build evidence passes, but peak heap, boot time, and task count await a responding physical device. | Two clean builds match and all local/CI commands pass from pinned tools. |
+| A0.4 Security and hardware readiness | In progress: Task 8 is complete with seven signing/revocation vectors; Task 9 awaits two responding physical HIL roles. | Signing/revocation vectors pass and both physical HIL roles recover. |
+| A0.5 Shared protocol and compatibility tooling | Complete: deterministic protocol generation, compatibility enforcement, the 3,849-symbol API lock, and the locked OFW parity matrix pass. | C/TypeScript/Rust generation is deterministic and official API/parity checks pass. |
 
-**Canonical task commands:** Python verifier tests use `python3 -m unittest discover tools/tests`; firmware checks use `./fbt lint_all`, `./fbt f7`, and `./fbt FIRMWARE_APP_SET=unit_tests`; physical unit execution uses `python3 tools/hil/run_suite.py --suite firmware-units`. A task adds its named focused command when it introduces a distinct executable or HIL suite. Record command, exit code, tool/input versions, and evidence digest before changing its ledger row.
+**Canonical task commands:** Python verifier tests use `python3 -m unittest discover tools/tests`; firmware checks use `./fbt lint_all`, `./fbt firmware_all updater_all resources`, and `./fbt FIRMWARE_APP_SET=unit_tests`; physical unit execution uses `python3 tools/hil/run_suite.py --suite firmware-units`. A task adds its named focused command when it introduces a distinct executable or HIL suite. Record command, exit code, tool/input versions, and evidence digest before changing its ledger row.
 
 ## Achievement A0.1: Repository and Baseline Identity
 
@@ -170,7 +170,7 @@ Run `git diff --check` after Git initialization, show the diff, propose `chore: 
 1. Preserve OFW-compatible defaults except set product origin and artifact suffix to PoisonedOS values documented in the spec.
 2. Record the exact FBT toolchain bundle, Python, SCons, compiler/binutils, nanopb generator, and host-tool digests; reject an unpinned or wrong-host toolchain before building.
 3. Write failing verifier tests for wrong version, wrong archive digest, missing tool, unexpected host fallback, and altered compiler flags.
-4. Run `./fbt f7` twice in separate clean temporary output directories whose absolute paths differ.
+4. Run `./fbt firmware_all updater_all resources` twice in separate clean temporary output directories whose absolute paths differ; `TARGET_HW=7` is pinned by `fbt_options.py`.
 5. Separate signed build metadata from reproducible payload bytes; do not normalize an unexplained byte. Compare firmware, updater, resources, API table, and map outputs.
 6. Run `python3 tools/verify_toolchain.py` and `python3 tools/check_reproducible_build.py` → Expected: pinned tools and identical reproducible payload digests.
 7. Record firmware size, free flash, static RAM, peak heap, boot time, task count, API version, compiler flags, and measurement method in `docs/development/build-baseline.md`.
@@ -191,17 +191,16 @@ Run `git diff --check` after Git initialization, show the diff, propose `chore: 
 
 1. Write doc tests for tagged code fences, valid repository path citations, unique requirement IDs, and no empty sections.
 2. Implement workflows for build, lint, firmware unit image, provenance/SBOM, and documentation checks.
-3. Run `./fbt lint_all`, `./fbt f7`, `python3 tools/verify_baseline.py`, and `python3 tools/verify_docs.py`.
+3. Run `./fbt lint_all`, `./fbt firmware_all updater_all resources`, `python3 tools/verify_baseline.py`, and `python3 tools/verify_docs.py`.
 4. Expected: all commands exit `0`; workflow YAML parses; generated artifacts are not committed.
 
 **Achievement check:** Every M0 quality gate runs locally and in CI from pinned inputs.
 
 ## Achievement A0.4: Security and Hardware Readiness
 
-### Task 8: Establish signing and threat-model governance
+### Task 8: Establish signing governance
 
 **Files:**
-- Create: `docs/security/threat-model.md`
 - Create: `docs/release/signing-policy.md`
 - Create: `docs/release/key-ceremony.md`
 - Create: `docs/decisions/ADR-0004-signing-authorities.md`
@@ -243,6 +242,8 @@ Run `git diff --check` after Git initialization, show the diff, propose `chore: 
 
 ### Task 10: Implement deterministic C, TypeScript, and Rust protocol generation
 
+**Status:** Complete on 2026-08-21. `generated/protocol/manifest.json` records the canonical inputs, pinned `@bufbuild/protoc-gen-es` 2.14.0 and `prost-build` 0.14.4 generators, Rust 1.96.0 formatting, and every generated digest. The bounds registry covers all 77 current messages and every string, bytes, repeated, chunk, and queue limit. `python3 -m unittest discover tools/tests` passes 114 tests; `./fbt proto`, `./fbt lint_all`, and `./fbt firmware_all updater_all resources` all exit `0`. Task 11 remains independently gated and is not implied complete by this status.
+
 **Files:**
 - Modify: `assets/SConscript:18-24`
 - Modify: `scripts/fbt_tools/fbt_assets.py:22-28,133-184`
@@ -267,6 +268,8 @@ Run `git diff --check` after Git initialization, show the diff, propose `chore: 
 6. Integrate all three checks into `./fbt proto` and CI before any M1 schema is added.
 
 ### Task 11: Snapshot firmware API and run official parity tests
+
+**Status:** Complete on 2026-08-21. `python3 tools/snapshot_firmware_api.py --check` verifies all 3,849 F7 symbols. `python3 tools/run_official_parity.py --baseline do_not_include/flipperzero-firmware` runs lint, production, unit-image, and production-restore phases in both PoisonedOS and OFW `a55e39395ff31bd5fdf3929c70720a7fb76e5968`; all eight phases pass. The checker accepts only API `88.2` to `88.3` with `menu_set_header`, the `Official`/`PoisonedOS` origin and `local`/`poisonedos` suffix changes, byte-identical canonical protobuf inputs, target-7 metadata, and explicitly classified build-metadata/product-source artifact deltas. Exact host and artifact evidence is recorded in `docs/testing/ofw-parity.md`; this host gate does not substitute for the separate physical HIL exit gates.
 
 **Files:**
 - Create: `provenance/firmware-api.lock.csv`
@@ -298,7 +301,7 @@ python3 tools/protocol/compatibility.py --against provenance/protocol-previous.j
 python3 tools/snapshot_firmware_api.py --check
 python3 tools/run_official_parity.py --baseline do_not_include/flipperzero-firmware
 ./fbt lint_all
-./fbt f7
+./fbt firmware_all updater_all resources
 ./fbt FIRMWARE_APP_SET=unit_tests
 python3 tools/check_reproducible_build.py
 python3 tools/hil/run_suite.py --suite baseline

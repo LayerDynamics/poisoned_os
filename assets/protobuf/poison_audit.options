@@ -1,0 +1,8 @@
+PB_Poison.AuditEvent.prior_digest max_size:32
+PB_Poison.AuditEvent.actor_digest max_size:32
+PB_Poison.AuditEvent.action max_length:32
+PB_Poison.AuditEvent.resource max_length:32
+PB_Poison.AuditEvent.correlation_id max_size:32
+PB_Poison.AuditEvent.safe_metadata max_length:160
+PB_Poison.AuditEvent.digest max_size:32
+PB_Poison.AuditSnapshotEnd.last_digest max_size:32

@@ -15,15 +15,25 @@
 
 | Achievement | Status before implementation | Required closing evidence |
 |---|---|---|
-| A5.1 Dependency boundary | Not started | ADR-0005 and offline vendor/license/source verification pass. |
-| A5.2 Versioned SDK/runtime | Not started | C/Rust ABI layout, allocator, panic, teardown, and capability tests pass. |
-| A5.3 Hermetic builder | Not started | API/idempotency, sandbox escape, restart, provenance, and reproducibility tests pass. |
-| A5.4 Native FAP target | Not started | Rust artifacts traverse normal/fast existing FAP pipelines and launch on hardware. |
-| A5.5 Sandboxed Wasm | Not started | ADR-0006 runtime adapter traps, meters, cleans up, and denies forged imports. |
-| A5.6 Browser Rust workspace | Not started | Offline revision/edit/build/diagnose/install/run UI passes for both targets. |
+| A5.1 Dependency boundary | In progress: ADR-0005, approved-crates metadata, and offline lock/source checksum verifier are implemented and tested; the full production dependency inventory remains. | ADR-0005 and offline vendor/license/source verification pass. |
+| A5.2 Versioned SDK/runtime | In progress: the no-std `poison-sdk` ABI types, storage/device/evidence/UI traits, and runtime entry/teardown contract are implemented with host tests; C ABI generation and firmware integration remain. | C/Rust ABI layout, allocator, panic, teardown, and capability tests pass. |
+| A5.3 Hermetic builder | In progress: offline bounded job state, idempotency, provenance canonicalization, output/log limits, and network-denial policy are implemented and tested; authenticated transport, container isolation, restart persistence, and signed attestations remain. | API/idempotency, sandbox escape, restart, provenance, and reproducibility tests pass. |
+| A5.4 Native FAP target | In progress: pinned thumbv7em target metadata, linker entry contract, and native artifact admission validation are implemented and tested; existing FAP build invocation, package signing, workload adapter, and physical launch remain. | Rust artifacts traverse normal/fast existing FAP pipelines and launch on hardware. |
+| A5.5 Sandboxed Wasm | In progress: ADR-0006 defines the measured-runtime gate; `lib/poison_wasm` and the workload adapter provide fail-closed module admission, forged-import rejection, resource metering, cleanup, and explicit runtime-unavailable behavior; measured runtime execution remains. | ADR-0006 runtime adapter traps, meters, cleans up, and denies forged imports. |
+| A5.6 Browser Rust workspace | In progress: offline Rust project import/revision canonicalization, target selection, Cargo editing, build state, diagnostics, provenance validation, and project UI foundations are implemented with dashboard coverage; bridge builder transport, device install/run, and physical E2E remain. | Offline revision/edit/build/diagnose/install/run UI passes for both targets. |
 | A5.7 Source-to-device workflow | Not started | Native/Wasm reproducibility, attacks, crash recovery, and evidence pass end to end. |
 
-**Canonical task commands:** SDK tasks run `cargo test --workspace --manifest-path rust-sdk/Cargo.toml` and `cargo clippy --manifest-path rust-sdk/Cargo.toml -- -D warnings`; builder tasks run `cargo test --workspace --manifest-path builder/Cargo.toml`; bridge and dashboard tasks run `cargo test --workspace --manifest-path bridge/Cargo.toml` and `pnpm --dir dashboard verify`; firmware and physical tasks run the exact FBT/HIL commands named below. Record command, toolchain/container/source digests, physical IDs, exit code, and evidence digest before changing a ledger row.
+**Canonical task commands:** Rust tasks use `python3 tools/rust/cargo.py`; when no explicit `RUSTUP_TOOLCHAIN`/`RUSTC` is set, it synchronizes local pinned compiler and target metadata to ignored `build/toolchain-metadata.json` without invoking rustup or the network, then selects the installed toolchain. SDK tasks run `python3 tools/rust/cargo.py test --workspace --manifest-path rust-sdk/Cargo.toml` and `python3 tools/rust/cargo.py clippy --manifest-path rust-sdk/Cargo.toml -- -D warnings`; builder tasks run the same wrapper with `--manifest-path builder/Cargo.toml`; bridge and dashboard tasks run the wrapper with `--manifest-path bridge/Cargo.toml` and `pnpm --dir dashboard verify`; firmware and physical tasks run the exact FBT/HIL commands named below. Record command, toolchain/container/source digests, physical IDs, exit code, and evidence digest before changing a ledger row.
+
+**Implementation evidence (Tasks 1–3 foundation):** `docs/decisions/ADR-0005-rust-dependency-policy.md`, `tools/rust/approved-crates.json`, and `tools/rust/verify_vendor.py` enforce offline local-source admission, exact versions, checksums, licenses, features, and review metadata. `rust-sdk/` provides the pinned toolchain declaration, no-std ABI crate, and runtime entry/teardown contract. `python3 -m unittest discover tools/rust/tests`, `python3 tools/rust/verify_vendor.py --locked`, `python3 tools/rust/cargo.py test --workspace --manifest-path rust-sdk/Cargo.toml --offline`, and workspace clippy pass; C generation, firmware adapters, and production dependency inventory remain open.
+
+**Implementation evidence (Task 4):** `builder/src/lib.rs` implements bounded create/finalize/start/finish/fail/cancel transitions, idempotency-key reuse, source/output/log limits, deterministic provenance bytes, a network-disabled policy, and native-artifact publication through the shared `poison-build` admission contract. The bridge now exposes authenticated, bounded create/finalize/start/status/cancel routes backed by the same `BuilderStore`; `bridge/tests/api_contract.rs` exercises the complete authenticated state sequence. `builder/tests/job_policy.rs` covers duplicate submission, limit denial, invalid transitions, cancellation, valid native publication, and unsupported-import rejection; bridge tests and clippy pass. Container/seccomp isolation, durable restart recovery, and detached signed attestations remain open.
+
+**Implementation evidence (Task 5 foundation):** `rust-sdk/targets/thumbv7em-poison-fap.json`, `rust-sdk/linker/poison-fap-link`, and `poison-build` define the Cortex-M4 hard-float target, `poison_rust_entry`, API/ABI versions, allowed imports, relocation set, capability identifiers, and lowercase digest admission checks. `poison_workload_native_adapter.c/.h` now validates scoped `/int`/`/ext` paths and delegates start/stop to the existing `RECORD_LOADER` service; the firmware unit image covers rejection before loader access. Three native-admission regression tests pass; integration with `fbt_extapps.py`/fast-FAP packaging, signing, loader launch success, and physical evidence remains open.
+
+**Implementation evidence (Task 6 foundation):** `docs/decisions/ADR-0006-rust-wasm-runtime.md`, `lib/poison_wasm/`, and `poison_workload_wasm_adapter.c/.h` define a fail-closed Wasm boundary: module magic/version and size validation, host-import prefix/capability checks, fuel/wall-time/handle/log/artifact meters, cleanup, and explicit `PoisonWasmRuntimeUnavailable` when no measured runtime is installed. `poison_wasm_test.c` covers malformed/forged admission, limit trips, and cleanup; physical runtime measurement and execution remain open.
+
+**Implementation evidence (Task 7):** `dashboard/src/workloads/rust/` provides deterministic Rust project validation/import, native-FAP/Wasm target selection, Cargo editing, build/cancel state, structured diagnostics, provenance verification, revision canonicalization, and an authenticated `RustBuilderClient` for the bridge job lifecycle. `bridge/src/rust_artifact.rs` and authenticated `POST /v1/rust/artifacts/validate` enforce the same native target/API/ABI/import/relocation/digest admission contract before installation. The bridge builder transport provides authenticated create/finalize/start/finish/status/cancel operations; dashboard typecheck, 31-file/40-test Vitest verification, and bridge lifecycle tests pass. Device install/run transport and physical evidence remain open.
 
 ## Achievement A5.1: Approved Rust Dependency Boundary
 
@@ -76,7 +86,7 @@
 2. Generate C and Rust declarations from `schemas/poison/rust-device-api.yaml` using the M0 deterministic-generation conventions; assert size, alignment, offset, constant, symbol, and calling-convention parity in both languages and prohibit hand edits.
 3. Expose safe wrappers for project storage, device metadata, structured UI, logs, cancellation, and evidence submission; keep raw Furi symbols outside the supported SDK.
 4. Confine unavoidable `unsafe` code to reviewed FFI modules with documented invariants and deny unsafe code elsewhere.
-5. Run `cargo test --workspace --manifest-path rust-sdk/Cargo.toml`, `cargo clippy --manifest-path rust-sdk/Cargo.toml -- -D warnings`, and firmware API tests → Expected: PASS with ABI snapshots stable.
+5. Run `python3 tools/rust/cargo.py test --workspace --manifest-path rust-sdk/Cargo.toml`, `python3 tools/rust/cargo.py clippy --manifest-path rust-sdk/Cargo.toml -- -D warnings`, and firmware API tests → Expected: PASS with ABI snapshots stable.
 
 ### Task 3: Implement native startup, allocation, panic, and teardown contracts
 
@@ -128,7 +138,7 @@
 5. Emit source, dependency-lock, vendor, toolchain-image, compiler, SDK/API, target, flags, capabilities, dependency-license, output, and builder-policy digests as signed provenance. Put wall-clock build/signing timestamps in a detached signed attestation excluded from reproducible artifact bytes.
 6. Build the same fixture twice in clean sandboxes and compare output bytes and deterministic provenance; test that timestamp changes affect only the detached attestation.
 7. Emit bounded M1-compatible builder queue/start/terminal/failure/limit counters without source, compiler output, user/project names, dependency contents, or stable hosted identity; test redaction and support-bundle inclusion.
-8. Run `cargo test --workspace --manifest-path builder/Cargo.toml` and the container isolation suite → Expected: all escape probes fail, retries do not duplicate builds, and clean builds are byte-identical.
+8. Run `python3 tools/rust/cargo.py test --workspace --manifest-path builder/Cargo.toml` and the container isolation suite → Expected: all escape probes fail, retries do not duplicate builds, and clean builds are byte-identical.
 
 ## Achievement A5.4: Signed Native FAP Target
 
@@ -248,9 +258,9 @@
 ./fbt f7
 ./fbt FIRMWARE_APP_SET=unit_tests
 python3 tools/hil/run_suite.py --suite firmware-units
-cargo test --workspace --manifest-path rust-sdk/Cargo.toml
-cargo clippy --manifest-path rust-sdk/Cargo.toml -- -D warnings
-cargo test --workspace --manifest-path builder/Cargo.toml
+python3 tools/rust/cargo.py test --workspace --manifest-path rust-sdk/Cargo.toml
+python3 tools/rust/cargo.py clippy --manifest-path rust-sdk/Cargo.toml -- -D warnings
+python3 tools/rust/cargo.py test --workspace --manifest-path builder/Cargo.toml
 python3 tools/rust/verify_vendor.py --locked
 pnpm --dir dashboard verify
 python3 tools/hil/run_suite.py --suite rust-native

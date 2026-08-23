@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package PB_Poison;
+
+message Profile {
+    uint32 format = 1;
+    string id = 2;
+    string version = 3;
+    string role = 4;
+    repeated string enabled_tools = 5;
+    repeated string favorites = 6;
+    string theme_id = 7;
+    string font_pack_id = 8;
+    string icon_pack_id = 9;
+    string menu_id = 10;
+    string dashboard_layout = 11;
+    uint32 contrast_ratio_x10 = 12;
+    uint64 capability_mask = 13;
+    bool classroom_restricted = 14;
+    string policy_id = 15;
+    repeated string hidden_tools = 16;
+    repeated string shortcuts = 17;
+    string home_presentation = 18;
+    string status_presentation = 19;
+    string lock_behavior = 20;
+    bool notifications_enabled = 21;
+    bool haptics_enabled = 22;
+    string tool_defaults_json = 23;
+    string transport_policy = 24;
+    string logging_policy = 25;
+    string evidence_policy = 26;
+    string radio_region = 27;
+    string peripheral_safety = 28;
+    string classroom_policy = 29;
+}
+
+message ProfileApply {
+    string profile_id = 1;
+    string confirmation_token = 2 [deprecated = true];
+    bytes confirmation_token_bytes = 3;
+}
+message ProfileStatus {
+    string profile_id = 1;
+    string version = 2;
+    bool known_good = 3;
+    bytes confirmation_token = 4;
+    bool preview = 5;
+}

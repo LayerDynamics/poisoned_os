@@ -150,6 +150,7 @@ static void rpc_system_gui_start_screen_stream_process(const PB_Main* request, v
         size_t framebuffer_size = gui_get_framebuffer_size(rpc_gui->gui);
         // Reusable Frame
         rpc_gui->transmit_frame = malloc(sizeof(PB_Main));
+        *rpc_gui->transmit_frame = (PB_Main)PB_Main_init_zero;
         rpc_gui->transmit_frame->which_content = PB_Main_gui_screen_frame_tag;
         rpc_gui->transmit_frame->command_status = PB_CommandStatus_OK;
         rpc_gui->transmit_frame->content.gui_screen_frame.data =
@@ -398,6 +399,7 @@ void* rpc_system_gui_alloc(RpcSession* session) {
     furi_assert(session);
 
     RpcGuiSystem* rpc_gui = malloc(sizeof(RpcGuiSystem));
+    memset(rpc_gui, 0, sizeof(*rpc_gui));
     rpc_gui->gui = furi_record_open(RECORD_GUI);
     rpc_gui->input_events = furi_record_open(RECORD_INPUT_EVENTS);
     rpc_gui->session = session;

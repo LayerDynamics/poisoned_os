@@ -1,13 +1,93 @@
 import csv
 import operator
 import os
+import struct
+import zlib
 from dataclasses import dataclass
 from enum import Enum, auto
-from typing import Any, ClassVar, Set
+from typing import Any, ClassVar, Iterable, Set
 
 from ansi.color import fg
 
 from . import ApiEntries, ApiEntryFunction, ApiEntryVariable, ApiHeader
+
+
+EXTERNAL_API_TABLE_MAGIC = b"FAPI"
+EXTERNAL_API_TABLE_FORMAT = 1
+EXTERNAL_API_TABLE_HEADER = struct.Struct("<4sHHIII")
+EXTERNAL_API_TABLE_ENTRY = struct.Struct("<II")
+
+
+class ExternalApiTableError(ValueError):
+    """Raised when an external firmware API lookup table is malformed."""
+
+
+def elf_gnu_hash(name: str) -> int:
+    value = 0x1505
+    for byte in name.encode("utf-8"):
+        value = ((value << 5) + value + byte) & 0xFFFFFFFF
+    return value
+
+
+def encode_external_api_table(
+    api_version: int,
+    symbols: Iterable[tuple[str, int]],
+) -> bytes:
+    if not 0 <= api_version <= 0xFFFFFFFF:
+        raise ExternalApiTableError("API version is outside uint32 range")
+
+    entries = sorted((elf_gnu_hash(name), address) for name, address in symbols)
+    for index, (symbol_hash, address) in enumerate(entries):
+        if not 0 <= address <= 0xFFFFFFFF:
+            raise ExternalApiTableError("symbol address is outside uint32 range")
+        if index and entries[index - 1][0] == symbol_hash:
+            raise ExternalApiTableError(
+                f"firmware API hash collision: 0x{symbol_hash:08x}"
+            )
+
+    encoded_entries = b"".join(
+        EXTERNAL_API_TABLE_ENTRY.pack(symbol_hash, address)
+        for symbol_hash, address in entries
+    )
+    header = EXTERNAL_API_TABLE_HEADER.pack(
+        EXTERNAL_API_TABLE_MAGIC,
+        EXTERNAL_API_TABLE_FORMAT,
+        EXTERNAL_API_TABLE_HEADER.size,
+        api_version,
+        len(entries),
+        zlib.crc32(encoded_entries) & 0xFFFFFFFF,
+    )
+    return header + encoded_entries
+
+
+def decode_external_api_table(data: bytes) -> tuple[int, list[tuple[int, int]]]:
+    if len(data) < EXTERNAL_API_TABLE_HEADER.size:
+        raise ExternalApiTableError("firmware API table header is truncated")
+
+    magic, format_version, header_size, api_version, entry_count, expected_crc = (
+        EXTERNAL_API_TABLE_HEADER.unpack_from(data)
+    )
+    if magic != EXTERNAL_API_TABLE_MAGIC:
+        raise ExternalApiTableError("firmware API table magic is invalid")
+    if format_version != EXTERNAL_API_TABLE_FORMAT:
+        raise ExternalApiTableError("firmware API table format is unsupported")
+    if header_size != EXTERNAL_API_TABLE_HEADER.size:
+        raise ExternalApiTableError("firmware API table header size is invalid")
+
+    expected_size = header_size + entry_count * EXTERNAL_API_TABLE_ENTRY.size
+    if len(data) != expected_size:
+        raise ExternalApiTableError("firmware API table size does not match its header")
+
+    encoded_entries = data[header_size:]
+    if zlib.crc32(encoded_entries) & 0xFFFFFFFF != expected_crc:
+        raise ExternalApiTableError("firmware API table checksum is invalid")
+
+    entries = list(EXTERNAL_API_TABLE_ENTRY.iter_unpack(encoded_entries))
+    if any(
+        entries[index - 1][0] >= entries[index][0] for index in range(1, len(entries))
+    ):
+        raise ExternalApiTableError("firmware API table hashes are not strictly sorted")
+    return api_version, entries
 
 
 @dataclass(frozen=True)

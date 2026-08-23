@@ -8,6 +8,23 @@ from SCons.Node import FS
 
 Import("ENV", "fw_build_meta")
 
+# Compact firmware must apply the same whole-program optimization to internal
+# libraries as it does to application sources. Otherwise archives are compiled
+# as standalone -Os objects and cannot participate in the final LTO link.
+compact_firmware_lto = ENV["COMPACT"] and fw_build_meta["type"] == "firmware"
+compact_lib_ccflags = ["-Oz", "-flto"] if compact_firmware_lto else None
+compact_archive_tools = (
+    {
+        "AR": "arm-none-eabi-gcc-ar",
+        # gcc-ar supplies the LTO plugin but does not accept SCons' response
+        # file form where the archive operation itself is inside @file.
+        "ARCOM": "$AR $ARFLAGS $TARGET $SOURCES",
+        "RANLIB": "arm-none-eabi-gcc-ranlib",
+    }
+    if compact_firmware_lto
+    else {}
+)
+
 # Building initial C environment for libs
 env = ENV.Clone(
     tools=[
@@ -31,6 +48,8 @@ env = ENV.Clone(
         Dir("applications"),
         # Not C code
         Dir("!applications/system/js_app/packages"),
+        # Runtime fixture paths intentionally preserve package names and versions.
+        Dir("!applications/debug/unit_tests/resources"),
     ],
     LIBPATH=[
         "${LIB_DIST_DIR}",
@@ -43,7 +62,8 @@ env = ENV.Clone(
     # Specific flags for building libraries - always do optimized builds
     FW_LIB_OPTS={
         "Default": {
-            "CCFLAGS": [
+            "CCFLAGS": compact_lib_ccflags
+            or [
                 "-Og" if ENV["LIB_DEBUG"] else "-Os",
             ],
             "CPPDEFINES": [
@@ -55,6 +75,8 @@ env = ENV.Clone(
         },
         # for furi_check to respect build type
         "furi": {
+            # Furi's crash handler contains fixed-register inline assembly and a
+            # terminal literal pool; LTO inlining can exceed Thumb load range.
             "CCFLAGS": [
                 "-Os",
             ],
@@ -64,7 +86,8 @@ env = ENV.Clone(
             ],
         },
         "flipper_application": {
-            "CCFLAGS": [
+            "CCFLAGS": compact_lib_ccflags
+            or [
                 "-Og",
             ],
             "CPPDEFINES": [
@@ -74,9 +97,11 @@ env = ENV.Clone(
         },
     },
     FW_API_TABLE=None,
+    FW_API_KEEP=None,
     _APP_ICONS=None,
     APPS=_.split(",") if (_ := GetOption("extra_int_apps")) else [],
     EXTRA_EXT_APPS=_.split(",") if (_ := GetOption("extra_ext_apps")) else [],
+    **compact_archive_tools,
 )
 
 env.PreConfigureFwEnvionment()
@@ -155,15 +180,6 @@ if env["IS_BASE_FIRMWARE"]:
     )
     fw_artifacts.append(fw_extapps.sdk_tree)
 
-    # Resources & manifest for SD card
-    manifest = fwenv.ManifestBuilder(
-        "${RESOURCES_ROOT}/Manifest",
-        GIT_UNIX_TIMESTAMP=get_git_commit_unix_timestamp(),
-        _EXTRA_DIST=[fwenv["DOLPHIN_EXTERNAL_OUT_DIR"]],
-    )
-    fwenv.Replace(FW_RESOURCES_MANIFEST=manifest)
-    fwenv.Alias("resources", manifest)
-
     # API getter
     fwenv.Append(FBT_API_VERSION=LazySdkVersionLoader(fwenv.subst("$SDK_DEFINITION")))
     fwenv.PhonyTarget(
@@ -213,12 +229,17 @@ sources.extend(
 # print(fwenv.Dump())
 
 # Full firmware definition
+if env["IS_BASE_FIRMWARE"]:
+    fwenv.AppendUnique(LINKFLAGS=["@${FW_API_KEEP.abspath}"])
+
 fwelf = fwenv["FW_ELF"] = fwenv.Program(
     "${FIRMWARE_BUILD_CFG}",
     sources,
     LIBS=fwenv["TARGET_CFG"].linker_dependencies,
 )
 Depends(fwelf, fwenv["LINKER_SCRIPT_PATH"])
+if env["IS_BASE_FIRMWARE"]:
+    Depends(fwelf, fwenv["FW_API_KEEP"])
 
 # Firmware depends on everything child builders returned
 # Depends(fwelf, lib_targets)
@@ -231,6 +252,19 @@ AddPostAction(
         "Firmware size",
     ),
 )
+
+if env["IS_BASE_FIRMWARE"]:
+    external_api_table = fwenv["APPENV"].ApiExternalTable(
+        "${BUILD_DIR}/firmware_api.bin",
+        [fwelf, fwenv["SDK_DEFINITION"]],
+    )
+    manifest = fwenv.ManifestBuilder(
+        "${RESOURCES_ROOT}/Manifest",
+        GIT_UNIX_TIMESTAMP=get_git_commit_unix_timestamp(),
+        _EXTRA_DIST=[fwenv["DOLPHIN_EXTERNAL_OUT_DIR"], external_api_table[0]],
+    )
+    fwenv.Replace(FW_RESOURCES_MANIFEST=manifest)
+    fwenv.Alias("resources", manifest)
 
 # Produce extra firmware files
 fwhex = fwenv["FW_HEX"] = fwenv.HEXBuilder("${FIRMWARE_BUILD_CFG}")

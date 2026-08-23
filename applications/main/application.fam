@@ -12,6 +12,9 @@ App(
         "bad_usb",
         "u2f",
         "archive",
+        "poison_toolbox",
+        "poison_marauder",
+        "poison_esp_flasher",
         "main_apps_on_start",
     ],
 )

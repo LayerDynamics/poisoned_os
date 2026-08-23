@@ -10,6 +10,7 @@
 #include <update_util/int_backup.h>
 #include <update_util/update_operation.h>
 #include <update_util/resources/manifest.h>
+#include <applications/services/poison_packages/poison_content_update_internal.h>
 #include <toolbox/tar/tar_archive.h>
 #include <toolbox/crc32_calc.h>
 
@@ -215,6 +216,11 @@ int32_t update_task_worker_backup_restore(void* context) {
             success = update_task_pre_update(update_task);
         } else if(boot_mode == FuriHalRtcBootModePostUpdate) { //-V547
             success = update_task_post_update(update_task);
+            if(success) {
+                success = poison_content_update_health_mark_complete_at(
+                    POISON_CONTENT_UPDATE_HEALTH_PENDING_PATH,
+                    POISON_CONTENT_UPDATE_HEALTH_COMPLETE_PATH);
+            }
             if(success) {
                 update_operation_disarm();
             }

@@ -13,6 +13,7 @@ message LockStatusRequest {
 
 message LockStatusResponse {
     bool locked = 1;
+    string active_application = 2;
 }
 
 message AppExitRequest {
@@ -55,4 +56,3 @@ message GetErrorResponse {
 message DataExchangeRequest {
     bytes data = 1;
 }
-

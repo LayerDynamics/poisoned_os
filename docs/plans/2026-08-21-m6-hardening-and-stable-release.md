@@ -15,15 +15,41 @@
 
 | Achievement | Status before implementation | Required closing evidence |
 |---|---|---|
-| A6.1 Requirement/static closure | Not started | All normative IDs and pinned static/dependency/license/secret/generated-code gates pass. |
+| A6.1 Requirement/static closure | In progress: machine-readable requirement evidence schema/verifier and pinned static-gate runner are implemented; the current requirement ledger is intentionally incomplete and remaining security/license/generated-code/release evidence is not yet closed. | All normative IDs and pinned static/dependency/license/secret/generated-code gates pass. |
 | A6.2 Adversarial security closure | Not started | Fuzz/threat/penetration/key-rotation matrix has zero open critical/high findings. |
 | A6.3 Reliability/recovery/performance | Not started | Locked endurance/fault/capacity/latency/battery budgets pass on supported hardware. |
 | A6.4 Accessibility/usability | Not started | Automated WCAG checks and professional/student/educator/first-use studies pass. |
-| A6.5 Update/local-only verification | Not started | Independently built release rolls back correctly and full core works with WAN blocked. |
+| A6.5 Update/local-only verification | In progress: release-manifest schema and digest/path verifier are implemented alongside the M3 update state machine; signing, platform packaging, independent rebuild, rollback, and local-only physical evidence remain. | Independently built release rolls back correctly and full core works with WAN blocked. |
 | A6.6 Operations/support readiness | Not started | Current runbooks/drills, retention decision, redaction, and support packaging pass. |
 | A6.7 Stable candidate/release | Not started | ADR-0010 claims audit and independently reproduced candidate receive explicit promotion approvals. |
 
 **Canonical task commands:** every M0–M5 exit gate is rerun from clean pinned inputs; M6 tools use their exact commands named below; dashboard, Rust, firmware, and HIL stacks use the same canonical commands as their owning milestones. Evidence is invalid unless it records source/artifact/config digests, versions, exit code, reviewer, timestamp, and physical IDs where applicable.
+
+**Implementation evidence (Tasks 1–2 foundation):** `tools/release/verify_spec.py` extracts normative IDs from SPEC-1 and rejects absent/duplicate/unknown/failed/stale/synthetic/out-of-root evidence; `tools/release/requirement_evidence.schema.json` defines the ledger contract. `config/release-static-gates.json` and `tools/release/run_static_gates.py` execute pinned host/Rust/JavaScript/dashboard/catalog/docs/diff gates and record exit status and output digests. Release tests pass; the authoritative evidence ledger is not populated yet, so M6 remains open.
+
+**Implementation evidence (Task 6 foundation):** `tools/release/compare_budgets.py` and `v1-performance-report.md` define a distribution-based performance evidence contract with p95/max/min checks, explicit sample counts, duplicate rejection, and machine-readable failures. Nine release-tool tests pass; physical latency, throughput, resource, and battery measurements remain open.
+
+**Implementation evidence (Task 8 foundation):** `schemas/poison/release-manifest.schema.json`, `tools/release/verify_release.py`, and `test_verify_release.py` define and test digest/path-bounded release composition with explicit rollback metadata. Signing, platform artifact production, independent rebuild, and interrupted-update physical evidence remain open.
+
+`tools/release/build_release.py` now assembles deterministic release ZIPs with canonical manifests, `tools/release/package_platforms.py` emits deterministic archives for the four supported host labels, `tools/release/sign_release.py` signs the canonical manifest with OpenSSL ECDSA-P256-SHA256, and `tools/release/promote_release.py` records a local promotion only after PASS rollout health. Reproducibility, signing-canonicalization, promotion, and unsupported-platform tests pass; clean installation and physical update evidence remain open.
+
+**Implementation evidence (Task 10 foundation):** `tools/release/verify_runbooks.py` validates the required release, rollback, key-compromise, builder-isolation, support-triage, storage-corruption, device-recovery, and evidence-recovery runbooks for owners, prerequisites, procedures, verification, escalation, and executable command blocks. The verifier and runbook fixture tests pass; operator tabletop and live drills remain open.
+
+**Implementation evidence (Task 12 foundation):** `docs/decisions/ADR-0010-external-validation.md` records that V1 makes no external-certification claims, and `tools/release/verify_claims.py` rejects unsupported forensic/court/admissibility language in supplied public-facing artifacts. Claim verifier tests pass; the complete release-content inventory remains open.
+
+**Implementation evidence (Task 3 fuzzing foundation):** Four checked-in offline Rust fuzz-target crates cover protocol envelopes, package paths, evidence digests, and Wasm headers; `tools/security/run_fuzz_matrix.py` enforces bounded execution, missing-target rejection, timeout handling, and per-target output digests. Host runner tests and the release matrix pass; sanitizer runs, minimized corpus expansion, and physical replay remain open.
+
+**Implementation evidence (Task 4 adversarial foundation):** `docs/security/v1-security-test-matrix.json` names ten owned critical/high trust-boundary checks, `tools/security/run_adversarial_suite.py` executes them with bounded timeouts and rejects unowned checks/open critical-high findings, and key-rotation/incident-response procedures are documented. Matrix tests and the release-candidate runner pass; independent penetration review and physical peer/key-rotation exercises remain open.
+
+**Implementation evidence (Task 5 HIL foundation):** `tools/hil/suites/v1_endurance.py`, `v1_fault_matrix.py`, and `v1_recovery.py` define the locked 24-hour/7-day endurance profile, controlled fault set, and recovery/rollback steps; `tools/hil/run_suite.py` dispatches all three suites and accepts `--release-duration`. Physical execution and recorded hardware evidence remain open.
+
+**Implementation evidence (Task 6 performance foundation):** `tools/hil/suites/v1_performance.py` probes both physical HIL roles and invokes the same `tools/release/compare_budgets.py` distribution comparator against measured evidence; `docs/testing/v1-performance-protocol.md` records the command and required evidence shape. Physical samples and budget results remain open.
+
+**Implementation evidence (Task 9 local-only foundation):** `tools/hil/suites/local_only.py` runs dashboard verification and both device probes with the local-only profile and network-disabled environment; the local-only and self-hosted dashboard runbooks define prerequisites, procedure, verification, and escalation. Physical network-capture evidence remains open.
+
+**Implementation evidence (Task 11 foundation):** `tools/security/verify_redaction.py` scans JSON and text diagnostic/support fixtures for prohibited sensitive fields, PEM/private-key material, bearer tokens, API keys, and raw payloads; `docs/privacy/diagnostics.md` records the digest-only export contract. Redaction tests pass; complete production fixture and support-bundle E2E coverage remains open.
+
+**Implementation evidence (Task 11 rollout-health foundation):** `tools/release/evaluate_rollout_health.py` evaluates versioned local candidate metrics against explicit halt thresholds without network access. Its pass, halt, duplicate, and malformed-input tests pass; production candidate evidence and staged rollout drills remain open.
 
 ## Achievement A6.1: Machine-Verifiable Requirement Closure
 
@@ -87,10 +113,9 @@
 4. Convert every discovered defect into a regression test in its owning milestone before fixing it; rerun that milestone's full gate.
 5. Run `python3 tools/security/run_fuzz_matrix.py --profile release` → Expected: no crash, hang, memory error, policy bypass, or untriaged unique finding at the release duration threshold.
 
-### Task 4: Execute the V1 threat-model and penetration matrix
+### Task 4: Execute the V1 penetration matrix
 
 **Files:**
-- Create: `docs/security/v1-threat-model.md`
 - Create: `docs/security/v1-security-test-matrix.md`
 - Create: `docs/security/key-rotation-and-revocation.md`
 - Create: `docs/security/incident-response.md`
@@ -307,9 +332,9 @@ python3 tools/verify_docs.py
 python3 tools/release/run_static_gates.py --profile stable
 python3 tools/catalog/validate_catalog.py
 pnpm --dir dashboard verify
-cargo test --workspace --manifest-path bridge/Cargo.toml
-cargo test --workspace --manifest-path rust-sdk/Cargo.toml
-cargo test --workspace --manifest-path builder/Cargo.toml
+python3 tools/rust/cargo.py test --workspace --manifest-path bridge/Cargo.toml
+python3 tools/rust/cargo.py test --workspace --manifest-path rust-sdk/Cargo.toml
+python3 tools/rust/cargo.py test --workspace --manifest-path builder/Cargo.toml
 python3 tools/security/run_fuzz_matrix.py --profile release
 python3 tools/security/run_adversarial_suite.py --release-candidate
 python3 tools/hil/run_suite.py --suite v1-endurance --release-duration

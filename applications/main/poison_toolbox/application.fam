@@ -1,0 +1,10 @@
+App(
+    appid="poison_toolbox",
+    name="Poison Tools",
+    apptype=FlipperAppType.MENUEXTERNAL,
+    entry_point="poison_toolbox_app",
+    requires=["gui", "loader", "poison_tools"],
+    stack_size=2 * 1024,
+    icon="I_PoisonFlask_14x14",
+    order=15,
+)

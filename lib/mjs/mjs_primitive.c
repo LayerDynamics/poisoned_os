@@ -151,7 +151,51 @@ mjs_val_t mjs_mk_function(struct mjs* mjs, size_t off) {
 }
 
 int mjs_is_function(mjs_val_t v) {
-    return (v & MJS_TAG_MASK) == MJS_TAG_FUNCTION;
+    const mjs_val_t tag = v & MJS_TAG_MASK;
+    return tag == MJS_TAG_FUNCTION || tag == MJS_TAG_FUNCTION_CLOSURE;
+}
+
+MJS_PRIVATE int mjs_is_closure(mjs_val_t v) {
+    return (v & MJS_TAG_MASK) == MJS_TAG_FUNCTION_CLOSURE;
+}
+
+MJS_PRIVATE struct mjs_closure* mjs_get_closure(mjs_val_t v) {
+    return mjs_is_closure(v) ? (struct mjs_closure*)get_ptr(v) : NULL;
+}
+
+MJS_PRIVATE mjs_val_t mjs_mk_closure(struct mjs* mjs, size_t off) {
+    const size_t scope_start = mjs->scope_base > 0u ? mjs->scope_base : 1u;
+    const size_t scope_size = mjs_stack_size(&mjs->scopes);
+    const size_t scope_count = scope_size > scope_start ? scope_size - scope_start : 0u;
+    if(scope_count == 0u) return mjs_mk_function(mjs, off);
+
+    struct mjs_closure* closure = gc_alloc_cell(mjs, &mjs->closure_arena);
+    if(!closure) return MJS_UNDEFINED;
+    closure->scopes = calloc(scope_count, sizeof(*closure->scopes));
+    if(!closure->scopes) {
+        mjs_set_errorf(mjs, MJS_OUT_OF_MEMORY, "closure scope allocation failed");
+        return MJS_UNDEFINED;
+    }
+    for(size_t index = 0u; index < scope_count; ++index) {
+        closure->scopes[index] = *vptr(&mjs->scopes, (int)(scope_start + index));
+    }
+    closure->scope_count = scope_count;
+    mjs->closure_scope_bytes += scope_count * sizeof(*closure->scopes);
+    closure->address = off;
+    return mjs_legit_pointer_to_value(closure) | MJS_TAG_FUNCTION_CLOSURE;
+}
+
+MJS_PRIVATE void mjs_closure_destructor(struct mjs* mjs, void* cell) {
+    (void)mjs;
+    struct mjs_closure* closure = cell;
+    if(mjs->closure_scope_bytes >= closure->scope_count * sizeof(*closure->scopes)) {
+        mjs->closure_scope_bytes -= closure->scope_count * sizeof(*closure->scopes);
+    } else {
+        mjs->closure_scope_bytes = 0u;
+    }
+    free(closure->scopes);
+    closure->scopes = NULL;
+    closure->scope_count = 0u;
 }
 
 MJS_PRIVATE void mjs_op_isnan(struct mjs* mjs) {

@@ -1,0 +1,3 @@
+import type { ReactElement } from "react";
+export interface WorkspaceResetPreview { snapshotId: string; workspacePath: string; affectedPaths: readonly string[]; }
+export function WorkspaceReset({ preview, onConfirm, onCancel }: { preview: WorkspaceResetPreview; onConfirm: () => void; onCancel: () => void }): ReactElement { return <dialog open aria-label="Workspace reset confirmation"><h2>Reset workspace?</h2><p>{preview.workspacePath}</p><p>{preview.affectedPaths.length} paths will be restored.</p><button type="button" onClick={onConfirm}>Reset exact workspace</button><button type="button" onClick={onCancel}>Cancel</button></dialog>; }

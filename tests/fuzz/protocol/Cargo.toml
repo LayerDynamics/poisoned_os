@@ -1,0 +1,8 @@
+[package]
+name = "poison-fuzz-protocol"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "session_envelope"
+path = "fuzz_targets/session_envelope.rs"

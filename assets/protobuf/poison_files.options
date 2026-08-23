@@ -1,0 +1,17 @@
+PB_Poison.LogicalPath.path max_length:256
+PB_Poison.FileStat.path max_length:256
+PB_Poison.FileStat.sha256 max_length:64
+PB_Poison.FileListRequest.path max_length:256
+PB_Poison.FileListRequest.cursor max_length:128
+PB_Poison.FileListResponse.next_cursor max_length:128
+PB_Poison.FileTransferBegin.operation_id max_length:64
+PB_Poison.FileTransferBegin.path max_length:256
+PB_Poison.FileTransferBegin.sha256 max_length:64
+PB_Poison.FileTransferChunk.operation_id max_length:64
+PB_Poison.FileTransferChunk.data max_size:1024
+PB_Poison.FileTransferChunk.sha256 max_length:64
+PB_Poison.FileTransferComplete.operation_id max_length:64
+PB_Poison.FileTransferComplete.sha256 max_length:64
+PB_Poison.FileConflict.path max_length:256
+PB_Poison.FileConflict.existing_sha256 max_length:64
+PB_Poison.FileConflict.incoming_sha256 max_length:64

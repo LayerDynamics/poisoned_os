@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://poisonedos.local/schemas/tool-catalog.schema.json",
+  "type": "object",
+  "required": ["schemaVersion", "tools"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "tools": {
+      "type": "array",
+      "maxItems": 128,
+      "items": {
+        "type": "object",
+        "required": ["id", "family", "status", "purpose", "capabilities", "parameters", "outputs", "sample", "owner", "provenance"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{2,63}$"},
+          "family": {"enum": ["nfc", "lf-rfid", "ibutton", "infrared", "sub-ghz", "gpio", "usb-hid", "ble-hid", "serial", "storage"]},
+          "status": {"enum": ["foundation", "verified", "unavailable"]},
+          "purpose": {"type": "string", "minLength": 1, "maxLength": 256},
+          "capabilities": {"type": "array", "maxItems": 16, "items": {"type": "string", "pattern": "^[a-z0-9._-]{1,64}$"}},
+          "parameters": {"type": "array", "maxItems": 32, "items": {"type": "object", "required": ["name", "type"], "properties": {"name": {"type": "string", "pattern": "^[a-z0-9_]{1,32}$"}, "type": {"enum": ["string", "integer", "boolean", "enum"]}}}},
+          "outputs": {"type": "array", "maxItems": 16, "items": {"type": "string", "maxLength": 64}},
+          "sample": {"type": "string", "minLength": 1, "maxLength": 256},
+          "owner": {"type": "string", "minLength": 1, "maxLength": 128},
+          "provenance": {"type": "string", "minLength": 1, "maxLength": 256},
+          "packageId": {"type": "string", "maxLength": 64},
+          "adapterVersion": {"type": "string", "maxLength": 32}
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

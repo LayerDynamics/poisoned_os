@@ -134,6 +134,18 @@ class GenerateSbomTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("component digest mismatch: fixture-component", result.stderr)
 
+    def test_declared_generated_path_does_not_change_component_digest(self) -> None:
+        generated = self.fixture.component / "generated"
+        generated.mkdir()
+        (generated / "bindings.py").write_bytes(b"generated build output\n")
+        component = self.fixture.components["components"][0]
+        component["digestExcludes"] = ["generated"]
+        self.fixture.write_manifests()
+
+        result = self.fixture.run("--check")
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+
     def test_reports_component_level_release_blocker(self) -> None:
         component = self.fixture.components["components"][0]
         component["releaseBlocked"] = True

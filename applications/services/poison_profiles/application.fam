@@ -1,0 +1,10 @@
+App(
+    appid="poison_profiles",
+    name="Poison Profiles",
+    apptype=FlipperAppType.STARTUP,
+    entry_point="poison_profiles_on_system_start",
+    order=128,
+    sources=["*.c"],
+    requires=["storage", "poison_packages"],
+    sdk_headers=["poison_profiles.h", "poison_profile_assets.h"],
+)

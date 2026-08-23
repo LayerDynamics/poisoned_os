@@ -1,0 +1,8 @@
+App(
+    appid="esp32_marauder_driver",
+    name="ESP32 Marauder Driver",
+    apptype=FlipperAppType.STARTUP,
+    entry_point="esp32_marauder_driver_start",
+    order=123,
+    sdk_headers=["esp32_marauder_driver.h"],
+)

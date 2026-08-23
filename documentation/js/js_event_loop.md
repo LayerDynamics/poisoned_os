@@ -51,11 +51,14 @@ let eventLoop = require("event_loop");
 // create an event source that will fire once 1 second after it has been created
 let timer = eventLoop.timer("oneshot", 1000);
 
-// subscribe a callback to the event source
-eventLoop.subscribe(timer, function(_subscription, _item, eventLoop) {
-    print("Hello, World!");
-    eventLoop.stop();
-}, eventLoop); // notice this extra argument. we'll come back to this later
+// create a callback that retains a function-local binding
+let subscribeStop = function(loop, source) {
+    loop.subscribe(source, function() {
+        print("Hello, World!");
+        loop.stop();
+    });
+};
+subscribeStop(eventLoop, timer);
 
 // run the loop until it is stopped
 eventLoop.run();
@@ -65,25 +68,25 @@ eventLoop.run();
 print("Stopped");
 ```
 
-I promised you that we'll come back to the extra argument after the callback
-function. Our JavaScript engine does not support closures (anonymous functions
-that access values outside of their arguments), so we ask `subscribe` to pass an
-outside value (namely, `eventLoop`) as an argument to the callback so that we
-can access it. We can modify this extra state:
+Callbacks are lexical closures, so the callback above retains the `loop`
+parameter after `subscribeStop` returns. `subscribe` also accepts optional extra
+arguments when explicit per-subscription state is more convenient. The callback
+can replace that state for its next invocation by returning an array with one
+entry for each extra argument:
 ```js
 // this timer will fire every second
 let timer = eventLoop.timer("periodic", 1000);
-eventLoop.subscribe(timer, function(_subscription, _item, counter, eventLoop) {
+eventLoop.subscribe(timer, function(_subscription, _item, counter) {
     print("Counter is at:", counter);
     if(counter === 10)
         eventLoop.stop();
     // modify the extra arguments that will be passed to us the next time
-    return [counter + 1, eventLoop];
-}, 0, eventLoop);
+    return [counter + 1];
+}, 0);
 ```
 
-Because we have two extra arguments, if we return anything other than an array
-of length 2, the arguments will be kept as-is for the next call.
+Because we have one extra argument, if we return anything other than an array
+of length 1, the argument will be kept as-is for the next call.
 
 The first two arguments that get passed to our callback are:
   - The subscription manager that lets us `.cancel()` our subscription.

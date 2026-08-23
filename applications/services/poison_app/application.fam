@@ -1,0 +1,10 @@
+App(
+    appid="poison_app",
+    name="Poison Structured Apps",
+    apptype=FlipperAppType.STARTUP,
+    entry_point="poison_app_on_system_start",
+    order=127,
+    sources=["*.c"],
+    requires=["storage"],
+    sdk_headers=["poison_app.h", "poison_app_sdk.h"],
+)

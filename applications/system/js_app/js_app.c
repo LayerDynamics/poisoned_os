@@ -1,5 +1,6 @@
 #include <dialogs/dialogs.h>
 #include "js_thread.h"
+#include "js_thread_i.h"
 #include <storage/storage.h>
 #include "js_app_i.h"
 #include <toolbox/path.h>
@@ -8,7 +9,8 @@
 #include <cli/cli_main_commands.h>
 #include <toolbox/pipe.h>
 
-#define TAG "JS app"
+#define TAG               "JS app"
+#define JS_CLI_STACK_SIZE (12u * 1024u)
 
 typedef struct {
     JsThread* js_thread;
@@ -177,25 +179,43 @@ static void js_cli_callback(JsThreadEvent event, const char* msg, void* context)
 void js_cli_execute(PipeSide* pipe, FuriString* args, void* context) {
     UNUSED(context);
 
-    const char* path = furi_string_get_cstr(args);
+    const char* command = furi_string_get_cstr(args);
     Storage* storage = furi_record_open(RECORD_STORAGE);
 
     do {
         if(furi_string_size(args) == 0) {
-            printf("Usage:\r\njs <path>\r\n");
+            printf("Usage:\r\njs <path>\r\njs console\r\njs debug <path>\r\n");
             break;
         }
 
-        if(!storage_file_exists(storage, path)) {
-            printf("Can not open file %s\r\n", path);
+        if(strcmp(command, "console") == 0) {
+            js_thread_cli_console(pipe);
+            break;
+        }
+
+        const char debug_prefix[] = "debug ";
+        if(strncmp(command, debug_prefix, sizeof(debug_prefix) - 1u) == 0) {
+            const char* path = command + sizeof(debug_prefix) - 1u;
+            while(*path == ' ')
+                ++path;
+            if(!*path || !storage_file_exists(storage, path)) {
+                printf("Can not open file %s\r\n", path);
+                break;
+            }
+            js_thread_cli_debug(pipe, path);
+            break;
+        }
+
+        if(!storage_file_exists(storage, command)) {
+            printf("Can not open file %s\r\n", command);
             break;
         }
 
         JsCliContext ctx = {.pipe = pipe};
         ctx.exit_sem = furi_semaphore_alloc(1, 0);
 
-        printf("Running script %s, press CTRL+C to stop\r\n", path);
-        JsThread* js_thread = js_thread_run(path, js_cli_callback, &ctx);
+        printf("Running script %s, press CTRL+C to stop\r\n", command);
+        JsThread* js_thread = js_thread_run(command, js_cli_callback, &ctx);
 
         while(furi_semaphore_acquire(ctx.exit_sem, 100) != FuriStatusOk) {
             if(cli_is_pipe_broken_or_is_etx_next_char(pipe)) break;
@@ -211,7 +231,8 @@ void js_cli_execute(PipeSide* pipe, FuriString* args, void* context) {
 void js_app_on_system_start(void) {
 #ifdef SRV_CLI
     CliRegistry* registry = furi_record_open(RECORD_CLI);
-    cli_registry_add_command(registry, "js", CliCommandFlagDefault, js_cli_execute, NULL);
+    cli_registry_add_command_ex(
+        registry, "js", CliCommandFlagDefault, js_cli_execute, NULL, JS_CLI_STACK_SIZE);
     furi_record_close(RECORD_CLI);
 #endif
 }

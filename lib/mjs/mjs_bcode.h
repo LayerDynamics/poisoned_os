@@ -54,6 +54,7 @@ enum mjs_opcode {
     OP_BCODE_HEADER, /* ( -- ) */
     OP_ARGS, /* ( -- ) Mark the beginning of function call arguments */
     OP_FOR_IN_NEXT, /* ( name obj iter_ptr -- name obj iter_ptr_next ) */
+    OP_DEBUGGER, /* ( -- ) Source-level debugger statement */
     OP_MAX
 };
 

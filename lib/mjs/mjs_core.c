@@ -17,6 +17,8 @@
 #include "mjs_string.h"
 #include "mjs_util.h"
 
+#include <limits.h>
+
 #ifndef MJS_OBJECT_ARENA_SIZE
 #define MJS_OBJECT_ARENA_SIZE 20
 #endif
@@ -25,6 +27,9 @@
 #endif
 #ifndef MJS_FUNC_FFI_ARENA_SIZE
 #define MJS_FUNC_FFI_ARENA_SIZE 20
+#endif
+#ifndef MJS_CLOSURE_ARENA_SIZE
+#define MJS_CLOSURE_ARENA_SIZE 20
 #endif
 
 #ifndef MJS_OBJECT_ARENA_INC_SIZE
@@ -35,6 +40,9 @@
 #endif
 #ifndef MJS_FUNC_FFI_ARENA_INC_SIZE
 #define MJS_FUNC_FFI_ARENA_INC_SIZE 10
+#endif
+#ifndef MJS_CLOSURE_ARENA_INC_SIZE
+#define MJS_CLOSURE_ARENA_INC_SIZE 10
 #endif
 
 void mjs_destroy(struct mjs* mjs) {
@@ -67,6 +75,7 @@ void mjs_destroy(struct mjs* mjs) {
     gc_arena_destroy(mjs, &mjs->object_arena);
     gc_arena_destroy(mjs, &mjs->property_arena);
     gc_arena_destroy(mjs, &mjs->ffi_sig_arena);
+    gc_arena_destroy(mjs, &mjs->closure_arena);
     free(mjs);
 }
 
@@ -88,6 +97,9 @@ struct mjs* mjs_create(void* context) {
     mbuf_init(&mjs->array_buffers, 0);
 
     mjs->bcode_len = 0;
+    mjs->debug_last_bcode_offset = SIZE_MAX;
+    mjs->debug_last_bcode_start = SIZE_MAX;
+    mjs->debug_last_line = -1;
 
     /*
    * The compacting GC exploits the null terminator of the previous string as a
@@ -115,6 +127,12 @@ struct mjs* mjs_create(void* context) {
         MJS_FUNC_FFI_ARENA_SIZE,
         MJS_FUNC_FFI_ARENA_INC_SIZE);
     mjs->ffi_sig_arena.destructor = mjs_ffi_sig_destructor;
+    gc_arena_init(
+        &mjs->closure_arena,
+        sizeof(struct mjs_closure),
+        MJS_CLOSURE_ARENA_SIZE,
+        MJS_CLOSURE_ARENA_INC_SIZE);
+    mjs->closure_arena.destructor = mjs_closure_destructor;
 
     global_object = mjs_mk_object(mjs);
     mjs_init_builtin(mjs, global_object);
@@ -124,6 +142,76 @@ struct mjs* mjs_create(void* context) {
     mjs->vals.dataview_proto = MJS_UNDEFINED;
 
     return mjs;
+}
+
+static void mjs_memory_usage_add(size_t* total, size_t value) {
+    if(value > SIZE_MAX - *total) {
+        *total = SIZE_MAX;
+    } else {
+        *total += value;
+    }
+}
+
+static void mjs_memory_usage_arena(size_t* total, const struct gc_arena* arena) {
+    for(const struct gc_block* block = arena->blocks; block; block = block->next) {
+        mjs_memory_usage_add(total, sizeof(*block));
+        if(arena->cell_size != 0 && block->size > SIZE_MAX / arena->cell_size) {
+            *total = SIZE_MAX;
+        } else {
+            mjs_memory_usage_add(total, block->size * arena->cell_size);
+        }
+    }
+}
+
+size_t mjs_memory_usage(const struct mjs* mjs) {
+    if(!mjs) return 0;
+    size_t total = sizeof(*mjs);
+    const struct mbuf* buffers[] = {
+        &mjs->bcode_gen,
+        &mjs->bcode_parts,
+        &mjs->stack,
+        &mjs->call_stack,
+        &mjs->arg_stack,
+        &mjs->scopes,
+        &mjs->loop_addresses,
+        &mjs->owned_strings,
+        &mjs->foreign_strings,
+        &mjs->owned_values,
+        &mjs->json_visited_stack,
+        &mjs->array_buffers,
+    };
+    for(size_t index = 0; index < sizeof(buffers) / sizeof(buffers[0]); ++index) {
+        mjs_memory_usage_add(&total, buffers[index]->size);
+    }
+    for(int index = 0; index < mjs_bcode_parts_cnt((struct mjs*)mjs); ++index) {
+        const struct mjs_bcode_part* part = mjs_bcode_part_get((struct mjs*)mjs, index);
+        if(!part->in_rom) mjs_memory_usage_add(&total, part->data.len);
+    }
+    mjs_memory_usage_arena(&total, &mjs->object_arena);
+    mjs_memory_usage_arena(&total, &mjs->property_arena);
+    mjs_memory_usage_arena(&total, &mjs->ffi_sig_arena);
+    mjs_memory_usage_arena(&total, &mjs->closure_arena);
+    mjs_memory_usage_add(&total, mjs->closure_scope_bytes);
+    for(const ffi_cb_args_t* callback = mjs->ffi_cb_args; callback; callback = callback->next) {
+        mjs_memory_usage_add(&total, sizeof(*callback));
+    }
+    if(mjs->error_msg) mjs_memory_usage_add(&total, strlen(mjs->error_msg) + 1u);
+    if(mjs->stack_trace) mjs_memory_usage_add(&total, strlen(mjs->stack_trace) + 1u);
+    return total;
+}
+
+size_t mjs_call_depth(const struct mjs* mjs) {
+    if(!mjs) return 0u;
+    const size_t frames = mjs->call_stack.len / (sizeof(mjs_val_t) * CALL_STACK_FRAME_ITEMS_CNT);
+    return frames > 0u ? frames - 1u : 0u;
+}
+
+size_t mjs_parser_depth(const struct mjs* mjs) {
+    return mjs ? mjs->parser_depth : 0u;
+}
+
+void mjs_set_parser_depth_limit(struct mjs* mjs, size_t maximum_depth) {
+    if(mjs) mjs->max_parser_depth = maximum_depth;
 }
 
 mjs_err_t mjs_set_errorf(struct mjs* mjs, mjs_err_t err, const char* fmt, ...) {
@@ -147,6 +235,20 @@ void mjs_exit(struct mjs* mjs) {
 
 void mjs_set_exec_flags_poller(struct mjs* mjs, mjs_flags_poller_t poller) {
     mjs->exec_flags_poller = poller;
+}
+
+void mjs_set_debug_hook(struct mjs* mjs, mjs_debug_hook_t hook, void* context) {
+    if(!mjs) return;
+    mjs->debug_hook = hook;
+    mjs->debug_hook_context = context;
+    mjs->debug_last_bcode_offset = SIZE_MAX;
+    mjs->debug_last_bcode_start = SIZE_MAX;
+    mjs->debug_last_line = -1;
+}
+
+mjs_val_t mjs_debug_get_scope(struct mjs* mjs, size_t depth) {
+    if(!mjs || depth >= mjs_stack_size(&mjs->scopes)) return MJS_UNDEFINED;
+    return *vptr(&mjs->scopes, -1 - (int)depth);
 }
 
 void* mjs_get_context(struct mjs* mjs) {
@@ -232,7 +334,8 @@ const char* mjs_get_stack_trace(struct mjs* mjs) {
 }
 
 MJS_PRIVATE size_t mjs_get_func_addr(mjs_val_t v) {
-    return v & ~MJS_TAG_MASK;
+    const struct mjs_closure* closure = mjs_get_closure(v);
+    return closure ? closure->address : v & ~MJS_TAG_MASK;
 }
 
 MJS_PRIVATE enum mjs_type mjs_get_type(mjs_val_t v) {
@@ -251,6 +354,7 @@ MJS_PRIVATE enum mjs_type mjs_get_type(mjs_val_t v) {
     case MJS_TAG_ARRAY >> 48:
         return MJS_TYPE_OBJECT_ARRAY;
     case MJS_TAG_FUNCTION >> 48:
+    case MJS_TAG_FUNCTION_CLOSURE >> 48:
         return MJS_TYPE_OBJECT_FUNCTION;
     case MJS_TAG_STRING_I >> 48:
     case MJS_TAG_STRING_O >> 48:

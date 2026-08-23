@@ -104,7 +104,7 @@ class VerifyBaselineTests(unittest.TestCase):
     def tearDown(self) -> None:
         self.fixture.close()
 
-    def verify(self) -> subprocess.CompletedProcess[str]:
+    def verify(self, *arguments: str) -> subprocess.CompletedProcess[str]:
         return subprocess.run(
             [
                 sys.executable,
@@ -113,6 +113,7 @@ class VerifyBaselineTests(unittest.TestCase):
                 os.fspath(self.fixture.root),
                 "--lock",
                 os.fspath(self.fixture.lock_path),
+                *arguments,
             ],
             capture_output=True,
             check=False,
@@ -154,6 +155,54 @@ class VerifyBaselineTests(unittest.TestCase):
         sbom.write_bytes(b"{}\n")
         result = self.verify()
         self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_ignores_known_build_generated_metadata(self) -> None:
+        (self.fixture.root / ".sconsign.dblite").write_bytes(b"generated database\n")
+        generated_binding = (
+            self.fixture.root
+            / "lib"
+            / "nanopb"
+            / "generator"
+            / "proto"
+            / "nanopb_pb2.py"
+        )
+        generated_binding.parent.mkdir(parents=True)
+        generated_binding.write_bytes(b"generated binding\n")
+
+        result = self.verify()
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_ignores_protocol_package_manager_install_tree(self) -> None:
+        installed = (
+            self.fixture.root
+            / "tools"
+            / "protocol"
+            / "node_modules"
+            / ".pnpm"
+            / "generator"
+            / "index.js"
+        )
+        installed.parent.mkdir(parents=True)
+        installed.write_bytes(b"installed generator dependency\n")
+
+        result = self.verify()
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_write_refreshes_product_bytes_and_classifications(self) -> None:
+        (self.fixture.root / "src" / "tracked.txt").write_bytes(b"product change\n")
+        (self.fixture.root / "new.txt").write_bytes(b"new product source\n")
+
+        written = self.verify("--write")
+
+        self.assertEqual(written.returncode, 0, written.stderr)
+        refreshed = json.loads(self.fixture.lock_path.read_text(encoding="utf-8"))
+        entries = {entry["path"]: entry for entry in refreshed["files"]}
+        self.assertEqual(entries["src/tracked.txt"]["classification"], "poison-modified")
+        self.assertEqual(entries["new.txt"]["classification"], "poison-added")
+        checked = self.verify()
+        self.assertEqual(checked.returncode, 0, checked.stderr)
 
     def test_ignores_nested_git_pointer_files(self) -> None:
         git_pointer = self.fixture.root / "src" / "dependency" / ".git"

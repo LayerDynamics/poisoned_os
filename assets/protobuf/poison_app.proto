@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package PB_Poison;
+
+message AppCommand {
+    string app_id = 1;
+    string command_id = 2;
+    string payload_json = 3;
+    bool cancel = 4;
+    string run_id = 5;
+    uint32 protocol_version = 6;
+    uint32 chunk_index = 7;
+    uint32 chunk_count = 8;
+    bytes payload_chunk = 9;
+}
+
+message AppEvent {
+    string app_id = 1;
+    string event_id = 2;
+    uint64 sequence = 3;
+    oneof kind {
+        AppLog log = 4;
+        AppProgress progress = 5;
+        AppForm form = 6;
+        AppTable table = 7;
+        AppArtifact artifact = 8;
+        AppResult result = 9;
+    }
+    string run_id = 10;
+    uint32 protocol_version = 11;
+    uint32 chunk_index = 12;
+    uint32 chunk_count = 13;
+    bytes message_chunk = 14;
+    bytes schema_json_chunk = 15;
+    bytes rows_json_chunk = 16;
+}
+
+message AppLog { string level = 1; string message = 2; }
+message AppProgress { uint32 percent = 1; string label = 2; }
+message AppForm { string schema_json = 1; }
+message AppTable { string schema_json = 1; string rows_json = 2; }
+message AppArtifact { string name = 1; string path = 2; string sha256 = 3; uint64 size = 4; }
+message AppResult { bool success = 1; string message = 2; }

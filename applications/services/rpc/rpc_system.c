@@ -104,6 +104,7 @@ static void rpc_system_system_device_info_process(const PB_Main* request, void* 
     furi_assert(session);
 
     PB_Main* response = malloc(sizeof(PB_Main));
+    *response = (PB_Main)PB_Main_init_zero;
     response->command_id = request->command_id;
     response->which_content = PB_Main_system_device_info_response_tag;
     response->command_status = PB_CommandStatus_OK;
@@ -130,6 +131,7 @@ static void rpc_system_system_get_datetime_process(const PB_Main* request, void*
     furi_hal_rtc_get_datetime(&datetime);
 
     PB_Main* response = malloc(sizeof(PB_Main));
+    *response = (PB_Main)PB_Main_init_zero;
     response->command_id = request->command_id;
     response->which_content = PB_Main_system_get_datetime_response_tag;
     response->command_status = PB_CommandStatus_OK;
@@ -217,6 +219,7 @@ static void rpc_system_system_protobuf_version_process(const PB_Main* request, v
     furi_assert(session);
 
     PB_Main* response = malloc(sizeof(PB_Main));
+    *response = (PB_Main)PB_Main_init_zero;
     response->command_id = request->command_id;
     response->has_next = false;
     response->command_status = PB_CommandStatus_OK;
@@ -246,8 +249,8 @@ static void rpc_system_system_power_info_callback(
     char* str_value = strdup(value);
 
     ctx->response->has_next = !last;
-    ctx->response->content.system_device_info_response.key = str_key;
-    ctx->response->content.system_device_info_response.value = str_value;
+    ctx->response->content.system_power_info_response.key = str_key;
+    ctx->response->content.system_power_info_response.value = str_value;
 
     rpc_send_and_release(ctx->session, ctx->response);
 }
@@ -262,6 +265,7 @@ static void rpc_system_system_get_power_info_process(const PB_Main* request, voi
     furi_assert(session);
 
     PB_Main* response = malloc(sizeof(PB_Main));
+    *response = (PB_Main)PB_Main_init_zero;
     response->command_id = request->command_id;
     response->which_content = PB_Main_system_power_info_response_tag;
     response->command_status = PB_CommandStatus_OK;

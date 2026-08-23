@@ -6,6 +6,7 @@
 
 #include <storage/storage.h>
 #include <applications/system/js_app/js_thread.h>
+#include <applications/system/js_app/js_capabilities.h>
 #include <applications/system/js_app/js_value.h>
 
 #include <stdint.h>
@@ -13,6 +14,18 @@
 #define TAG "JsUnitTests"
 
 #define JS_SCRIPT_PATH(name) EXT_PATH("unit_tests/js/" name ".js")
+#define JS_MANAGED_SCRIPT_PATH                                                   \
+    EXT_PATH("unit_tests/js/managed/versions/"                                   \
+             "f3517af98a20ff2713b691ebb3625ba02aafab9a7bcf6a23e3e2a597698cb26f/" \
+             "src/main.js")
+#define JS_MANAGED_BUILTIN_SCRIPT_PATH                                           \
+    EXT_PATH("unit_tests/js/managed/versions/"                                   \
+             "f503455e739a4ef011d1b3941500c693915565b63dc959715439ea428eb472e5/" \
+             "src/main.js")
+#define JS_MANAGED_ASYNC_SCRIPT_PATH                                             \
+    EXT_PATH("unit_tests/js/managed/versions/"                                   \
+             "bf66b7eb30ee1cbc8d26f5124f50912b629020e2456e8553acacb9415c083a0f/" \
+             "src/main.js")
 
 typedef enum {
     JsTestsFinished = 1,
@@ -22,12 +35,16 @@ typedef enum {
 typedef struct {
     FuriEventFlag* event_flags;
     FuriString* error_string;
+    const char* expected_print;
+    bool saw_expected_print;
 } JsTestCallbackContext;
 
 static void js_test_callback(JsThreadEvent event, const char* msg, void* param) {
     JsTestCallbackContext* context = param;
     if(event == JsThreadEventPrint) {
         FURI_LOG_I("js_test", "%s", msg);
+        if(context->expected_print && strstr(msg, context->expected_print))
+            context->saw_expected_print = true;
     } else if(event == JsThreadEventError || event == JsThreadEventErrorTrace) {
         context->error_string = furi_string_alloc_set_str(msg);
         furi_event_flag_set(context->event_flags, JsTestsFinished | JsTestsError);
@@ -37,7 +54,7 @@ static void js_test_callback(JsThreadEvent event, const char* msg, void* param) 
 }
 
 static void js_test_run(const char* script_path) {
-    JsTestCallbackContext* context = malloc(sizeof(JsTestCallbackContext));
+    JsTestCallbackContext* context = calloc(1u, sizeof(JsTestCallbackContext));
     context->event_flags = furi_event_flag_alloc();
 
     JsThread* thread = js_thread_run(script_path, js_test_callback, context);
@@ -63,8 +80,47 @@ static void js_test_run(const char* script_path) {
     }
 }
 
+static void js_test_run_managed_project_with_capabilities(
+    const char* script_path,
+    uint32_t capabilities,
+    const char* expected_print) {
+    JsTestCallbackContext* context = calloc(1u, sizeof(JsTestCallbackContext));
+    context->event_flags = furi_event_flag_alloc();
+    context->expected_print = expected_print;
+    const JsLimitsConfig limits = {
+        .heap_bytes = 32u * 1024u,
+        .source_bytes = 16u * 1024u,
+        .modules = 8u,
+        .parser_depth = 32u,
+        .stack_depth = 32u,
+        .fuel_limit = 100000u,
+        .logs = 1024u,
+        .wall_time_ms = 5000u,
+    };
+    JsThread* thread =
+        js_thread_run_managed(script_path, js_test_callback, context, &limits, capabilities);
+    mu_check(thread != NULL);
+    const uint32_t flags = furi_event_flag_wait(
+        context->event_flags, JsTestsFinished, FuriFlagWaitAny, FuriWaitForever);
+    mu_check((flags & FuriFlagError) == 0u);
+    FuriString* error_string = context->error_string;
+    const bool saw_expected_print = context->saw_expected_print;
+    js_thread_stop(thread);
+    furi_event_flag_free(context->event_flags);
+    free(context);
+    if(flags & JsTestsError) mu_fail(furi_string_get_cstr(error_string));
+    if(expected_print) mu_check(saw_expected_print);
+}
+
+static void js_test_run_managed_project(const char* script_path) {
+    js_test_run_managed_project_with_capabilities(script_path, 0u, NULL);
+}
+
 MU_TEST(js_test_basic) {
     js_test_run(JS_SCRIPT_PATH("basic"));
+}
+MU_TEST(js_test_closure) {
+    js_test_run(JS_SCRIPT_PATH("closure"));
 }
 MU_TEST(js_test_math) {
     js_test_run(JS_SCRIPT_PATH("math"));
@@ -74,6 +130,18 @@ MU_TEST(js_test_event_loop) {
 }
 MU_TEST(js_test_storage) {
     js_test_run(JS_SCRIPT_PATH("storage"));
+}
+MU_TEST(js_test_managed_commonjs_dependency) {
+    js_test_run_managed_project(JS_MANAGED_SCRIPT_PATH);
+}
+MU_TEST(js_test_managed_node_builtin) {
+    js_test_run_managed_project(JS_MANAGED_BUILTIN_SCRIPT_PATH);
+}
+MU_TEST(js_test_managed_node_async_runtime) {
+    js_test_run_managed_project_with_capabilities(
+        JS_MANAGED_ASYNC_SCRIPT_PATH,
+        JsCapabilityDevice | JsCapabilityRuntime,
+        "managed async ok");
 }
 
 static void js_value_test_compatibility_matrix(struct mjs* mjs) {
@@ -382,9 +450,13 @@ MU_TEST(js_value_test) {
 MU_TEST_SUITE(test_js) {
     MU_RUN_TEST(js_value_test);
     MU_RUN_TEST(js_test_basic);
+    MU_RUN_TEST(js_test_closure);
     MU_RUN_TEST(js_test_math);
     MU_RUN_TEST(js_test_event_loop);
     MU_RUN_TEST(js_test_storage);
+    MU_RUN_TEST(js_test_managed_commonjs_dependency);
+    MU_RUN_TEST(js_test_managed_node_builtin);
+    MU_RUN_TEST(js_test_managed_node_async_runtime);
 }
 
 int run_minunit_test_js(void) {

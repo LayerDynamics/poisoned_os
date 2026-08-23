@@ -1,0 +1,14 @@
+{
+  "schema": "poison.lesson/v1",
+  "id": "poison.getting-started",
+  "version": 1,
+  "title": "PoisonedOS Getting Started",
+  "signature": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+  "steps": [
+    { "id": "welcome", "kind": "explanation", "title": "Meet your Flipper" },
+    { "id": "device-status", "kind": "device-action", "title": "Read device status" },
+    { "id": "observe", "kind": "observation", "title": "Record an observation" },
+    { "id": "checkpoint", "kind": "evidence-checkpoint", "title": "Save a digest-only checkpoint", "requiredEvidenceDigest": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef" },
+    { "id": "finish", "kind": "knowledge-check", "title": "Complete the knowledge check" }
+  ]
+}

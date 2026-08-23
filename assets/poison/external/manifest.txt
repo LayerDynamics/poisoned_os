@@ -1,0 +1,30 @@
+Filetype: Flipper Animation Manifest
+Version: 1
+
+Name: P1_Assay_128x64
+Min butthurt: 0
+Max butthurt: 14
+Min level: 1
+Max level: 3
+Weight: 5
+
+Name: P1_Containment_128x64
+Min butthurt: 0
+Max butthurt: 14
+Min level: 1
+Max level: 3
+Weight: 5
+
+Name: P2_Link_128x64
+Min butthurt: 0
+Max butthurt: 14
+Min level: 2
+Max level: 3
+Weight: 5
+
+Name: P3_Signal_128x64
+Min butthurt: 0
+Max butthurt: 14
+Min level: 3
+Max level: 3
+Weight: 5

@@ -1,0 +1,15 @@
+App(
+    appid="poison_workload",
+    name="Poison JavaScript Workload",
+    apptype=FlipperAppType.STARTUP,
+    entry_point="poison_workload_on_system_start",
+    order=130,
+    requires=["js_app", "loader", "poison_evidence", "poison_packages"],
+    sources=["*.c", "../../../lib/poison_wasm/*.c"],
+    sdk_headers=[
+        "poison_workload.h",
+        "poison_workload_js_adapter.h",
+        "poison_workload_native_adapter.h",
+        "poison_js_bundle.h",
+    ],
+)

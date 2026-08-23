@@ -5,6 +5,9 @@
 # public variables
 DEFAULT_SCRIPT_PATH="$(pwd -P)";
 FBT_TOOLCHAIN_VERSION="${FBT_TOOLCHAIN_VERSION:-"39"}";
+FBT_TOOLCHAIN_VERSION_LOCKED="39";
+FBT_TOOLCHAIN_ARCHIVE_SHA256="d6c6fc35607af9aa357d549d29f230799c91b973b938ce776e55e1a8b99daea0";
+FBT_PRESERVE_TAR="${FBT_PRESERVE_TAR:-"1"}";
 
 if [ -z ${FBT_TOOLCHAIN_PATH+x} ] ; then
     FBT_TOOLCHAIN_PATH_WAS_SET=0;
@@ -79,6 +82,11 @@ fbtenv_restore_env()
 fbtenv_check_if_noenv_set()
 {
     if [ -n "${FBT_NOENV:-""}" ]; then
+        echo "PoisonedOS requires the pinned FBT toolchain; FBT_NOENV host fallback is forbidden" >&2;
+        return 1;
+    fi
+    if [ "$FBT_TOOLCHAIN_VERSION" != "$FBT_TOOLCHAIN_VERSION_LOCKED" ]; then
+        echo "PoisonedOS requires FBT toolchain bundle $FBT_TOOLCHAIN_VERSION_LOCKED" >&2;
         return 1;
     fi
     return 0;
@@ -172,6 +180,24 @@ fbtenv_check_downloaded_toolchain()
         return 1;
     fi
     echo "yes";
+    return 0;
+}
+
+fbtenv_verify_toolchain_archive()
+{
+    archive_path="$FBT_TOOLCHAIN_PATH/toolchain/$TOOLCHAIN_TAR";
+    if command -v sha256sum > /dev/null 2>&1; then
+        archive_sha256="$(sha256sum "$archive_path" | cut -d ' ' -f 1)";
+    elif command -v shasum > /dev/null 2>&1; then
+        archive_sha256="$(shasum -a 256 "$archive_path" | cut -d ' ' -f 1)";
+    else
+        echo "A SHA-256 utility is required to verify the FBT toolchain archive" >&2;
+        return 1;
+    fi
+    if [ "$archive_sha256" != "$FBT_TOOLCHAIN_ARCHIVE_SHA256" ]; then
+        echo "FBT toolchain archive digest mismatch" >&2;
+        return 1;
+    fi
     return 0;
 }
 
@@ -285,6 +311,7 @@ fbtenv_download_toolchain()
         fbtenv_curl_wget_check || return 1;
         fbtenv_download_toolchain_tar || return 1;
     fi
+    fbtenv_verify_toolchain_archive || return 1;
     fbtenv_remove_old_toolchain;
     fbtenv_unpack_toolchain || return 1;
     fbtenv_cleanup;
@@ -306,9 +333,7 @@ fbtenv_print_config()
 
 fbtenv_main()
 {
-    if ! fbtenv_check_if_noenv_set; then
-        return 0;
-    fi
+    fbtenv_check_if_noenv_set || return 1;
     fbtenv_check_sourced || return 1;
     fbtenv_get_kernel_type || return 1;
     if [ "$1" = "--restore" ]; then

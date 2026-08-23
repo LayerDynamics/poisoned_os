@@ -56,13 +56,23 @@ static void desktop_view_pin_timeout_draw(Canvas* canvas, void* _model) {
 
     DesktopViewPinTimeoutModel* model = _model;
 
+    canvas_clear(canvas);
+    canvas_set_color(canvas, ColorBlack);
+    canvas_draw_box(canvas, 0, 13, 128, 13);
+    canvas_set_color(canvas, ColorWhite);
+    canvas_set_font(canvas, FontSecondary);
+    canvas_draw_str(canvas, 4, 23, "ACCESS / DELAY");
+
+    canvas_set_color(canvas, ColorBlack);
     canvas_set_font(canvas, FontPrimary);
-    canvas_draw_str(canvas, 36, 31, "Wrong PIN!");
+    canvas_draw_str(canvas, 6, 40, "INPUT REJECTED");
 
     canvas_set_font(canvas, FontSecondary);
     char str[30] = {0};
-    snprintf(str, sizeof(str), "Timeout: %lus", model->time_left);
-    canvas_draw_str_aligned(canvas, 64, 38, AlignCenter, AlignCenter, str);
+    snprintf(str, sizeof(str), "RETRY IN %lus", model->time_left);
+    canvas_draw_str(canvas, 6, 52, str);
+    canvas_draw_line(canvas, 6, 56, 122, 56);
+    canvas_draw_str(canvas, 6, 63, "LOCAL INPUT SUSPENDED");
 }
 
 void desktop_view_pin_timeout_free(DesktopViewPinTimeout* instance) {

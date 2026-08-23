@@ -1,0 +1,11 @@
+{
+  "target": "thumbv7em-none-eabihf",
+  "cpu": "cortex-m4",
+  "features": ["+v7e-m", "+fp-only-sp", "+d16"],
+  "linker": "poison-fap-link",
+  "entry": "poison_rust_entry",
+  "apiVersion": 1,
+  "abiVersion": 1,
+  "unwind": false,
+  "relocations": [0, 2, 3, 10]
+}

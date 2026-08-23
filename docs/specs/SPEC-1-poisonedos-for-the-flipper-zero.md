@@ -1,6 +1,6 @@
-# SPEC-1: PoisonedOS for the Flipper Zero
+# SPEC-1: Poisoned_Os for the Flipper Zero
 
-> A professional, field-first Flipper Zero operating system combining auditable security and education tools, a unified file and evidence workspace, deep customization, browser-based control, and managed JavaScript and Rust workloads.
+> A Flipper Zero firmware built around discreet, full-device browser control over Wi-Fi, with a unified file and evidence workspace, deep customization, and managed JavaScript and Rust workloads.
 
 - **Date:** 2026-08-21
 - **Author:** PoisonedOS project owner + Codex
@@ -13,9 +13,9 @@
 
 ### 1.1 Product Thesis
 
-PoisonedOS turns the Flipper Zero from a primarily device-operated handheld into a connected field-work and education platform. A cybersecurity professional, student, or educator must be able to pair a phone or computer, control the device, run tools and applications, develop and execute JavaScript and Rust workloads, organize results into case workspaces, and export verifiable evidence without fighting the 128×64 display or a collection of disconnected file formats.
+Poisoned_Os lets a user keep the Flipper out of sight and operate the complete device through a phone or computer browser over Wi-Fi. A cybersecurity professional, student, or educator must be able to control the device, run tools and applications, develop and execute JavaScript and Rust workloads, organize results into case workspaces, and export verifiable evidence without being limited by the 128×64 display or disconnected file formats.
 
-The browser dashboard is a first-class control plane rather than a screen-mirroring accessory. Native on-device operation remains fully supported so the Flipper does not become dependent on a phone, account, cloud service, or network connection.
+The browser dashboard is the defining control plane. Native on-device operation remains available independently, while every dashboard session requires the local Node.js web runtime and the Wi-Fi board path.
 
 ### 1.2 Problem Statement
 
@@ -62,7 +62,8 @@ The opportunity is to combine capabilities that currently exist separately—por
 
 - Flipper Zero remains the primary hardware target for V1.
 - The firmware continues to use Furi/FreeRTOS, the existing C/C++ HAL, `.fam` manifests, protobuf RPC, and FAP compatibility conventions.
-- Phones and computers may have different browser transport capabilities; a local bridge is an accepted compatibility layer.
+- Phones and computers use the same standards-based HTTP(S) and WS(S) dashboard transport.
+- The local Node.js runtime and a supported Wi-Fi board are mandatory for every dashboard session.
 - The dashboard must remain useful offline after installation.
 - Cloud services are optional for device control and evidence access.
 - Rust source is compiled off-device. PoisonedOS accepts Rust source, produces a policy-checked artifact, deploys it, and runs it on the Flipper; it does not embed a full Rust compiler in the MCU firmware.
@@ -79,9 +80,10 @@ The opportunity is to combine capabilities that currently exist separately—por
 | ID | Priority | Requirement |
 |---|---|---|
 | FR-1 | MUST | The system MUST let a user pair a supported phone or computer with a physical PoisonedOS device using an authenticated local connection. |
-| FR-2 | MUST | The system MUST support USB and BLE device transports and MUST expose one transport-independent session API to the dashboard. |
+| FR-2 | MUST | The dashboard MUST use HTTP(S) for application/discovery traffic and WS(S) for its live session through the local Node.js runtime. |
 | FR-3 | MUST | The dashboard MUST remain installable and usable as an offline-capable web application after its initial load. |
-| FR-4 | MUST | The system MUST provide a local bridge for platforms whose browsers cannot access the required USB or BLE APIs directly. |
+| FR-4 | MUST | The local Node.js runtime MUST own the supported Wi-Fi board connection and carry the Flipper expansion RPC protocol over the board's raw TCP-to-UART service. |
+| FR-4A | MUST | The local Node.js runtime MUST give other local Node.js processes independent named addresses and publish them to browsers only through authenticated same-origin HTTP(S) and WS(S) proxy paths. |
 | FR-5 | MUST | The dashboard MUST show connection state, firmware/API version, battery state, storage state, active application, and transport health. |
 | FR-6 | MUST | The dashboard MUST stream the physical device display and MUST send all supported button press, release, short, long, and repeat events. |
 | FR-7 | MUST | The dashboard MUST start, stop, and inspect built-in and external applications. |
@@ -114,6 +116,7 @@ The opportunity is to combine capabilities that currently exist separately—por
 | FR-24 | MUST | The system MUST verify package integrity, target compatibility, firmware API compatibility, signatures, and declared capabilities before installing or running an application. |
 | FR-25 | MUST | The user MUST be able to install, update, disable, remove, and roll back applications from the browser. |
 | FR-26 | MUST | PoisonedOS MUST ship a curated set of field security and education tools covering NFC, LF RFID, iButton, infrared, Sub-GHz, GPIO, USB/HID, BLE, serial, and storage workflows supported by the hardware. |
+| FR-26A | MUST | Curated GPIO coprocessor firmware MUST be version/source pinned, verified before use, matched against detected chip and board identity without guessing, written only at manifest-declared offsets, verified by readback, and skipped when the exact approved version is already installed. |
 | FR-27 | MUST | Every curated tool MUST provide a purpose statement, authorized-use guidance, required hardware, parameter descriptions, structured output schema, and at least one safe sample or lab dataset. |
 | FR-28 | MUST | The system MUST let users create field profiles that atomically apply menus, shortcuts, UI theme, tool defaults, transport policy, logging policy, and evidence policy. |
 | FR-29 | MUST | The dashboard MUST edit themes, icon/font packs, menus, shortcuts, status presentation, lock behavior, and application visibility with preview and rollback. |
@@ -166,11 +169,11 @@ The opportunity is to combine capabilities that currently exist separately—por
 
 | ID | Priority | Requirement |
 |---|---|---|
-| FR-59 | SHOULD | The dashboard SHOULD manage up to 30 classroom devices from one instructor workspace through multiple local bridges. |
+| FR-59 | SHOULD | The dashboard SHOULD manage up to 30 classroom devices from one instructor workspace through multiple named Wi-Fi board connections. |
 | FR-60 | SHOULD | The system SHOULD support optional encrypted synchronization of selected cases, profiles, projects, and lesson packs across user devices. |
 | FR-61 | SHOULD | The system SHOULD provide a reviewed catalog for signed applications, workloads, themes, tool-data packs, and lessons. |
 | FR-62 | SHOULD | The dashboard SHOULD support collaborative case notes with explicit author attribution and conflict resolution. |
-| FR-63 | COULD | The platform COULD support an external Wi-Fi devboard as a local network transport without changing the device API. |
+| FR-63 | COULD | The platform COULD support additional Wi-Fi board firmware implementations after they satisfy the pinned TCP/UART, provenance, and physical-E2E contract. |
 | FR-64 | COULD | The platform COULD support organization-managed policy and fleet reporting. |
 
 ### 2.2 Non-Functional Requirements
@@ -180,13 +183,11 @@ The opportunity is to combine capabilities that currently exist separately—por
 | Metric | Target | Measurement |
 |---|---:|---|
 | Dashboard cold start from local cache | p95 ≤ 2 seconds | Browser performance test on supported baseline phones/computers |
-| Paired-session establishment | p95 ≤ 3 seconds | Physical USB and BLE connection suites |
-| Command acknowledgement over USB | p95 ≤ 150 ms | Browser-to-device hardware E2E test |
-| Command acknowledgement over BLE | p95 ≤ 350 ms | Browser-to-device hardware E2E test |
-| Remote input-to-frame feedback over USB | p95 ≤ 250 ms | Timestamped physical-device E2E test |
-| Remote input-to-frame feedback over BLE | p95 ≤ 600 ms | Timestamped physical-device E2E test |
+| Paired-session establishment | p95 ≤ 3 seconds | Physical browser → Node runtime → Wi-Fi board → Flipper suite |
+| Command acknowledgement over Wi-Fi | p95 ≤ 350 ms | Browser-to-device hardware E2E test |
+| Remote input-to-frame feedback over Wi-Fi | p95 ≤ 600 ms | Timestamped physical-device E2E test |
 | Directory listing | p95 ≤ 1 second for 1,000 entries | Real SD-card corpus test |
-| Evidence search | p95 ≤ 500 ms for 10,000 indexed artifacts | Dashboard/bridge benchmark |
+| Evidence search | p95 ≤ 500 ms for 10,000 indexed artifacts | Dashboard/Node-service benchmark |
 | JavaScript launch | p95 ≤ 1 second for a 100 KiB installed project | Physical-device workload suite |
 | Native Rust FAP launch | p95 ≤ 2 seconds after installation | Physical-device workload suite |
 | Rust build feedback | First diagnostic or progress event ≤ 2 seconds | Build-service integration test |
@@ -210,7 +211,7 @@ The opportunity is to combine capabilities that currently exist separately—por
 - Long-term device and client keys MUST be stored using the strongest hardware-backed or OS-protected facility available on each platform.
 - Signed packages and updates MUST use an offline-root/online-intermediate signing hierarchy with revocation metadata.
 - Secrets, raw credential captures, case data, and private keys MUST never appear in ordinary logs or analytics.
-- Evidence at rest in the dashboard or bridge MUST be encrypted when the host platform provides secure key storage.
+- Evidence at rest in the dashboard or a local Node.js service MUST be encrypted when the host platform provides secure key storage.
 - Hosted services, if enabled, MUST meet OWASP ASVS Level 2 controls before public availability.
 - The platform MUST document radio-region policy and MUST preserve regulatory enforcement by default.
 - The platform MUST make no claim of legal forensic admissibility without an independent validation program.
@@ -219,8 +220,8 @@ The opportunity is to combine capabilities that currently exist separately—por
 #### Scalability and Capacity
 
 - A single dashboard session MUST remain responsive with 10,000 evidence artifacts, 1,000 filesystem entries in one directory, 250 installed packages, and 100 saved profiles.
-- One bridge process MUST support four concurrently connected devices without output loss.
-- Instructor mode SHOULD support 30 devices through multiple bridges while preserving per-device isolation.
+- One Node.js runtime MUST support four configured Wi-Fi boards without output loss while preserving one raw board owner per board.
+- Instructor mode SHOULD support 30 devices through multiple runtime instances while preserving per-device isolation.
 - The optional build service MUST horizontally scale by queue depth and MUST isolate every build in a fresh sandbox.
 - Device RPC MUST apply bounded queues and credit-based streaming so dashboard or build-service load cannot exhaust firmware memory.
 
@@ -235,7 +236,7 @@ The opportunity is to combine capabilities that currently exist separately—por
 ### 2.3 Constraints
 
 - The target firmware is constrained by the STM32WB55 memory map: 1 MiB flash and approximately 192 KiB primary RAM are declared in `targets/f7/stm32wb55xx_flash.ld:4-12`.
-- BLE bandwidth and browser transport support differ materially from USB.
+- Wi-Fi latency, signal quality, and board TCP/UART throughput vary by local environment.
 - Existing FAPs depend on firmware API compatibility and cannot be assumed safe merely because they load.
 - Native code on this MCU has no general-purpose process isolation.
 - SD cards can be removed, corrupted, or replaced while the device is running.
@@ -264,25 +265,30 @@ The opportunity is to combine capabilities that currently exist separately—por
 ```text
 ┌──────────────────────────── Phones and Computers ────────────────────────────┐
 │                                                                              │
-│  Poisoned Dashboard PWA                                                     │
+│  Poisoned_Os Dashboard                                                      │
 │  ├─ Device console and structured app UI                                    │
 │  ├─ Files, cases, evidence, reports                                          │
 │  ├─ JavaScript/Rust IDE and build client                                    │
 │  ├─ Profiles, themes, lessons, package manager                              │
 │  └─ Encrypted local database                                                 │
-│          │ direct WebUSB/WebSerial/Web Bluetooth where available            │
-│          │                                                                  │
-│          └──────── Poisoned Bridge ──────── optional hosted services         │
-│                    ├─ USB/BLE adapters       ├─ sandboxed Rust builds         │
-│                    ├─ local encrypted store  ├─ signed package catalog       │
-│                    └─ local build/cache      └─ encrypted opt-in sync         │
+│          │ HTTP(S) application/discovery + WS(S) encrypted RPC              │
+│          ▼                                                                  │
+│  Local Node.js Web Runtime                                                  │
+│  ├─ HTTPS/WS origin, authentication, and dashboard assets                   │
+│  ├─ Named same-origin proxies for local Node.js processes                   │
+│  └─ Single-owner Wi-Fi board control plane                                  │
 └─────────────────────────────────┬────────────────────────────────────────────┘
-                                  │ authenticated protobuf RPC v2
+                                  │ Wi-Fi: board HTTP API + TCP UART :3456
+                         ┌────────▼────────┐
+                         │ Blackmagic S2  │
+                         │ Wi-Fi Devboard │
+                         └────────┬────────┘
+                                  │ Flipper expansion protocol over UART
 ┌─────────────────────────────────▼────────────────────────────────────────────┐
-│ PoisonedOS Firmware                                                         │
+│ Poisoned_Os Firmware                                                        │
 │  ├─ Session gateway and policy engine                                       │
 │  ├─ Unified virtual filesystem and evidence journal                         │
-│  ├─ Structured tool/app adapter + legacy screen/input bridge                │
+│  ├─ Structured tool/app adapter + legacy screen/input control               │
 │  ├─ JavaScript runtime + dashboard-extension server                         │
 │  ├─ Native FAP loader + restricted WebAssembly runtime                      │
 │  ├─ Package/update verifier and recovery manager                            │
@@ -292,7 +298,7 @@ The opportunity is to combine capabilities that currently exist separately—por
 └──────────────────────────────────────────────────────────────────────────────┘
 ```
 
-The device API is transport-independent. Direct browser transport, the local bridge, and an optional Wi-Fi devboard all carry the same framed protocol and security session. The bridge is a compatibility and acceleration component, not a trusted cloud dependency.
+The browser transport and board transport are separate first-class layers. Browsers use HTTP(S) and WS(S) only. The local Node.js runtime owns the mandatory Wi-Fi link, translates the Blackmagic board's HTTP and raw TCP UART services into the Flipper expansion protocol, and forwards only the already encrypted device-session bytes to the browser.
 
 ### 3.2 Component Design
 
@@ -306,7 +312,7 @@ The device API is transport-independent. Direct browser transport, the local bri
 #### Session Gateway
 
 - **Responsibility:** Authenticate clients and multiplex versioned command, event, file, screen, and workload streams.
-- **Technology:** Nanopb/protobuf over USB, BLE, UART, or bridge transport.
+- **Technology:** Nanopb/protobuf inside the encrypted session envelope, carried through the Flipper expansion RPC channel over UART.
 - **Interfaces:** Poisoned RPC v2 envelope and capability negotiation.
 - **Dependencies:** Existing RPC service, mbedTLS, transport drivers, policy engine.
 
@@ -327,7 +333,7 @@ The device API is transport-independent. Direct browser transport, the local bri
 #### Evidence Service
 
 - **Responsibility:** Create immutable raw artifacts, metadata, hashes, annotations, audit chains, and exports.
-- **Technology:** Firmware capture adapter plus dashboard/bridge indexing and report generation.
+- **Technology:** Firmware capture adapter plus dashboard/local Node.js service indexing and report generation.
 - **Interfaces:** Case, run, artifact, annotation, verify, import, and export APIs.
 - **Dependencies:** VFS, clock, operator identity, tool adapters, cryptographic digests.
 
@@ -350,7 +356,7 @@ The device API is transport-independent. Direct browser transport, the local bri
 - **Responsibility:** Accept Rust projects, orchestrate reproducible off-device builds, verify artifacts, and execute native or WebAssembly outputs under policy.
 - **Technology:** Pinned Rust toolchain containers, constrained SDK, FAP/ELF output, compact WebAssembly runtime.
 - **Interfaces:** Build submission/events, artifact manifest, deploy, run, stop, output, crash report.
-- **Dependencies:** Bridge or hosted builder, package verifier, FAP loader, policy engine.
+- **Dependencies:** Named local or hosted builder service, package verifier, FAP loader, policy engine.
 
 #### Package and Update Manager
 
@@ -359,19 +365,19 @@ The device API is transport-independent. Direct browser transport, the local bri
 - **Interfaces:** Check, download/import, verify, stage, activate, roll back, revoke.
 - **Dependencies:** VFS, cryptography, recovery manager, optional catalog.
 
-#### Poisoned Dashboard
+#### Poisoned_Os Dashboard
 
 - **Responsibility:** Provide the complete user-facing phone/computer experience.
 - **Technology:** TypeScript progressive web application with service worker, IndexedDB, Web Workers, sandboxed frames, and accessible component system.
-- **Interfaces:** Session API, local bridge WebSocket, optional HTTPS services.
-- **Dependencies:** Browser platform, bridge when required, schema-generated client.
+- **Interfaces:** Same-origin HTTP(S) discovery and service routes; authenticated WS(S) RPC and service streams.
+- **Dependencies:** Browser platform, local Node.js web runtime, schema-generated client.
 
-#### Poisoned Bridge
+#### Local Node.js Web Runtime
 
-- **Responsibility:** Adapt local USB/BLE devices to the browser, cache data, and run local builds without becoming the source of truth.
-- **Technology:** Rust service with a loopback-only authenticated API and optional desktop/mobile shell.
-- **Interfaces:** Local WebSocket/HTTP API, USB/BLE adapters, build worker.
-- **Dependencies:** OS device APIs, secure credential storage, pinned toolchains.
+- **Responsibility:** Serve the dashboard, authenticate HTTP(S)/WS(S) clients, own every configured Wi-Fi board connection, and proxy independently named local Node.js processes to the browser.
+- **Technology:** Node.js HTTP/HTTPS servers, authenticated WebSockets, Blackmagic HTTP UART configuration, raw TCP port `3456`, and the Flipper expansion protocol.
+- **Interfaces:** Runtime manifest, board RPC WebSockets, service registry, same-origin HTTP(S)/WS(S) process proxies.
+- **Dependencies:** Supported Wi-Fi board firmware, local network, secure credential storage, and any registered local processes.
 
 #### Optional Hosted Platform
 
@@ -479,27 +485,27 @@ Channels are versioned independently: `device`, `files`, `screen`, `apps`, `tool
 }
 ```
 
-#### Bridge API
+#### Node Runtime Web API
 
-- `GET /v1/devices` lists locally visible devices without exposing secrets.
-- `POST /v1/devices/{id}/sessions` begins a user-confirmed pairing or authenticated session.
-- `GET /v1/sessions/{id}/stream` upgrades to an authenticated WebSocket carrying session envelopes.
-- `POST /v1/builds` submits a JavaScript validation or Rust build job.
-- `GET /v1/builds/{id}` returns immutable build metadata.
-- `GET /v1/builds/{id}/events` streams ordered build events.
-- The bridge binds to loopback by default, requires an origin-bound token, validates browser origins, and never accepts unauthenticated LAN traffic.
+- `GET /api/runtime/v1/manifest` declares `web` as the primary route, the HTTP/HTTPS and WS/WSS capabilities, configured Wi-Fi boards, and named service proxy paths.
+- `WS(S) /api/runtime/v1/boards/{id}/rpc` carries one board's opaque encrypted RPC stream and requires the origin-bound browser protocol token.
+- `POST /api/runtime/v1/services` registers an independently owned local Node.js process with an owner PID and bounded lease.
+- `PATCH /api/runtime/v1/services/{name}` renews the owning process lease; `DELETE` releases it.
+- `/api/runtime/v1/services/{name}/proxy/*` forwards authenticated HTTP(S) requests or WS(S) streams to the named loopback process without publishing that process's loopback address.
+- The runtime requires exact same-origin WebSocket upgrades, separate browser and admin tokens, unique service names and addresses, and loopback-only service targets.
 
 ### 3.6 Primary Data Flows
 
 #### Pair and Control
 
-1. Dashboard discovers a device directly or through the bridge.
-2. Device and client negotiate protocol and cryptographic suites.
-3. User confirms a short authentication code on both screens.
-4. Each side stores the paired public identity and granted role.
-5. Dashboard opens an encrypted RPC session and requests device state.
-6. User starts an integrated app or legacy screen stream.
-7. Commands and events are sequence-checked, authorized, executed, and audited.
+1. Dashboard loads the Node runtime manifest over HTTP(S) and selects a configured Wi-Fi board.
+2. The runtime opens the board's raw TCP UART service, negotiates the Flipper expansion session, and starts RPC.
+3. Device and client negotiate protocol and cryptographic suites through the authenticated WS(S) stream.
+4. User confirms a short authentication code on both screens.
+5. The browser stores its non-extractable P-256 identity key in IndexedDB; the device transactionally stores the device-enclave-authenticated public-identity digest, client name, and granted role in alternating generation slots.
+6. Dashboard opens an encrypted RPC session and requests device state.
+7. User starts an integrated app or legacy screen stream.
+8. Commands and events are sequence-checked, authorized, executed, and audited.
 
 #### Capture Evidence
 
@@ -540,7 +546,7 @@ Channels are versioned independently: `device`, `files`, `screen`, `apps`, `tool
 - **Untrusted scripts/WebAssembly:** restricted runtime APIs and resource budgets.
 - **Trusted native FAPs:** signed but not memory-isolated; require elevated approval.
 - **Dashboard sandbox:** untrusted extensions isolated from credentials and transport.
-- **Bridge:** local privileged adapter with minimal persistent secrets.
+- **Node runtime:** local web origin, Wi-Fi board owner, and named process proxy with separate browser/admin credentials.
 - **Hosted platform:** optional remote zone that never receives device private keys.
 
 #### Authorization
@@ -576,15 +582,15 @@ Capabilities are specific verbs such as `storage.case.read`, `storage.project.wr
 
 ### 3.9 Observability
 
-The system emits structured logs with correlation IDs across dashboard, bridge, builder, and device. Metrics include connection success, transport latency, command failures, dropped/retried frames, storage recovery, artifact verification, app/workload crashes, build queue time, build failures, update rollback, and policy denials.
+The system emits structured logs with correlation IDs across dashboard, Node runtime, builder, and device. Metrics include connection success, transport latency, command failures, dropped/retried frames, storage recovery, artifact verification, app/workload crashes, build queue time, build failures, update rollback, and policy denials.
 
 Device logs are bounded and redact secrets. User-facing diagnostics provide a downloadable support bundle containing versions, public configuration, recent redacted events, and integrity results. Hosted telemetry is opt-in and must not contain raw captures, case contents, source code, device private identity, or credential data.
 
 ### 3.10 Infrastructure and Deployment
 
 - **Firmware:** reproducible FBT build, signed updater bundle, stable/beta/developer channels.
-- **Dashboard:** static PWA deployable from official hosting, self-hosting, or the bridge; content-addressed assets and signed release manifest.
-- **Bridge:** signed Rust binaries/packages for supported desktop/mobile platforms; loopback-only service by default.
+- **Dashboard and Node runtime:** one local Node.js package serving signed dashboard assets, HTTP(S) discovery, WS(S) RPC, the Wi-Fi board control plane, and same-origin named-service proxies.
+- **Auxiliary host services:** independently addressed local processes registered with bounded leases; browser access only through the Node runtime.
 - **Builder:** local OCI-compatible sandbox or hosted ephemeral worker using the same pinned image digest.
 - **Hosted services:** optional regional deployments with separate build, catalog, and encrypted-sync trust domains.
 - **Environments:** development, hardware-in-loop test, staging/signing candidate, production.
@@ -599,14 +605,14 @@ Device logs are bounded and redact secrets. User-facing diagnostics provide a do
 #### Phase 0: Baseline and Governance
 
 - **Goal:** Establish a reproducible, legally complete, measurable firmware baseline.
-- **Scope:** Upstream baseline policy, dependency inventory, restored root licensing/notices, build reproducibility, API snapshot, threat-model seed, hardware test rack, release signing design.
+- **Scope:** Upstream baseline policy, dependency inventory, restored root licensing/notices, build reproducibility, API snapshot, hardware test rack, release signing design.
 - **Exit criteria:** Clean build from pinned toolchain; SBOM produced; licenses complete; official comparison tests pass; two physical recovery devices available; baseline performance recorded.
 - **Requirements:** Enables all requirements; directly satisfies provenance constraints for FR-24 and FR-54.
 
 #### Phase 1: Secure Browser-to-Device Vertical Slice
 
 - **Goal:** Prove professional phone/computer control of a physical device.
-- **Scope:** RPC v2 envelope, pairing, USB/BLE adapters, bridge, PWA shell, device status, live screen, remote input, app start/stop, audit events.
+- **Scope:** RPC v2 envelope, pairing, HTTP(S)/WS(S) web transport, Node.js runtime, Wi-Fi board expansion transport, PWA shell, device status, live screen, remote input, app start/stop, audit events.
 - **Exit criteria:** Real browser → real transport → real firmware E2E passes on supported phone and computer baselines; disconnect recovery passes; latency targets met.
 - **Requirements:** FR-1–FR-10, FR-51, FR-52, FR-57.
 
@@ -649,22 +655,22 @@ Device logs are bounded and redact secrets. User-facing diagnostics provide a do
 
 - **Unit tests:** Policy evaluation, manifests, serializers, path validation, journal state machine, audit chain, package verification, build provenance, dashboard state reducers.
 - **Property tests:** Filesystem operation sequences, protocol envelope parsing, evidence import/export, version negotiation, capability intersections.
-- **Integration tests:** Firmware services with real storage images; dashboard with bridge; builder with pinned SDK; update/package signing and revocation.
-- **Hardware-in-loop tests:** USB, BLE, SD insertion/removal, battery interruption, button injection, screen streaming, workload start/stop, recovery boot.
-- **True E2E tests:** A complete user workflow through a real browser/client → actual network or local transport → actual bridge when required → actual firmware and services → physical storage/hardware, with no mocked components. Separate E2E suites cover pairing/control, case capture/export, JavaScript, Rust, app installation, customization rollback, classroom reset, and firmware update rollback.
+- **Integration tests:** Firmware services with real storage images; dashboard with the Node runtime and local process proxies; builder with pinned SDK; update/package signing and revocation.
+- **Hardware-in-loop tests:** Wi-Fi board transport, SD insertion/removal, battery interruption, button injection, screen streaming, workload start/stop, recovery boot.
+- **True E2E tests:** A complete user workflow through a real browser/client → HTTP(S)/WS(S) → actual local Node.js runtime → actual Wi-Fi board/TCP/UART expansion path → actual firmware and services → physical storage/hardware, with no mocked components. Separate E2E suites cover pairing/control, case capture/export, JavaScript, Rust, app installation, customization rollback, classroom reset, and firmware update rollback.
 - **Security tests:** Protocol fuzzing, malformed packages, replay, origin attacks, capability escalation, JS escape, WebAssembly escape, native-signature bypass, dependency substitution, secret scanning, and physical revocation.
-- **Load tests:** 10,000 artifacts, 1,000-entry directories, saturated BLE streams, four bridge devices, and 30-device instructor orchestration.
+- **Load tests:** 10,000 artifacts, 1,000-entry directories, saturated Wi-Fi RPC streams, four boards per runtime, and 30-device instructor orchestration.
 - **Usability/accessibility tests:** Field gloves/touch constraints, keyboard-only, screen reader, projector/classroom, novice ten-minute happy path.
 
 No test may be labeled E2E unless the real browser/client, transport, firmware, storage, and relevant hardware execute together.
 
 ### 4.3 CI/CD and Quality Gates
 
-Every pull request runs formatting, static analysis, unit/property tests, protocol compatibility, dashboard build, bridge tests, Rust SDK samples, license/SBOM checks, and documentation validation. Hardware-impacting changes enter a queued physical-device suite before merge.
+Every pull request runs formatting, static analysis, unit/property tests, protocol compatibility, dashboard/Node runtime build and tests, board provenance verification, Rust SDK samples, license/SBOM checks, and documentation validation. Hardware-impacting changes enter a queued physical-device suite before merge.
 
 Release candidates require:
 
-1. Reproducible firmware/dashboard/bridge/build-image outputs.
+1. Reproducible firmware/dashboard/Node-runtime/build-image outputs.
 2. Signed SBOM and provenance.
 3. All supported hardware E2E suites passing with zero regressions.
 4. Security fuzz corpus and dependency audit passing.
@@ -678,7 +684,7 @@ Release candidates require:
 - Firmware channels are developer, beta, and stable.
 - Stable rollout advances through 1%, 10%, 25%, 50%, and 100% cohorts only when halt thresholds remain clear.
 - Device keeps last-known-good updater metadata and supports offline recovery.
-- Dashboard and bridge retain the previous compatible version and protocol schemas.
+- Dashboard and Node runtime retain the previous compatible version and protocol schemas.
 - Package updates preserve the previous activated object until post-start health confirmation.
 - A rollback never deletes cases, evidence, source projects, or audit history.
 
@@ -757,8 +763,8 @@ The project reviews release health daily during staged rollout, weekly during be
 
 | ID | Risk | Impact | Likelihood | Mitigation | Contingency |
 |---|---|---:|---:|---|---|
-| R-1 | Browser USB/BLE support differs by platform | High | High | Transport-independent API plus bridge/native shell | Publish supported matrix; require bridge on restricted platforms |
-| R-2 | BLE bandwidth cannot sustain rich remote UI | Medium | High | Structured events, delta frames, backpressure, USB preference | Reduce frame rate; keep legacy mirror secondary |
+| R-1 | Phone trust stores reject the local HTTPS certificate | High | Medium | Explicit certificate/key configuration and documented SAN/trust requirements | Block remote browser use until the presented certificate validates |
+| R-2 | Wi-Fi or TCP/UART throughput cannot sustain rich remote UI | Medium | High | Structured events, delta frames, bounded queues, expansion backpressure | Reduce frame rate while preserving control and structured output |
 | R-3 | Native FAP or Rust code compromises firmware | Critical | Medium | Signatures, capability approval, provenance, default denial | Quarantine/revoke package; require WebAssembly mode |
 | R-4 | mJS raw FFI defeats script isolation | Critical | Medium | Restricted resolver; developer-only trusted FFI | Disable FFI entirely in stable channel |
 | R-5 | WebAssembly runtime exceeds memory budget | High | Medium | Compact runtime, static limits, admission checks | Restrict Rust V1 to signed native FAP subset |
@@ -783,7 +789,7 @@ These are bounded decisions, not missing implementation requirements. Their owne
 | # | Question | Owner | Due Gate |
 |---|---|---|---|
 | OQ-1 | Will distribution be public open source, commercial managed, or open-core with paid hosted services? | Project owner | Before M1 completion |
-| OQ-2 | Which phone/browser/OS combinations receive direct transport versus the bridge shell? | Product + Dashboard | Before M1 design freeze |
+| OQ-2 | Which phone/browser/OS combinations pass the complete HTTPS/WSS and Wi-Fi-board physical workflow? | Product + Dashboard | Before M1 design freeze |
 | OQ-3 | Which official firmware branch and upstream-sync cadence define each PoisonedOS major version? | Firmware lead | M0 |
 | OQ-4 | Who controls offline root and online package-signing keys? | Security/Release | M0 |
 | OQ-5 | Which Rust dependencies are approved for offline/pinned builds? | Toolchain/Security | Before M5 implementation |
@@ -801,7 +807,7 @@ These are bounded decisions, not missing implementation requirements. Their owne
 
 | Term | Meaning |
 |---|---|
-| Bridge | Local Rust service adapting browser sessions to USB/BLE and optional local builds |
+| Local Node.js web runtime | Required dashboard server, HTTPS/WS origin, Wi-Fi board owner, and named local-process proxy |
 | Case | User-defined field investigation, assessment, lab, or lesson workspace |
 | Evidence artifact | Immutable raw output with cryptographic digest and provenance metadata |
 | FAP | Flipper Application Package containing an ELF-based external application |
@@ -846,7 +852,7 @@ Momentum-specific state, when imported, is treated as an alternative implementat
 | Threat | Boundary | Required Control |
 |---|---|---|
 | Unauthorized nearby client | Radio/device | Physical confirmation, authenticated encryption, revocation |
-| Malicious browser origin | Browser/bridge | Origin validation, loopback token, CSP, no ambient device access |
+| Malicious browser origin | Browser/Node runtime | Exact origin validation, browser protocol token, CSP, and no ambient board access |
 | Replay or message injection | Transport/session | Counters, AEAD, expiry, channel binding |
 | Malicious package | Package/firmware | Signature, provenance, capability policy, quarantine |
 | Script escape | JS runtime | Restricted resolver, no raw FFI, resource limits |
@@ -860,7 +866,7 @@ Momentum-specific state, when imported, is treated as an alternative implementat
 
 ### Appendix E: Capacity Model
 
-The dashboard/bridge capacity baseline is 10,000 evidence artifacts, 250 packages, 100 profiles, 1,000 entries per directory, four devices per bridge, and 30 classroom devices across bridges. Device allocations are budgeted per workload manifest and admitted only when the requested heap, stack, output queue, runtime, and artifact limits fit current availability.
+The dashboard/Node-runtime capacity baseline is 10,000 evidence artifacts, 250 packages, 100 profiles, 1,000 entries per directory, four Wi-Fi boards per runtime, and 30 classroom devices across runtime instances. Device allocations are budgeted per workload manifest and admitted only when the requested heap, stack, output queue, runtime, and artifact limits fit current availability.
 
 Build-service capacity is expressed in concurrent isolated workers rather than requests per second. Queue autoscaling uses pending-job count and oldest-job age; per-principal quotas prevent one classroom or project from exhausting the pool.
 
@@ -868,12 +874,12 @@ Build-service capacity is expressed in concurrent isolated workers rather than r
 
 The architecture separates costs so the unresolved business model does not force a redesign:
 
-- Local-only use incurs dashboard hosting/download, bridge distribution, signing, and support costs but no per-command cloud cost.
+- Local use incurs dashboard/Node-runtime distribution, signing, certificate setup, and support costs.
 - Self-hosted builds consume the user's compute and storage.
 - Hosted builds scale with worker minutes, dependency-cache storage, artifact storage, and egress.
 - Optional synchronization scales with encrypted object bytes, metadata operations, retention, and egress.
 - Catalog service scales primarily with artifact storage, signing operations, review labor, and distribution bandwidth.
-- Hardware-in-loop quality requires dedicated devices, USB/BLE hosts, controllable power, SD fixtures, RF-safe test facilities, and maintenance labor.
+- Hardware-in-loop quality requires dedicated devices, supported Wi-Fi boards, controllable power, SD fixtures, RF-safe test facilities, and maintenance labor.
 
 Financial figures are intentionally deferred until OQ-1 chooses a distribution model; engineering instrumentation MUST record these unit drivers during beta so pricing or sponsorship decisions use measured costs.
 

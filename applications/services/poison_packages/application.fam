@@ -1,0 +1,15 @@
+App(
+    appid="poison_packages",
+    name="Poison Packages",
+    apptype=FlipperAppType.STARTUP,
+    entry_point="poison_packages_on_system_start",
+    order=126,
+    requires=["storage"],
+    sources=["*.c"],
+    sdk_headers=[
+        "poison_package_catalog.h",
+        "poison_package_verify.h",
+        "poison_packages.h",
+        "poison_content_update.h",
+    ],
+)

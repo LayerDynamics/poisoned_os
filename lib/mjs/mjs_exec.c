@@ -38,17 +38,29 @@ static void call_stack_push_frame(struct mjs* mjs, size_t offset, mjs_val_t retv
     mjs->vals.this_obj = this_obj;
 
     push_mjs_val(&mjs->call_stack, mjs_mk_number(mjs, (double)offset));
+    push_mjs_val(&mjs->call_stack, mjs_mk_number(mjs, (double)mjs->scope_base));
     push_mjs_val(&mjs->call_stack, mjs_mk_number(mjs, (double)mjs_stack_size(&mjs->scopes)));
     push_mjs_val(
         &mjs->call_stack, mjs_mk_number(mjs, (double)mjs_stack_size(&mjs->loop_addresses)));
     push_mjs_val(&mjs->call_stack, retval_stack_idx);
 }
 
+static void call_stack_enter_function(struct mjs* mjs, mjs_val_t function) {
+    const size_t scope_base = mjs_stack_size(&mjs->scopes);
+    const struct mjs_closure* closure = mjs_get_closure(function);
+    if(closure) {
+        for(size_t index = 0u; index < closure->scope_count; ++index) {
+            push_mjs_val(&mjs->scopes, closure->scopes[index]);
+        }
+    }
+    mjs->scope_base = scope_base;
+}
+
 /*
  * Restores call stack frame. Returns the return address.
  */
 static size_t call_stack_restore_frame(struct mjs* mjs) {
-    size_t retval_stack_idx, return_address, scope_index, loop_addr_index;
+    size_t retval_stack_idx, return_address, scope_index, scope_base, loop_addr_index;
     assert(mjs_stack_size(&mjs->call_stack) >= CALL_STACK_FRAME_ITEMS_CNT);
 
     /*
@@ -57,8 +69,10 @@ static size_t call_stack_restore_frame(struct mjs* mjs) {
     retval_stack_idx = mjs_get_int(mjs, mjs_pop_val(&mjs->call_stack));
     loop_addr_index = mjs_get_int(mjs, mjs_pop_val(&mjs->call_stack));
     scope_index = mjs_get_int(mjs, mjs_pop_val(&mjs->call_stack));
+    scope_base = mjs_get_int(mjs, mjs_pop_val(&mjs->call_stack));
     return_address = mjs_get_int(mjs, mjs_pop_val(&mjs->call_stack));
     mjs->vals.this_obj = mjs_pop_val(&mjs->call_stack);
+    mjs->scope_base = scope_base;
 
     /* Remove created scopes */
     while(mjs_stack_size(&mjs->scopes) > scope_index) {
@@ -79,10 +93,14 @@ static size_t call_stack_restore_frame(struct mjs* mjs) {
 
 static mjs_val_t mjs_find_scope(struct mjs* mjs, mjs_val_t key) {
     size_t num_scopes = mjs_stack_size(&mjs->scopes);
-    while(num_scopes > 0) {
+    while(num_scopes > mjs->scope_base) {
         mjs_val_t scope = *vptr(&mjs->scopes, num_scopes - 1);
         num_scopes--;
         if(mjs_get_own_property_v(mjs, scope, key) != NULL) return scope;
+    }
+    if(mjs->scope_base > 0u) {
+        mjs_val_t global = *vptr(&mjs->scopes, 0);
+        if(mjs_get_own_property_v(mjs, global, key) != NULL) return global;
     }
     mjs_set_errorf(mjs, MJS_REFERENCE_ERROR, "[%s] is not defined", mjs_get_cstring(mjs, &key));
     return MJS_UNDEFINED;
@@ -639,6 +657,7 @@ MJS_PRIVATE mjs_err_t mjs_execute(struct mjs* mjs, size_t off, mjs_val_t* res) {
     int call_stack_len = mjs->call_stack.len;
     int arg_stack_len = mjs->arg_stack.len;
     int scopes_len = mjs->scopes.len;
+    size_t scope_base = mjs->scope_base;
     int loop_addresses_len = mjs->loop_addresses.len;
     size_t start_off = off;
     const uint8_t* code;
@@ -652,7 +671,8 @@ MJS_PRIVATE mjs_err_t mjs_execute(struct mjs* mjs, size_t off, mjs_val_t* res) {
     off -= bp.start_idx;
 
     for(i = off; i < bp.data.len; i++) {
-        mjs->cur_bcode_offset = i;
+        const size_t global_offset = bp.start_idx + i;
+        mjs->cur_bcode_offset = global_offset;
 
         if(mjs->need_gc) {
             if(maybe_gc(mjs)) {
@@ -669,6 +689,28 @@ MJS_PRIVATE mjs_err_t mjs_execute(struct mjs* mjs, size_t off, mjs_val_t* res) {
 #endif
         prev_opcode = opcode;
         opcode = code[i];
+
+        if(mjs->debug_hook && !mjs->debug_hook_suppressed && opcode != OP_BCODE_HEADER) {
+            const int line = mjs_get_lineno_by_offset(mjs, (int)global_offset);
+            const bool location_changed = mjs->debug_last_bcode_start != bp.start_idx ||
+                                          mjs->debug_last_line != line ||
+                                          (mjs->debug_last_bcode_offset != SIZE_MAX &&
+                                           global_offset <= mjs->debug_last_bcode_offset);
+            if(opcode == OP_DEBUGGER || location_changed) {
+                mjs->debug_last_bcode_start = bp.start_idx;
+                mjs->debug_last_bcode_offset = global_offset;
+                mjs->debug_last_line = line;
+                mjs->debug_hook(
+                    mjs,
+                    opcode == OP_DEBUGGER ? MJS_DEBUG_EVENT_STATEMENT : MJS_DEBUG_EVENT_LINE,
+                    mjs_get_bcode_filename_by_offset(mjs, (int)global_offset),
+                    line,
+                    mjs->debug_hook_context);
+            } else {
+                mjs->debug_last_bcode_offset = global_offset;
+            }
+        }
+
         switch(opcode) {
         case OP_BCODE_HEADER: {
             mjs_header_item_t bcode_offset;
@@ -698,7 +740,7 @@ MJS_PRIVATE mjs_err_t mjs_execute(struct mjs* mjs, size_t off, mjs_val_t* res) {
             break;
         case OP_PUSH_FUNC: {
             int llen, n = cs_varint_decode_unsafe(&code[i + 1], &llen);
-            mjs_push(mjs, mjs_mk_function(mjs, bp.start_idx + i - n));
+            mjs_push(mjs, mjs_mk_closure(mjs, bp.start_idx + i - n));
             i += llen;
             break;
         }
@@ -902,6 +944,7 @@ MJS_PRIVATE mjs_err_t mjs_execute(struct mjs* mjs, size_t off, mjs_val_t* res) {
             if(mjs_is_function(*func)) {
                 size_t off_call;
                 call_stack_push_frame(mjs, bp.start_idx + i, retval_stack_idx);
+                call_stack_enter_function(mjs, *func);
 
                 /*
            * Function offset is a global bcode offset, so we need to convert it
@@ -1033,6 +1076,8 @@ MJS_PRIVATE mjs_err_t mjs_execute(struct mjs* mjs, size_t off, mjs_val_t* res) {
         } break;
         case OP_NOP:
             break;
+        case OP_DEBUGGER:
+            break;
         case OP_EXIT:
             i = bp.data.len;
             break;
@@ -1068,6 +1113,7 @@ MJS_PRIVATE mjs_err_t mjs_execute(struct mjs* mjs, size_t off, mjs_val_t* res) {
             mjs->call_stack.len = call_stack_len;
             mjs->arg_stack.len = arg_stack_len;
             mjs->scopes.len = scopes_len;
+            mjs->scope_base = scope_base;
             mjs->loop_addresses.len = loop_addresses_len;
 
             /* script will evaluate to `undefined` */
@@ -1174,6 +1220,40 @@ mjs_err_t mjs_exec(struct mjs* mjs, const char* src, mjs_val_t* res) {
     return mjs_exec_internal(mjs, "<stdin>", src, 0 /* generate_jsc */, res);
 }
 
+mjs_err_t mjs_debug_eval(
+    struct mjs* mjs,
+    const char* src,
+    mjs_val_t* res,
+    char* error,
+    size_t error_size) {
+    if(!mjs || !src) return MJS_BAD_ARGS_ERROR;
+
+    const mjs_err_t saved_error = mjs->error;
+    char* const saved_error_msg = mjs->error_msg;
+    char* const saved_stack_trace = mjs->stack_trace;
+    const size_t saved_offset = mjs->cur_bcode_offset;
+    const unsigned saved_suppressed = mjs->debug_hook_suppressed;
+    mjs->error_msg = NULL;
+    mjs->stack_trace = NULL;
+    mjs->error = MJS_OK;
+    mjs->debug_hook_suppressed = 1;
+
+    const mjs_err_t result = mjs_exec_internal(mjs, "<debug-eval>", src, 0, res);
+    if(error && error_size) {
+        const char* message = result == MJS_OK ? "" : mjs_strerror(mjs, result);
+        snprintf(error, error_size, "%s", message ? message : "JavaScript evaluation failed");
+    }
+
+    free(mjs->error_msg);
+    free(mjs->stack_trace);
+    mjs->error_msg = saved_error_msg;
+    mjs->stack_trace = saved_stack_trace;
+    mjs->error = saved_error;
+    mjs->cur_bcode_offset = saved_offset;
+    mjs->debug_hook_suppressed = saved_suppressed;
+    return result;
+}
+
 mjs_err_t mjs_exec_file(struct mjs* mjs, const char* path, mjs_val_t* res) {
     mjs_err_t error = MJS_FILE_READ_ERROR;
     mjs_val_t r = MJS_UNDEFINED;
@@ -1256,6 +1336,7 @@ mjs_err_t mjs_apply(
         mjs_ffi_call2(mjs);
         if(res != NULL) *res = *resp;
     } else {
+        call_stack_enter_function(mjs, func);
         size_t addr = mjs_get_func_addr(func);
         mjs_execute(mjs, addr, &r);
         if(res != NULL) *res = r;

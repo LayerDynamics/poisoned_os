@@ -80,18 +80,14 @@ static void gui_redraw_status_bar(Gui* gui, bool need_attention) {
     canvas_frame_set(
         gui->canvas, GUI_STATUS_BAR_X, GUI_STATUS_BAR_Y, GUI_DISPLAY_WIDTH, GUI_STATUS_BAR_HEIGHT);
 
-    /* for support black theme - paint white area and
-     * draw icon with transparent white color
-     */
+    /* PoisonedOS field rail: quiet chrome with fixed assay ticks. */
     canvas_set_color(gui->canvas, ColorWhite);
-    canvas_draw_box(gui->canvas, 1, 1, 9, 7);
-    canvas_draw_box(gui->canvas, 7, 3, 58, 6);
-    canvas_draw_box(gui->canvas, 61, 1, 32, 7);
-    canvas_draw_box(gui->canvas, 89, 3, 38, 6);
+    canvas_draw_box(gui->canvas, 0, 0, GUI_DISPLAY_WIDTH, GUI_STATUS_BAR_HEIGHT);
     canvas_set_color(gui->canvas, ColorBlack);
-    canvas_set_bitmap_mode(gui->canvas, 1);
-    canvas_draw_icon(gui->canvas, 0, 0, &I_Background_128x11);
-    canvas_set_bitmap_mode(gui->canvas, 0);
+    canvas_draw_line(gui->canvas, 0, 10, GUI_DISPLAY_WIDTH - 1, 10);
+    for(uint8_t tick = 3; tick < GUI_DISPLAY_WIDTH; tick += 8) {
+        canvas_draw_line(gui->canvas, tick, 8, tick, 10);
+    }
 
     // Right side
     uint8_t x = GUI_DISPLAY_WIDTH - 1;
@@ -131,8 +127,8 @@ static void gui_redraw_status_bar(Gui* gui, bool need_attention) {
             right_used + 3,
             GUI_STATUS_BAR_HEIGHT);
         canvas_set_color(gui->canvas, ColorBlack);
-        canvas_draw_rframe(
-            gui->canvas, 0, 0, canvas_width(gui->canvas), canvas_height(gui->canvas), 1);
+        canvas_draw_frame(
+            gui->canvas, 0, 0, canvas_width(gui->canvas), canvas_height(gui->canvas));
         canvas_draw_line(
             gui->canvas,
             canvas_width(gui->canvas) - 2,
@@ -200,8 +196,8 @@ static void gui_redraw_status_bar(Gui* gui, bool need_attention) {
     // Draw frame around icons on the left
     if(left_used) {
         canvas_frame_set(gui->canvas, 0, 0, left_used + 3, GUI_STATUS_BAR_HEIGHT);
-        canvas_draw_rframe(
-            gui->canvas, 0, 0, canvas_width(gui->canvas), canvas_height(gui->canvas), 1);
+        canvas_draw_frame(
+            gui->canvas, 0, 0, canvas_width(gui->canvas), canvas_height(gui->canvas));
         canvas_draw_line(
             gui->canvas,
             canvas_width(gui->canvas) - 2,

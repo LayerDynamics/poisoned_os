@@ -6,15 +6,22 @@ App(
     stack_size=2 * 1024,
     resources="examples",
     order=10,
+    requires=["poison_evidence"],
     provides=["js_app_start"],
     sources=[
         "js_app.c",
         "js_modules.c",
+        "js_capabilities.c",
+        "js_developer_policy.c",
+        "js_limits.c",
         "js_thread.c",
         "js_value.c",
         "plugin_api/app_api_table.cpp",
         "views/console_view.c",
         "modules/js_flipper.c",
+        "modules/js_poison_device.c",
+        "modules/js_poison_evidence.c",
+        "modules/js_poison_storage.c",
         "modules/js_tests.c",
     ],
 )
@@ -222,4 +229,12 @@ App(
     entry_point="js_storage_ep",
     requires=["js_app"],
     sources=["modules/js_storage.c"],
+)
+
+App(
+    appid="js_crypto",
+    apptype=FlipperAppType.PLUGIN,
+    entry_point="js_crypto_ep",
+    requires=["js_app", "rpc_start"],
+    sources=["modules/js_crypto.c"],
 )

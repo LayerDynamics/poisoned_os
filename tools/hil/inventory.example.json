@@ -1,0 +1,39 @@
+{
+  "schema": "poison.hil.inventory/v1",
+  "devices": [
+    {
+      "role": "test",
+      "serial": "REPLACE_WITH_TEST_FLIPPER_SERIAL",
+      "usbPower": {
+        "driver": "uhubctl",
+        "location": "REPLACE_WITH_TEST_HUB_LOCATION",
+        "port": 1,
+        "settleSeconds": 2
+      },
+      "sdFixture": {
+        "sentinelPath": "/ext/.poison-hil/test.json",
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    },
+    {
+      "role": "recovery",
+      "serial": "REPLACE_WITH_RECOVERY_FLIPPER_SERIAL",
+      "usbPower": {
+        "driver": "uhubctl",
+        "location": "REPLACE_WITH_RECOVERY_HUB_LOCATION",
+        "port": 2,
+        "settleSeconds": 2
+      },
+      "sdFixture": {
+        "sentinelPath": "/ext/.poison-hil/recovery.json",
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "recovery": {
+        "driver": "fbt-swd",
+        "transport": "blackmagic_usb",
+        "probeSerial": "REPLACE_WITH_SWD_PROBE_SERIAL",
+        "dfuSerial": "REPLACE_WITH_STM32_DFU_SERIAL"
+      }
+    }
+  ]
+}

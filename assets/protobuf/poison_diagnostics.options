@@ -1,0 +1,3 @@
+PB_Poison.DiagnosticEvent.category max_length:24
+PB_Poison.DiagnosticEvent.summary max_length:96
+PB_Poison.DiagnosticEvent.correlation_digest max_size:32

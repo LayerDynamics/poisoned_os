@@ -1,0 +1,9 @@
+App(
+    appid="poison_vfs_start",
+    name="Poison VFS",
+    apptype=FlipperAppType.STARTUP,
+    entry_point="poison_vfs_on_system_start",
+    sources=["*.c"],
+    order=27,
+    sdk_headers=["poison_vfs.h", "poison_vfs_paths.h"],
+)

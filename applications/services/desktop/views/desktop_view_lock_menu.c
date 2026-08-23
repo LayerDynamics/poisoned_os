@@ -48,16 +48,19 @@ void desktop_lock_menu_set_idx(DesktopLockMenuView* lock_menu, uint8_t idx) {
 void desktop_lock_menu_draw_callback(Canvas* canvas, void* model) {
     DesktopLockMenuViewModel* m = model;
 
+    canvas_clear(canvas);
     canvas_set_color(canvas, ColorBlack);
-    canvas_draw_icon(canvas, -57, 0 + STATUS_BAR_Y_SHIFT, &I_DoorLeft_70x55);
-    canvas_draw_icon(canvas, 116, 0 + STATUS_BAR_Y_SHIFT, &I_DoorRight_70x55);
+    canvas_draw_box(canvas, 0, STATUS_BAR_Y_SHIFT, 128, 13);
+    canvas_set_color(canvas, ColorWhite);
     canvas_set_font(canvas, FontSecondary);
+    canvas_draw_str(canvas, 4, STATUS_BAR_Y_SHIFT + 10, "POISON // CONTROL");
+    canvas_set_color(canvas, ColorBlack);
 
     for(size_t i = 0; i < DesktopLockMenuIndexTotalCount; ++i) {
         const char* str = NULL;
 
         if(i == DesktopLockMenuIndexLock) {
-            str = "Lock";
+            str = "Lock device";
         } else if(i == DesktopLockMenuIndexStealth) {
             if(m->stealth_mode) {
                 str = "Unmute";
@@ -66,18 +69,24 @@ void desktop_lock_menu_draw_callback(Canvas* canvas, void* model) {
             }
         } else if(i == DesktopLockMenuIndexDummy) { //-V547
             if(m->dummy_mode) {
-                str = "Default Mode";
+                str = "Field mode";
             } else {
-                str = "Dummy Mode";
+                str = "Cover mode";
             }
         }
 
-        if(str) //-V547
-            canvas_draw_str_aligned(
-                canvas, 64, 9 + (i * 17) + STATUS_BAR_Y_SHIFT, AlignCenter, AlignCenter, str);
-
-        if(m->idx == i) elements_frame(canvas, 15, 1 + (i * 17) + STATUS_BAR_Y_SHIFT, 98, 15);
+        const uint8_t item_y = STATUS_BAR_Y_SHIFT + 15 + (i * 13);
+        if(m->idx == i) {
+            canvas_draw_box(canvas, 0, item_y, 123, 12);
+            canvas_set_color(canvas, ColorWhite);
+            canvas_draw_str(canvas, 7, item_y + 9, str);
+            canvas_set_color(canvas, ColorBlack);
+        } else {
+            canvas_draw_str(canvas, 7, item_y + 9, str);
+        }
     }
+
+    elements_scrollbar(canvas, m->idx, DesktopLockMenuIndexTotalCount);
 }
 
 View* desktop_lock_menu_get_view(DesktopLockMenuView* lock_menu) {

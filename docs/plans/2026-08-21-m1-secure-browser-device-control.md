@@ -15,14 +15,14 @@
 
 | Achievement | Status before implementation | Required closing evidence |
 |---|---|---|
-| A1.0 Product and transport decisions | Not started | ADR-0001/0002 and the machine-checked feature/client matrices are approved. |
-| A1.1 Versioned session contract | Not started | Compatibility, crypto, replay, sequencing, cancellation, and flow-control tests pass on USB and BLE. |
-| A1.2 Role policy and device UX | Not started | Complete role/capability matrix and physical pairing/revocation workflows pass. |
-| A1.3 Audit, confirmation, and diagnostics | Not started | Chain, redaction, exact-target mutation/replay, and support-export tests pass. |
-| A1.4 Dashboard and bridge foundations | Not started | Offline PWA and loopback-origin isolation pass on every supported client row. |
-| A1.5 Complete remote operation | Not started | Real browser/transport/firmware app, screen, input, stream, and reconnect E2E passes. |
+| A1.0 Product and transport decisions | Complete: Tasks 1 and 2 are implemented and machine-checked; physical support-row evidence is intentionally still empty. | ADR-0001/0002 and the machine-checked feature/client matrices are approved. |
+| A1.1 Versioned session contract | In progress: session, channel, and authenticated app/evidence caller adapters are implemented; authenticated crypto transport and physical USB/BLE evidence remain. | Compatibility, crypto, replay, sequencing, cancellation, and flow-control tests pass on USB and BLE. |
+| A1.2 Role policy and device UX | In progress: Task 6 policy and bounded store are implemented; Task 7 device UX remains. | Complete role/capability matrix and physical pairing/revocation workflows pass. |
+| A1.3 Audit, confirmation, and diagnostics | In progress: bounded audit chain and confirmation tokens are implemented; diagnostics/export remain. | Chain, redaction, exact-target mutation/replay, and support-export tests pass. |
+| A1.4 Dashboard and bridge foundations | In progress: Tasks 10 and 11 foundations are implemented; supported-client physical evidence and full device forwarding remain. | Offline PWA and loopback-origin isolation pass on every supported client row. |
+| A1.5 Complete remote operation | In progress: Task 12 dashboard contracts are implemented; authenticated firmware callers, safe sample, and physical E2E remain. | Real browser/transport/firmware app, screen, input, stream, and reconnect E2E passes. |
 
-**Canonical task commands:** firmware tasks run `./fbt FIRMWARE_APP_SET=unit_tests` and `python3 tools/hil/run_suite.py --suite firmware-units`; dashboard tasks run `pnpm --dir dashboard verify`; bridge tasks run `cargo test --workspace --manifest-path bridge/Cargo.toml` and `cargo clippy --manifest-path bridge/Cargo.toml -- -D warnings`; physical workflows run the exact `tools/hil/run_suite.py` and Playwright commands named by the task. Record command, versions, physical IDs where applicable, exit code, and evidence digest before changing a ledger row.
+**Canonical task commands:** firmware tasks run `./fbt FIRMWARE_APP_SET=unit_tests` and `python3 tools/hil/run_suite.py --suite firmware-units`; dashboard tasks run `pnpm --dir dashboard verify`; Rust bridge tasks use `python3 tools/rust/cargo.py` for tests and clippy; physical workflows run the exact `tools/hil/run_suite.py` and Playwright commands named by the task. Record command, versions, physical IDs where applicable, exit code, and evidence digest before changing a ledger row.
 
 ## Achievement A1.0: Product and Transport Decisions
 
@@ -41,6 +41,8 @@
 3. Write tests that fail if a core capability imports a hosted-only client, requires an account flag, or makes an external request in local-only configuration.
 4. Run `python3 -m unittest tools.tests.test_feature_matrix` → Expected: every feature has an owner, build flag, local behavior, and data boundary.
 
+**Implementation evidence (Task 1):** `python3 -m unittest tools.tests.test_feature_matrix`, `python3 tools/verify_feature_matrix.py --config config/features/local-only.json`, and `python3 tools/verify_docs.py` passed on 2026-08-21. The local-only matrix keeps device control, files, evidence export, customization, and installed workloads enabled without accounts or hosted dependencies; catalog, hosted build, synchronization, and organization management are disabled locally.
+
 ### Task 2: Resolve supported direct and bridge transports
 
 **Files:**
@@ -55,6 +57,8 @@
 2. Tie every supported row to an available physical test host and device transport; a row without hardware evidence cannot be marked supported.
 3. Define one transport-independent session behavior and explicit adapter limitations, including BLE MTU/credit behavior and USB RPC ownership.
 4. Run `python3 tools/verify_supported_clients.py --config config/supported-clients.json` → Expected: no untested supported row and no ambiguous direct/bridge selection.
+
+**Implementation evidence (Task 2):** `python3 -m unittest tools.tests.test_supported_clients`, `python3 tools/verify_supported_clients.py --config config/supported-clients.json`, and `python3 tools/verify_docs.py` passed on 2026-08-21. The matrix enumerates seven explicit OS/browser rows; none is advertised as supported until physical host, device, route, command, and digest evidence is recorded.
 
 ## Achievement A1.1: Versioned Session Contract
 
@@ -91,6 +95,8 @@ message SessionEnvelope {
 4. Run firmware, dashboard typecheck, and bridge tests → Expected: PASS with identical field/tag snapshots.
 5. Stage diffs and request approval for proposed `feat(protocol): define authenticated session envelope`.
 
+**Implementation evidence (Task 3):** `./fbt proto`, `python3 -m unittest tools.tests.test_protocol_codegen tools.tests.test_protocol_compatibility`, `python3 tools/protocol/check_generated.py`, `python3 tools/protocol/compatibility.py --against provenance/protocol-previous.json`, `./fbt FIRMWARE_APP_SET=unit_tests`, and `python3 tools/verify_docs.py` passed on 2026-08-21. The session schema, nanopb bounds, C/TypeScript/Rust generated bindings, dashboard/bridge copies, and compatibility snapshot are current.
+
 ### Task 4: Implement common command, stream, and error semantics
 
 **Files:**
@@ -108,6 +114,8 @@ message SessionEnvelope {
 2. Test channel-local sequence/acknowledgement, bounded credit windows, retransmission, duplicate suppression, gap reporting, truncation, reconnect resumption, and resume refusal after expiry/revocation.
 3. Implement the bounded firmware channel table over the existing 1,024-byte RPC stream buffer (`applications/services/rpc/rpc.h:12`) without unbounded per-channel allocation.
 4. Run firmware, dashboard, and bridge focused tests → Expected: identical fixtures and no accepted unexplained stream gap.
+
+**Implementation evidence (Task 4):** The fixed-size firmware table in `applications/services/rpc/rpc_poison_channel.c`, the dashboard `ChannelState`, and the bridge `ChannelState` enforce the 1,024-byte frame limit, four-credit window, monotonic sequencing, duplicate/gap reporting, bounded channel names, and deterministic close behavior. `rpc_poison_channel_receive_authenticated` now verifies the session envelope and channel identity before advancing channel sequence state; `poison_channel_test.c` covers valid and tampered authenticated frames. `./fbt FIRMWARE_APP_SET=unit_tests`, `python3 tools/rust/cargo.py test --manifest-path bridge/Cargo.toml`, the focused protocol/feature/client tests, and `python3 tools/verify_docs.py` passed on 2026-08-21.
 
 ### Task 5: Implement pairing, encryption, counters, and revocation
 
@@ -133,6 +141,8 @@ message SessionEnvelope {
 
 **Achievement check:** A packet capture reveals no plaintext payload or reusable session secret; replayed frames never reach an RPC handler.
 
+**Implementation evidence (Task 5 foundations):** `rpc_poison_crypto.c` uses the existing F7 crypto HAL for AES-256-GCM, mbedTLS P-256 primitives for ephemeral key agreement, and a bounded manual HKDF-SHA-256 implementation; `rpc_poison_session.c` enforces the six session states, physical confirmation, monotonic counters, replay/gap rejection, revocation, and truncated HMAC-SHA-256 authentication for active envelopes. `dashboard/src/session/SessionClient.ts` now emits the same canonical truncated HMAC when the negotiated 32-byte session key is supplied. `./fbt FIRMWARE_APP_SET=unit_tests` and `pnpm --dir dashboard verify` passed on 2026-08-21. Authenticated RPC caller dispatch, physical packet-capture, and on-device execution evidence remain part of the M1 exit gate.
+
 ## Achievement A1.2: Role Policy and Device UX
 
 ### Task 6: Implement paired-client and role policy storage
@@ -153,6 +163,8 @@ message SessionEnvelope {
 3. Implement least-privilege intersection across role, requested capability, lock state, and physical confirmation.
 4. Run `./fbt FIRMWARE_APP_SET=unit_tests` and `python3 tools/hil/run_suite.py --suite firmware-units` → Expected: PASS; no default role grants destructive or native-code capability.
 
+**Implementation evidence (Task 6):** `poison_policy.c` defines Owner, Operator, Instructor, Student, and Observer capability ceilings, intersects requests with lock and physical-confirmation state, and denies native/destructive/radio actions without confirmation. `poison_pairing_store.c` maintains eight fixed records, rejects duplicate/invalid keys and names, and revokes individual or all clients. `./fbt proto` and `./fbt FIRMWARE_APP_SET=unit_tests` passed on 2026-08-21; physical persistence/recovery evidence remains required before closing A1.2.
+
 ### Task 7: Add physical pairing and revocation screens
 
 **Files:**
@@ -170,6 +182,8 @@ message SessionEnvelope {
 3. Run headless scene tests and physical input test → Expected: canceled/expired pairing creates no stored client.
 
 **Achievement check:** Owner can identify and revoke a client entirely from the Flipper.
+
+**Implementation evidence (Task 7 foundation):** `poison_security_settings` is now a production settings app with device-security menu, pairing/revocation scene entrypoints, bounded confirmation-code/fingerprint/client-name/role state, timeout and cancel handling, and a physical approval callback path. The firmware production image and unit image build successfully, and `poison_pairing_ui_test.c` covers mismatch, expiry boundary, cancellation, and one-shot confirmation; persistent store mutation from the GUI and physical HIL input evidence remain open.
 
 ## Achievement A1.3: Shared Audit, Confirmation, and Diagnostics Foundations
 
@@ -201,6 +215,8 @@ message SessionEnvelope {
 4. Integrate pairing, authentication, role changes, confirmation, revocation, app lifecycle, and policy denial callers in M1; later milestones must integrate their own caller families before exit.
 5. Run audit-chain, policy, RPC, and dashboard tests → Expected: every sensitive decision has one ordered redacted event and confirmation cannot authorize a changed command.
 
+**Implementation evidence (Task 8 foundation):** `poison_confirmation.c` issues short-lived one-use tokens bound to session, role, command/target/consequence digests, policy version, expiry, and physical approval. `poison_audit.c` maintains an ordered SHA-256 chain and rejects unsafe metadata containing secret, token, key, private, or payload material. `dashboard/src/audit/AuditClient.ts` verifies event ordering/predecessor links and `ConfirmationDialog.tsx` validates exact target/consequence bindings before approval. Firmware, dashboard, and host tests passed on 2026-08-21; RPC caller integration and physical approval evidence remain open.
+
 ### Task 9: Create bounded diagnostic events before feature expansion
 
 **Files:**
@@ -223,6 +239,8 @@ message SessionEnvelope {
 3. Attach correlation IDs from the common command contract and expose diagnostics only to authorized roles.
 4. Implement a local support-bundle snapshot with schema version, component versions, bounded counters, redacted errors, user-selected optional records, consent record, file digests, and preview-before-export; exclude secrets, keys, pairing codes, client tokens, payload contents, source files, evidence bytes, and stable private identifiers by default.
 5. Run firmware, bridge, and dashboard tests → Expected: actionable aggregate health and a verifiable local support export without prohibited content.
+
+**Implementation evidence (Task 9):** `poison_diagnostics.c` provides saturating counters and a fixed 16-entry event ring; event recording rejects secret/key/token/payload/private material and stores only bounded summaries, timestamps, and correlation digests. `rpc_poison_diagnostics_snapshot_authenticated` now binds snapshot export to the M1 session and fixed `diagnostics` channel, copies counters, and returns events in event-ID order; firmware regression coverage exercises valid and wrong-channel snapshots. `bridge/src/diagnostics.rs` and `dashboard/src/support/SupportBundle.tsx` enforce previewed consent, bounded counters/events/files, `/ext/` file paths, and lowercase digest-only references. Firmware, bridge, dashboard, host, protocol, and documentation checks passed on 2026-08-21; physical export evidence remains open.
 
 ## Achievement A1.4: Dashboard and Bridge Foundations
 
@@ -249,6 +267,8 @@ message SessionEnvelope {
 3. Implement installable offline PWA shell and secure session client.
 4. Run `pnpm --dir dashboard install`, `pnpm --dir dashboard test`, `pnpm --dir dashboard typecheck`, and `pnpm --dir dashboard build` → Expected: PASS and offline assets emitted.
 
+**Implementation evidence (Task 10 foundation):** `pnpm --dir dashboard install`, `pnpm --dir dashboard test`, `pnpm --dir dashboard typecheck`, and `pnpm --dir dashboard build` passed on 2026-08-21. The dashboard now has a typed USB/Serial/BLE transport contract, generated-protobuf pairing handshake with a device-assigned nonzero session ID, cancellation/close handling, and an installable cached shell; reconnect, authenticated envelope processing, and physical transport evidence remain open.
+
 ### Task 11: Create the loopback-only Rust bridge
 
 **Files:**
@@ -268,7 +288,9 @@ message SessionEnvelope {
 1. Write failing tests for non-loopback bind, missing origin token, wrong Origin, cross-session access, and connection cleanup.
 2. Implement the exact SPEC bridge endpoints `GET /v1/devices`, `POST /v1/devices/{id}/sessions`, and `GET /v1/sessions/{id}/stream`, plus USB/BLE adapter traits and strict request/body limits.
 3. Store client keys through OS secure storage abstraction; never plaintext files.
-4. Run `cargo test --workspace --manifest-path bridge/Cargo.toml` and `cargo clippy --manifest-path bridge/Cargo.toml -- -D warnings` → Expected: PASS.
+4. Run `python3 tools/rust/cargo.py test --workspace --manifest-path bridge/Cargo.toml` and `python3 tools/rust/cargo.py clippy --manifest-path bridge/Cargo.toml -- -D warnings` → Expected: PASS.
+
+**Implementation evidence (Task 11 foundation):** `python3 tools/rust/cargo.py test --workspace --manifest-path bridge/Cargo.toml` and `python3 tools/rust/cargo.py clippy --manifest-path bridge/Cargo.toml -- -D warnings` passed on 2026-08-21. The bridge binds only to loopback, authenticates exact loopback origins with an OS keyring-backed token, enforces a 1,024-byte body limit, exposes the three specified route shapes, bounds four sessions, keeps session IDs isolated, discovers supported macOS/Linux USB serial names, and forwards bounded WebSocket binary frames to discovered serial endpoints. BLE discovery and physical packet E2E evidence remain open.
 
 **Achievement check:** An unrelated browser origin cannot enumerate or open devices through the bridge.
 
@@ -307,6 +329,12 @@ message SessionEnvelope {
 6. Render the M1 audit event families with sequence-gap, verification, offline, and permission states; M2 adds evidence/file events.
 7. Run the canonical dashboard, firmware-unit, and bridge commands → Expected: PASS with complete status fields, the real structured safe sample, and a legacy framebuffer application.
 
+**Implementation evidence (Task 12):** The dashboard now has typed status validation, stale/invalid framebuffer rejection, complete press/release/short/long/repeat input ordering with held-key cleanup, structured app event sequencing/artifact-digest validation, launch gating, console/artifact views, and audit timeline rendering. `rpc_poison_app_accept_event_authenticated` now correctly requires and accepts a verified session envelope before accepting structured app events; its regression test covers a valid frame and a rejected replay. Dashboard tests/typecheck/build and the firmware unit image passed on 2026-08-21; complete caller coverage, `poison_safe_sample`, and physical screen/input/app E2E remain open.
+
+`applications/main/poison_safe_sample/` now provides a launchable non-destructive sample with bounded parameters, cancellable progress, typed structured events, warnings/status text, and deterministic generated artifacts. Its bounds, determinism, and output-capacity regression test is included in the unit image.
+
+`tools/hil/suites/pair_control.py`, `tools/hil/fixtures/supported-platforms.json`, and `dashboard/e2e/pair-control.spec.ts` now provide the real pair-control preflight: dashboard verification, safe-sample FAP build/flash, physical test-device reconnect, and supported-client route inventory. Physical USB/BLE pairing, input, revocation, and latency evidence remain open.
+
 ### Task 13: Add the real hardware E2E suite
 
 **Files:**
@@ -331,8 +359,8 @@ message SessionEnvelope {
 ./fbt FIRMWARE_APP_SET=unit_tests
 python3 tools/hil/run_suite.py --suite firmware-units
 pnpm --dir dashboard verify
-cargo test --workspace --manifest-path bridge/Cargo.toml
-cargo clippy --manifest-path bridge/Cargo.toml -- -D warnings
+python3 tools/rust/cargo.py test --workspace --manifest-path bridge/Cargo.toml
+python3 tools/rust/cargo.py clippy --manifest-path bridge/Cargo.toml -- -D warnings
 python3 tools/hil/run_suite.py --suite pair-control
 ```
 

@@ -116,6 +116,7 @@ static void rpc_system_storage_info_process(const PB_Main* request, void* contex
     rpc_system_storage_reset_state(rpc_storage, session, true);
 
     PB_Main* response = malloc(sizeof(PB_Main));
+    *response = (PB_Main)PB_Main_init_zero;
     response->command_id = request->command_id;
 
     FS_Error error = storage_common_fs_info(

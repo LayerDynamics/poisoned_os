@@ -104,6 +104,7 @@ class BufferedRead:
 class FlipperStorage:
     CLI_PROMPT = ">: "
     CLI_EOL = "\r\n"
+    STARTUP_TIMEOUT = 10.0
     # A silent device mid-transfer means a hung CLI/RPC, not a slow reboot, so
     # the copy path bounds its waits; other callers (e.g. await_flipper) don't.
     WRITE_CHUNK_TIMEOUT = 60.0
@@ -129,14 +130,21 @@ class FlipperStorage:
 
     def start(self):
         self.port.open()
-        time.sleep(0.5)
-        self.read.until(self.CLI_PROMPT)
-        self.port.reset_input_buffer()
-        # Send a command with a known syntax to make sure the buffer is flushed
-        self.send("device_info\r")
-        self.read.until("hardware_model")
-        # And read buffer until we get prompt
-        self.read.until(self.CLI_PROMPT)
+        try:
+            time.sleep(0.5)
+            # The CLI does not necessarily emit a prompt when an already-running
+            # device is opened. Wake it explicitly before waiting for one.
+            self.send("\r")
+            self.read.until(self.CLI_PROMPT, timeout=self.STARTUP_TIMEOUT)
+            self.port.reset_input_buffer()
+            # Send a command with a known response to verify that this is a
+            # responsive Flipper CLI before an update is copied to it.
+            self.send("device_info\r")
+            self.read.until("hardware_model", timeout=self.STARTUP_TIMEOUT)
+            self.read.until(self.CLI_PROMPT, timeout=self.STARTUP_TIMEOUT)
+        except Exception:
+            self.port.close()
+            raise
 
     def stop(self) -> None:
         self.port.close()

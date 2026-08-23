@@ -283,16 +283,14 @@ static Desktop* desktop_alloc(void) {
 
     desktop->main_view_stack = view_stack_alloc();
     desktop->main_view = desktop_main_alloc();
-    View* dolphin_view = animation_manager_get_animation_view(desktop->animation_manager);
+    View* poison_animation_view = animation_manager_get_animation_view(desktop->animation_manager);
+    view_stack_add_view(desktop->main_view_stack, poison_animation_view);
     view_stack_add_view(desktop->main_view_stack, desktop_main_get_view(desktop->main_view));
-    view_stack_add_view(desktop->main_view_stack, dolphin_view);
     view_stack_add_view(
         desktop->main_view_stack, desktop_view_locked_get_view(desktop->locked_view));
 
-    /* locked view (as animation view) attends in 2 scenes: main & locked,
-     * because it has to draw "Unlocked" label on main scene */
+    /* The locked view attends both scenes so it can draw the release confirmation on home. */
     desktop->locked_view_stack = view_stack_alloc();
-    view_stack_add_view(desktop->locked_view_stack, dolphin_view);
     view_stack_add_view(
         desktop->locked_view_stack, desktop_view_locked_get_view(desktop->locked_view));
 

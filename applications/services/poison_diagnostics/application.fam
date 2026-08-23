@@ -1,0 +1,8 @@
+App(
+    appid="poison_diagnostics_start",
+    apptype=FlipperAppType.STARTUP,
+    entry_point="poison_diagnostics_on_system_start",
+    sources=["poison_diagnostics.c"],
+    order=26,
+    sdk_headers=["poison_diagnostics.h"],
+)

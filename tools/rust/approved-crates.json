@@ -1,0 +1,44 @@
+{
+  "schema": "poison.rust-dependencies/v1",
+  "toolchain": "1.96.0",
+  "sourcePolicy": {
+    "offline": true,
+    "allowed": ["vendor", "workspace"],
+    "denied": ["git", "path", "network", "registry"]
+  },
+  "crates": [
+    {
+      "name": "poison-build",
+      "version": "0.1.0",
+      "source": "rust-sdk/crates/poison-build",
+      "checksum": "2f6ad51c6c18e484584af062dbffec41e105782f2c994759de2c472237b5ec67",
+      "license": "MIT",
+      "features": [],
+      "unsafe": false,
+      "reviewer": "runtime",
+      "reason": "native artifact admission contract"
+    },
+    {
+      "name": "poison-runtime",
+      "version": "0.1.0",
+      "source": "rust-sdk/crates/poison-runtime",
+      "checksum": "54ef025992d9618d569710ad9b0fa720ca831cb3748773fda34647e52fd8d89d",
+      "license": "MIT",
+      "features": [],
+      "unsafe": false,
+      "reviewer": "runtime",
+      "reason": "device entry and teardown contract"
+    },
+    {
+      "name": "poison-sdk",
+      "version": "0.1.0",
+      "source": "rust-sdk/crates/poison-sdk",
+      "checksum": "6bf31cca56488a977c66cc312fd4f1ea83bd902f8364ac32812e655e36f357db",
+      "license": "MIT",
+      "features": [],
+      "unsafe": false,
+      "reviewer": "runtime",
+      "reason": "versioned device ABI wrappers"
+    }
+  ]
+}

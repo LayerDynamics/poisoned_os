@@ -1,5 +1,6 @@
 #include "js_event_loop.h"
 #include "../../js_modules.h" // IWYU pragma: keep
+#include "../../js_thread.h"
 #include <expansion/expansion.h>
 #include <mlib/m-array.h>
 
@@ -54,6 +55,10 @@ struct JsEventLoop {
  */
 static void js_event_loop_callback_generic(void* param) {
     JsEventLoopCallbackContext* context = param;
+    if(!js_thread_account(context->mjs, &(JsLimitsUsage){.callbacks = 1u})) {
+        furi_event_loop_stop(context->event_loop);
+        return;
+    }
     mjs_val_t result;
     mjs_err_t error = mjs_apply(
         context->mjs,
@@ -142,6 +147,7 @@ static void js_event_loop_subscription_cancel(struct mjs* mjs) {
  */
 static void js_event_loop_subscribe(struct mjs* mjs) {
     JsEventLoop* module = JS_GET_CONTEXT(mjs);
+    if(!js_thread_account(mjs, &(JsLimitsUsage){.callbacks = 1u, .open_handles = 1u})) return;
 
     // get arguments
     static const JsValueDeclaration js_loop_subscribe_arg_list[] = {
@@ -269,6 +275,7 @@ static void js_event_loop_timer(struct mjs* mjs) {
     }
 
     JsEventLoop* module = JS_GET_CONTEXT(mjs);
+    if(!js_thread_account(mjs, &(JsLimitsUsage){.timers = 1u})) return;
 
     // make timer contract
     JsEventLoopContract* contract = malloc(sizeof(JsEventLoopContract));
@@ -339,6 +346,7 @@ static void js_event_loop_queue(struct mjs* mjs) {
     JS_VALUE_PARSE_ARGS_OR_RETURN(mjs, &js_loop_q_args, &length);
 
     JsEventLoop* module = JS_GET_CONTEXT(mjs);
+    if(!js_thread_account(mjs, &(JsLimitsUsage){.open_handles = 1u})) return;
 
     // make queue contract
     JsEventLoopContract* contract = malloc(sizeof(JsEventLoopContract));

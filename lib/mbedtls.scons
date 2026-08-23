@@ -39,8 +39,10 @@ libenv.AppendUnique(
 # Otherwise, we can just use the files we need:
 sources = [
     File("mbedtls/library/aes.c"),
+    File("mbedtls/library/asn1parse.c"),
     File("mbedtls/library/bignum.c"),
     File("mbedtls/library/bignum_core.c"),
+    File("mbedtls/library/constant_time.c"),
     File("mbedtls/library/ecdsa.c"),
     File("mbedtls/library/ecp.c"),
     File("mbedtls/library/ecp_curves.c"),

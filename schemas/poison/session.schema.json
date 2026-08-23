@@ -1,0 +1,28 @@
+{
+  "$id": "https://poisoned.invalid/schemas/session.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PoisonedOS RPC v2 session contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "protocolVersion", "maxEnvelopeBytes", "channels", "states"],
+  "properties": {
+    "schema": {"const": "poison.rpc/v2"},
+    "protocolVersion": {"const": 2},
+    "maxEnvelopeBytes": {"const": 1024},
+    "channels": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["control", "device", "screen", "apps"],
+      "properties": {
+        "control": {"const": "pairing-and-session-control"},
+        "device": {"const": "status-and-input"},
+        "screen": {"const": "bounded-screen-stream"},
+        "apps": {"const": "application-lifecycle-and-events"}
+      }
+    },
+    "states": {
+      "type": "array",
+      "const": ["Unpaired", "Negotiating", "Confirming", "Active", "Closing", "Revoked"]
+    }
+  }
+}

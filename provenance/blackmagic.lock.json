@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "kind": "poison-wifi-board-runtime",
+  "sourceRepository": "flipperdevices/blackmagic-esp32-s2",
+  "sourceCommit": "9447ee92605c7373d93fe710f6f7e5cc37a7862d",
+  "sourceTag": "0.1.2-rc",
+  "releaseIndexUrl": "https://update.flipperzero.one/blackmagic-firmware/directory.json",
+  "releaseArtifactUrl": "https://update.flipperzero.one/builds/blackmagic-firmware/0.1.2-rc/blackmagic-firmware-s2-full-0.1.2-rc.tgz",
+  "releaseArtifactSha256": "f7730eaaa0c39a4a0375fcfa29b493faf2da2570ce6c6685de768de7415d400a",
+  "releaseArtifactMember": "blackmagic.bin",
+  "bundledImagePath": "applications/external/poison_esp_flasher/resources/apps_data/esp_flasher/assets/blackmagic/s2/blackmagic.bin",
+  "bundledImageSize": 961488,
+  "bundledImageSha256": "89386c52b34a9112f7c0c445fdd7e48ce9ceac05aae52c9a7d2bfb820d675f1d",
+  "imageMetadata": {
+    "project": "blackmagic",
+    "appVersion": "1",
+    "compileTime": "Sep 11 2025 13:29:43",
+    "espIdf": "v4.4.8-1-ga9d0f22193",
+    "chip": "ESP32-S2"
+  },
+  "requiredCapabilities": {
+    "rawTcpUartPort": 3456,
+    "maxRawTcpClients": 1,
+    "uartGetConfigPath": "/api/v1/uart/get_config",
+    "uartSetConfigPath": "/api/v1/uart/set_config"
+  }
+}

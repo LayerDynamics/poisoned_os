@@ -92,8 +92,13 @@
       "upstreamSha256": "df11796125f7c67a4963c944f827399bc542a2b60d801da597c184745cd4a8b7"
     },
     {
-      "classification": "upstream-omitted",
+      "classification": "poison-modified",
+      "differences": [
+        "content"
+      ],
       "path": ".github/workflows/build.yml",
+      "productMode": "100644",
+      "productSha256": "5e9c238363b753b911d2d3bc92344af7d2c7f8eb99b58cd914501672e02ce60d",
       "upstreamMode": "100644",
       "upstreamSha256": "79b739197151640c7674e01815dd5de898e4b339c5da4ea8947ae1a465838a51"
     },
@@ -110,6 +115,12 @@
       "upstreamSha256": "67754fd87e670c0136e8bbef66bd404afc74328f3f02c7ea226d00bc7082e24b"
     },
     {
+      "classification": "poison-added",
+      "path": ".github/workflows/lint.yml",
+      "productMode": "100644",
+      "productSha256": "7b5d1993b3be895ccbcea988c15155930f6530a1d74d60b63e72b0def884a5f6"
+    },
+    {
       "classification": "upstream-omitted",
       "path": ".github/workflows/lint_and_submodule_check.yml",
       "upstreamMode": "100644",
@@ -122,6 +133,12 @@
       "upstreamSha256": "dd0b8f1fd3769a9b44a663bb6437d8174cd2139f6d7c1278c5fbeb2d3a8078d6"
     },
     {
+      "classification": "poison-added",
+      "path": ".github/workflows/provenance.yml",
+      "productMode": "100644",
+      "productSha256": "c02759a7ef7120c150a923eac1efd188c891c27d366891aeb9d94996c3ee7bf5"
+    },
+    {
       "classification": "upstream-omitted",
       "path": ".github/workflows/pvs_studio.yml",
       "upstreamMode": "100644",
@@ -132,6 +149,12 @@
       "path": ".github/workflows/reindex.yml",
       "upstreamMode": "100644",
       "upstreamSha256": "15dcc2714bb4d850b63adee557e07050f3c9fb2e86c8b9fada03d91bad4d47d0"
+    },
+    {
+      "classification": "poison-added",
+      "path": ".github/workflows/unit.yml",
+      "productMode": "100644",
+      "productSha256": "c59452e3f8bab43d749c743cf705962be1d515c78be03e4938b536bde90e65c4"
     },
     {
       "classification": "upstream-omitted",
@@ -152,7 +175,7 @@
       ],
       "path": ".gitignore",
       "productMode": "100644",
-      "productSha256": "bc64e4ef45c417e0f003ebf050dc90d22bf47db729a4fcbee1be7987d8db2a43",
+      "productSha256": "9ce5330b518b55312ee4bfb3a54ac34f6278bdcf511a678e5a257c3d48fbaaf0",
       "upstreamMode": "100644",
       "upstreamSha256": "55f8bcf7136f9ec8f9bf4c4e06ba725c63a9f430dd29d925a7a4737284078c0e"
     },
@@ -293,10 +316,13 @@
       "upstreamSha256": "424edcdfed69e00beb9ee514e78c945f14c996e490d65bcf8cc163fc288a3e67"
     },
     {
-      "classification": "identical",
+      "classification": "poison-modified",
+      "differences": [
+        "content"
+      ],
       "path": "SConstruct",
       "productMode": "100644",
-      "productSha256": "f89ce018d0dfca6ff196c8569367e3c46248121ca44d273c716acaa565d13433",
+      "productSha256": "8aea3e7318d4276d9dd7433ed8a1e8fc8c962e403c43fafb31be22566883253a",
       "upstreamMode": "100644",
       "upstreamSha256": "f89ce018d0dfca6ff196c8569367e3c46248121ca44d273c716acaa565d13433"
     },
@@ -3421,6 +3447,2442 @@
       "upstreamSha256": "1138be019fcedddec97ae40c25586d854e3a4b62fb0a21c898f12d8360c3166e"
     },
     {
+      "classification": "poison-added",
+      "path": "applications/external/application.fam",
+      "productMode": "100644",
+      "productSha256": "364a56f42051968890834f55f89654e5ff15a367ef6f5d3250c8979656d3cf80"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/.github/FUNDING.yml",
+      "productMode": "100644",
+      "productSha256": "5be8e0c252aad00186f9e47c44612f831e47ce16cd9b5f86cbe9cb903acf111f"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/.github/workflows/build.yml",
+      "productMode": "100644",
+      "productSha256": "c041fcd587a7bb78e235714a33a70762bd548b106f61ece32b03a91ee72f54ee"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/.github/workflows/build_now",
+      "productMode": "100644",
+      "productSha256": "f7e9d0bc3a79a3f33dcebf9de06ff97feee6b280d2e0f49b92331fe49ec4c2a2"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/.gitsubtree",
+      "productMode": "100644",
+      "productSha256": "576626aecb570dda3c274a72dc72ff2ab37f5ca9690c1f5f20c03f4d427e755a"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/LICENSE",
+      "productMode": "100644",
+      "productSha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/ReadMe.md",
+      "productMode": "100644",
+      "productSha256": "afdc9697ad96967dc1fc6cd5e39e81b5c51a413a8fbab2d32970e50e6d7eeb3f"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/application.fam",
+      "productMode": "100644",
+      "productSha256": "8713fccdc5909282e9cb0ddf5cedb29e507d6d3bd6e4b8e85457cd36aebd52f4"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/assets/Text_10x10.png",
+      "productMode": "100644",
+      "productSha256": "76bcfa5dcede6840e4ab1029634dbc550c21a38dc58ae1064d5b6f2739bb2bb6"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/docs/README.md",
+      "productMode": "100644",
+      "productSha256": "7c541482e47a77434b780c86a4d26c1b06c286c85fb8ec0b6c410c48b8bacea3"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/docs/changelog.md",
+      "productMode": "100644",
+      "productSha256": "df3e08613bab94fb61bb6dafe7db046b6fbd41c9cf888cb5ec26ced7aafe3a59"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/esp_flasher_app.c",
+      "productMode": "100644",
+      "productSha256": "76528820781a35f34c16c7a3b0d09f3dcb0a574913e4fa3adf696f899a263de9"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/esp_flasher_app.h",
+      "productMode": "100644",
+      "productSha256": "faf58dbe7f8db861b558fa0e3b948491bbb4cad8a87bf6dabbb7145214f9efea"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/esp_flasher_app_i.h",
+      "productMode": "100644",
+      "productSha256": "f9a9668ac43a680e68300c85f000428c582f9d31256ee191243e419563c48ffd"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/esp_flasher_custom_event.h",
+      "productMode": "100644",
+      "productSha256": "c757c92d0c2484329b64a506e300abff6a139811e6b311ce0224605de97824ec"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/esp_flasher_uart.c",
+      "productMode": "100644",
+      "productSha256": "74c64afa7313261fb7af0fe8c3d993971e778307031b3cc052857a5f96ff7c38"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/esp_flasher_uart.h",
+      "productMode": "100644",
+      "productSha256": "2da7c4e09774e93922ec4059fef5fa332ea9d5b2dbc507b376d5c426198abe99"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/esp_flasher_worker.c",
+      "productMode": "100644",
+      "productSha256": "ea6d0f6bb3edaec7c44966d304b06efed36fc869a45489f7ed7daa78af281634"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/esp_flasher_worker.h",
+      "productMode": "100644",
+      "productSha256": "96f1fca7fb8c05fe5d501a369557121bc45d9cc6057c45737af940071bcefdc0"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/file/sequential_file.c",
+      "productMode": "100644",
+      "productSha256": "2458013310b05577859a7f1e4cb50cf25c0f3d22fffce5a850cb1e90aa6c0c81"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/file/sequential_file.h",
+      "productMode": "100644",
+      "productSha256": "7a58aa265040398111047d2646dc857e952ac7ec2f7c425181c07571d6327e34"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/.cz.toml",
+      "productMode": "100644",
+      "productSha256": "3adac9f0c4221a8052775b0c73180d0da220ddf36b00e376567d98c8ad11cf9d"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/.git-blame-ignore-revs",
+      "productMode": "100644",
+      "productSha256": "9f0196e4df6e70e13acac4a78bac1c301fa1a9b3d4b05bd1452999b22a3c2d74"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/.github/ISSUE_TEMPLATE/bug_report.yml",
+      "productMode": "100644",
+      "productSha256": "041808e933d3e231ee96e1d66318985da5d49eed9a30f7e5c0b7b66397580ba2"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/.github/ISSUE_TEMPLATE/feature_request.yml",
+      "productMode": "100644",
+      "productSha256": "1761323450398d09857799e6846c7a2e46eeff01294944a51f4d6c3ff679bcd4"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/.github/workflows/dangerjs.yml",
+      "productMode": "100644",
+      "productSha256": "2120f1c8354514dd579112382b2af197479e4aaae1bacb9fc9eba964ee704ccc"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/.github/workflows/issue_bot.yml",
+      "productMode": "100644",
+      "productSha256": "3447936d6b29ca59c4ee62d7cfa2ab63f1fa6a509a8af27fbd0a5fda8f4d3cc3"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/.github/workflows/issue_comment.yml",
+      "productMode": "100644",
+      "productSha256": "3478eeae2eab72384f4faf6082c4a9c35d2c840054e09610377c628713d8e94d"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/.github/workflows/new_issues.yml",
+      "productMode": "100644",
+      "productSha256": "caee26005c33dea7810fd2fc25ef36c791d7221a98131775e6e31872407f9c8d"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/.github/workflows/new_prs.yml",
+      "productMode": "100644",
+      "productSha256": "d82ecaf58af3ed848e0d3ebd13c2d10ebcc861e2c69ea05173e2680adb0d73c1"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/.github/workflows/new_release.yml",
+      "productMode": "100644",
+      "productSha256": "0dffff9b09a6e2c6dbfcdcbba1c7a82e04bfc00433ab8acb2c87ed17f9436dcb"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/.github/workflows/pre_commit.yml",
+      "productMode": "100644",
+      "productSha256": "70bc3eb6290b14ef2871012e7a466c1aa92b5f1ad910f9185e6287362a59512d"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/.github/workflows/stub_sources_correctness.yml",
+      "productMode": "100644",
+      "productSha256": "0da0f334191ceb02db55ab61006b6e044af1093eb1c0c06c07adc9c465e34ae9"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/.gitignore",
+      "productMode": "100644",
+      "productSha256": "3d336259e1f792c41ec2b22960fdd255da0c429c5ad6bece1e8f04433ece9539"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/.gitlab-ci.yml",
+      "productMode": "100644",
+      "productSha256": "201d0a131303ad2aa3ba7cf9ca149e03b5d5daf67d0fa016128a4c09c156dcf0"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/.gitsubtree",
+      "productMode": "100644",
+      "productSha256": "f508137d08321305e45a8ace6ab263be33d7665b802922c40355f098f24632c1"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/.pre-commit-config.yaml",
+      "productMode": "100644",
+      "productSha256": "c44187d877377edeed5f7ae26730dfd3860ba8ec3f6bc885d2981b3d4e2a4913"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/CHANGELOG.md",
+      "productMode": "100644",
+      "productSha256": "bdd9c36c4ad38b9332e82cab49838a5d7d2c29d29b7641a73e8b931aa12c0725"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/CMakeLists.txt",
+      "productMode": "100644",
+      "productSha256": "badd7ad69f50d88a64976afd43c996269345b21eda54520b1d69072280de1094"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/Kconfig",
+      "productMode": "100644",
+      "productSha256": "8bdd761282c6778550a7773fde1a5ccec53585448d64d395102f4afeb5e753d5"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/LICENSE",
+      "productMode": "100644",
+      "productSha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/README.md",
+      "productMode": "100644",
+      "productSha256": "2dad28134d0141941b739a6763b0c8ba9b6b7f59d3b4e3868662cb1e916a4a76"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/astyle_config",
+      "productMode": "100644",
+      "productSha256": "429841978a2ac92e58fdb32dc11d6df0c759b2ba3babccf2ee4a933bc67eda3f"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/cmake/esp_stubs.c.template",
+      "productMode": "100644",
+      "productSha256": "c884158d6fb4bd54a688b8fb0ef796b4ff2612a23b249db00ac553f28950db20"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/cmake/esp_stubs.h.template",
+      "productMode": "100644",
+      "productSha256": "f8b8a161c3134f19202a238491a6d48915ce72060db6423424742d99a74d729c"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/cmake/gen_stub_sources.py",
+      "productMode": "100644",
+      "productSha256": "afacebf49457d265d70b34236546a06520407f4af6791391fca11c29bb932fa2"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/cmake/serial_flasher_pull_stubs.cmake",
+      "productMode": "100644",
+      "productSha256": "be4bc8eb962f88fbcc2b4785182a3a1cb17d738e37c7166deaff0761d77bd9a1"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/binaries/ESP32_AT_Firmware/note.txt",
+      "productMode": "100644",
+      "productSha256": "95437e20fcc131f150bb99337554d2f2dc69d6b63d5c368a807cbb9c635333a8"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/binaries/Hello-world/ESP32/bootloader.bin",
+      "productMode": "100644",
+      "productSha256": "90951591b98cf2915afe4649f13180816e44bc621a1628a81d3c6d682d794d99"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/binaries/Hello-world/ESP32/hello_world.bin",
+      "productMode": "100644",
+      "productSha256": "d98bfba1b7e4343a7d68d492a45d51248a6842ba9cb749de0d573506bb420d33"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/binaries/Hello-world/ESP32/partition-table.bin",
+      "productMode": "100644",
+      "productSha256": "7f00b6c042a89b15b0cac534f82ed988caf29278ff5700b0c511eb1b5bb7c820"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/binaries/Hello-world/ESP32_C2/bootloader.bin",
+      "productMode": "100644",
+      "productSha256": "82a65742be5012ae901db4517453033b788bf95b8cd7d01d55a842613d7887db"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/binaries/Hello-world/ESP32_C2/hello_world.bin",
+      "productMode": "100644",
+      "productSha256": "4193ad1273ef3f2b91728fff93de877283cddfd5baa541294d03883672ed0822"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/binaries/Hello-world/ESP32_C2/partition-table.bin",
+      "productMode": "100644",
+      "productSha256": "7f00b6c042a89b15b0cac534f82ed988caf29278ff5700b0c511eb1b5bb7c820"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/binaries/Hello-world/ESP32_C3/bootloader.bin",
+      "productMode": "100644",
+      "productSha256": "0c6ea2239618957aa8005f5ae24b0132c835cb7294ea4cf6b84fd977ed21d4bb"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/binaries/Hello-world/ESP32_C3/hello_world.bin",
+      "productMode": "100644",
+      "productSha256": "06ea6806942019baa484808a54a62fe2e9eb4a524edada9e00c741d0a98a047a"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/binaries/Hello-world/ESP32_C3/partition-table.bin",
+      "productMode": "100644",
+      "productSha256": "7f00b6c042a89b15b0cac534f82ed988caf29278ff5700b0c511eb1b5bb7c820"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/binaries/Hello-world/ESP32_C5/bootloader.bin",
+      "productMode": "100644",
+      "productSha256": "dfe77ab1d7be430d1f955207f54bf42b06b3ddcf28ce4bf69b7ad39cd1fa824b"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/binaries/Hello-world/ESP32_C5/hello_world.bin",
+      "productMode": "100644",
+      "productSha256": "ad754348dff1a54723fe3a915c575390a93788401f04beeed57358e9b5c68ed2"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/binaries/Hello-world/ESP32_C5/partition-table.bin",
+      "productMode": "100644",
+      "productSha256": "7f00b6c042a89b15b0cac534f82ed988caf29278ff5700b0c511eb1b5bb7c820"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/binaries/Hello-world/ESP32_C6/bootloader.bin",
+      "productMode": "100644",
+      "productSha256": "bd13dd92bd5825cb8c498948dd2923ad10baa31b3b6d4ca16ff5f13366ff850d"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/binaries/Hello-world/ESP32_C6/hello_world.bin",
+      "productMode": "100644",
+      "productSha256": "848755dd3f78ce15d18f7249e3cf9bb883395dd4a3e69d5ddd6d24adffca2afa"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/binaries/Hello-world/ESP32_C6/partition-table.bin",
+      "productMode": "100644",
+      "productSha256": "7f00b6c042a89b15b0cac534f82ed988caf29278ff5700b0c511eb1b5bb7c820"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/binaries/Hello-world/ESP32_H2/bootloader.bin",
+      "productMode": "100644",
+      "productSha256": "c81e243b36befd477ff1ba16f72701c0d0b22dc2423ccc485f368539df855b57"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/binaries/Hello-world/ESP32_H2/hello_world.bin",
+      "productMode": "100644",
+      "productSha256": "02d92a02ac7a7618429a366066846d73a24c6e2e4e28d845720aaa410a33aa3f"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/binaries/Hello-world/ESP32_H2/partition-table.bin",
+      "productMode": "100644",
+      "productSha256": "7f00b6c042a89b15b0cac534f82ed988caf29278ff5700b0c511eb1b5bb7c820"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/binaries/Hello-world/ESP32_P4/bootloader.bin",
+      "productMode": "100644",
+      "productSha256": "b644ce6424a4afacda2a3927c9af882125172a9cdb70ba633795c14727adae8f"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/binaries/Hello-world/ESP32_P4/hello_world.bin",
+      "productMode": "100644",
+      "productSha256": "6d62218023d6ef23dc84ca052ac5e8d893f2048ccf3da4321983c510123cd5f0"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/binaries/Hello-world/ESP32_P4/partition-table.bin",
+      "productMode": "100644",
+      "productSha256": "7f00b6c042a89b15b0cac534f82ed988caf29278ff5700b0c511eb1b5bb7c820"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/binaries/Hello-world/ESP32_S2/bootloader.bin",
+      "productMode": "100644",
+      "productSha256": "077956da4014a4ecb355b30743734e0c370d799b396b4bae890a798f68e44116"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/binaries/Hello-world/ESP32_S2/hello_world.bin",
+      "productMode": "100644",
+      "productSha256": "008c681971057cd48bab70f07fbf47e0041f1686143fd860dbf06bcc1f1fd98b"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/binaries/Hello-world/ESP32_S2/partition-table.bin",
+      "productMode": "100644",
+      "productSha256": "7f00b6c042a89b15b0cac534f82ed988caf29278ff5700b0c511eb1b5bb7c820"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/binaries/Hello-world/ESP32_S3/bootloader.bin",
+      "productMode": "100644",
+      "productSha256": "b9f10e90fa559f70bc2130d7f58b6511265aea0f7b16f4fb48d874b67767cd4c"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/binaries/Hello-world/ESP32_S3/hello_world.bin",
+      "productMode": "100644",
+      "productSha256": "3dfbf390a908ac4a5e0cc83d55f0f5e6bbec28fc40f3f6823944e24f5f4373fc"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/binaries/Hello-world/ESP32_S3/partition-table.bin",
+      "productMode": "100644",
+      "productSha256": "7f00b6c042a89b15b0cac534f82ed988caf29278ff5700b0c511eb1b5bb7c820"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/binaries/Hello-world/ESP8266/bootloader.bin",
+      "productMode": "100644",
+      "productSha256": "b403022ce80345aa92d2510d8ae5f6b44998a720586e4ee0d3881527c3533519"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/binaries/Hello-world/ESP8266/hello-world.bin",
+      "productMode": "100644",
+      "productSha256": "ca3ec7ed8678d0d8552dd7c7b072a7a8d1700009a203632382ef9cb4d1afa7ea"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/binaries/Hello-world/ESP8266/partition-table.bin",
+      "productMode": "100644",
+      "productSha256": "5d1dbc1e3c50d7bc93b123215900b57fdfda24131e76da03999a54fe9b554ec3"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/binaries/RAM_APP/ESP32/app.bin",
+      "productMode": "100644",
+      "productSha256": "3887a06f3f5789766bd0db88349429a94e30ea828bab9eb9ac9041c1ed75d712"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/binaries/RAM_APP/ESP32_C2/app.bin",
+      "productMode": "100644",
+      "productSha256": "337075e837ef2e50f3c0e8b73fdbba98d4a8f0e7dae8832cfc4ce1227e49ce44"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/binaries/RAM_APP/ESP32_C3/app.bin",
+      "productMode": "100644",
+      "productSha256": "ebbec4adfadfbfdeb50d08165a111131d37a1279934606af5b579d0fa1449dc9"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/binaries/RAM_APP/ESP32_C5/app.bin",
+      "productMode": "100644",
+      "productSha256": "ea6bfe4eafce7e000713f684c37ed0cb57383b562d198e38d860daa31cb51e4e"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/binaries/RAM_APP/ESP32_C6/app.bin",
+      "productMode": "100644",
+      "productSha256": "16eaad77737748a2547d874c924c00a91ac8bef3b677250f8ab0aa26fe768bff"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/binaries/RAM_APP/ESP32_H2/app.bin",
+      "productMode": "100644",
+      "productSha256": "e37ccd976ef36bf488d731e468d9419c5826dc65059081e4ffd2b5517ce57bf6"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/binaries/RAM_APP/ESP32_P4/app.bin",
+      "productMode": "100644",
+      "productSha256": "f54bd72f301120a09174d8b28e0f6265236f0046083f33e67618f2b7b5cf269a"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/binaries/RAM_APP/ESP32_S2/app.bin",
+      "productMode": "100644",
+      "productSha256": "1786cc6162b978af61ac8110f3a7cae7675e141d41c7f32d0b4ce3ce95afa83c"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/binaries/RAM_APP/ESP32_S3/app.bin",
+      "productMode": "100644",
+      "productSha256": "a148f350dc47133a3435a9e85eb0aa8a6ab49dd9b80b6dcb9457cf3fb2cb5e8d"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/binaries/source/CMakeLists.txt",
+      "productMode": "100755",
+      "productSha256": "c213f94181c669f609966180ae161dd6e379a61972dac88f79d9136dcc521428"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/binaries/source/main/CMakeLists.txt",
+      "productMode": "100755",
+      "productSha256": "db9cdcccf2b7cd8e737870196797222b2600c71e921e2c6084287c4ef429265d"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/binaries/source/main/main.c",
+      "productMode": "100755",
+      "productSha256": "57ece26888877f1e2d0bd9a35b4dcc645523af16bea446d2dcb1d9a6b9ff2904"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/binaries/source/sdkconfig.defaults.flash",
+      "productMode": "100644",
+      "productSha256": "8a90d4765dd00309988692c4446437d7732b45d457583bef7333c45a3520b1d5"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/binaries/source/sdkconfig.defaults.ram",
+      "productMode": "100644",
+      "productSha256": "91d387fc1c4242fcfeea1b760715dde6533b332f39e3fd528228d058de67ed82"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/binaries/source_ESP8266/CMakeLists.txt",
+      "productMode": "100644",
+      "productSha256": "f7ad7dc3a0b7b659dd49b256ea7cfda6c1fded1aa01e02b22f1aaee16345d0f2"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/binaries/source_ESP8266/Makefile",
+      "productMode": "100644",
+      "productSha256": "cbb826f559027b16faae18a324a9828cab03311ca6c1c07fecb556c9871e7351"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/binaries/source_ESP8266/main/CMakeLists.txt",
+      "productMode": "100644",
+      "productSha256": "13d08446db51895bc435887661df7ba678169031b7450d632e3e6ce7388ea01d"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/binaries/source_ESP8266/main/component.mk",
+      "productMode": "100644",
+      "productSha256": "5aa43ccdc28d82b29f353b3bf616a001c45441b9e6eda5318a2f43f4fab494c3"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/binaries/source_ESP8266/main/hello_world_main.c",
+      "productMode": "100644",
+      "productSha256": "9577bcaafbbc4adba0fe184d0998a08bb7af816504dd3d2747d9050f2bb4530c"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/binaries/source_ESP8266/sdkconfig.defaults",
+      "productMode": "100644",
+      "productSha256": "878ef1d74ff23d9a07b9b8c6aba0633794539ee68d03d4604c6c05b62b77f5dc"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/common/bin2array.cmake",
+      "productMode": "100644",
+      "productSha256": "72dc01d972105456a1afbb2a4546e014989e4695f4efcc84e194538c871b787c"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/common/example_common.c",
+      "productMode": "100644",
+      "productSha256": "3f08f7e56018607550ceca9833e9c1a9b0ce7c905568dd69aeeb7e536a5bc99f"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/common/example_common.h",
+      "productMode": "100644",
+      "productSha256": "a723acda43dcb5be4034fdf0d24a04bcb86ef7150a1c171f3e9abb19f441097b"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/conftest.py",
+      "productMode": "100644",
+      "productSha256": "42c984ba3ca7d4c137ccb57b7559abf6db987f9151cd9189dff09bd6f179648b"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_example/CMakeLists.txt",
+      "productMode": "100644",
+      "productSha256": "bffed7bac09a834451c08c04434ccede7720c31c8d599e3559b02dafafeaa2ec"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_example/README.md",
+      "productMode": "100644",
+      "productSha256": "0b4b076667e4c98a8c569e4a07b22d65ef1afcc4706654bf158eb42bafe11e53"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_example/main/CMakeLists.txt",
+      "productMode": "100644",
+      "productSha256": "42c786c04dab6ae76d35816616335cbf08165dacf230f20dbdcb0c24c47a1e59"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_example/main/main.c",
+      "productMode": "100644",
+      "productSha256": "918330dc09a319a0c36cb069b6d2fc86791122da65abce5f1cbfb6646939e7c2"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_example/partitions.csv",
+      "productMode": "100644",
+      "productSha256": "6400703bd35b54f624cf0c0ead350ca515241fcb89ad68b9b74b73bb017ee1c7"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_example/pytest_esp32_example.py",
+      "productMode": "100644",
+      "productSha256": "b45c8d213d8d923754850c3cfe2a9856b2b7dfc13bf8da797fc5b0b837a87195"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_example/sdkconfig.defaults",
+      "productMode": "100644",
+      "productSha256": "fbad927edab1181d7889da851ae2e0f001fcf6c4fd1cc234df852104511a0ab3"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_example/sdkconfig.defaults_md5_disabled",
+      "productMode": "100644",
+      "productSha256": "f04d8668bc73431e4d43bc1f85ea3941d6a13d5faefbee39a95207c529d74370"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_fast_reflash_example/CMakeLists.txt",
+      "productMode": "100644",
+      "productSha256": "bffed7bac09a834451c08c04434ccede7720c31c8d599e3559b02dafafeaa2ec"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_fast_reflash_example/README.md",
+      "productMode": "100644",
+      "productSha256": "a029364e5cf38cc91239d3cfab93bb7ff015aa8e6b8c5229fa3f5a8e905831d9"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_fast_reflash_example/main/CMakeLists.txt",
+      "productMode": "100644",
+      "productSha256": "42c786c04dab6ae76d35816616335cbf08165dacf230f20dbdcb0c24c47a1e59"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_fast_reflash_example/main/main.c",
+      "productMode": "100644",
+      "productSha256": "3b37670e845119073af98d1cded968034157ce8aa7111a30c32470204aab764a"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_fast_reflash_example/partitions.csv",
+      "productMode": "100644",
+      "productSha256": "6400703bd35b54f624cf0c0ead350ca515241fcb89ad68b9b74b73bb017ee1c7"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_fast_reflash_example/pytest_esp32_fast_reflash_example.py",
+      "productMode": "100644",
+      "productSha256": "920c948389e0c26c9680691a28a189d9977e9c77609f5e2cab3a2264a74dfe66"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_fast_reflash_example/sdkconfig.defaults",
+      "productMode": "100644",
+      "productSha256": "3686c5b94a31cf6e61ba9b154e07e1a0988adc7bc16f9ad32869083d733003dd"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_get_target_info_example/CMakeLists.txt",
+      "productMode": "100644",
+      "productSha256": "bffed7bac09a834451c08c04434ccede7720c31c8d599e3559b02dafafeaa2ec"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_get_target_info_example/README.md",
+      "productMode": "100644",
+      "productSha256": "45bed2c7d9aebfd2f8ad2f23cb45d4da251ff0e5d106291ae9d28133e6389a53"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_get_target_info_example/main/CMakeLists.txt",
+      "productMode": "100644",
+      "productSha256": "5816729ed28457376b8c93ce57ce3fcf62a7f902891ed17a649b93b5dd10cdd3"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_get_target_info_example/main/main.c",
+      "productMode": "100644",
+      "productSha256": "6ff55546a82efc569a92449a9e3c4ef297c9d3ad96e7c47f40bc77abea912fc5"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_get_target_info_example/pytest_esp32_get_target_info_example.py",
+      "productMode": "100644",
+      "productSha256": "950af3d83d531e7eb3b2bb6101fe7e78b90437e68256412111b57f8a66161765"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_get_target_info_example/sdkconfig.defaults",
+      "productMode": "100644",
+      "productSha256": "b5cb63deea9b1e4d616752e09fab4ed18fbb039e5f980ea26431acf1307d67cb"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_load_ram_example/CMakeLists.txt",
+      "productMode": "100644",
+      "productSha256": "42d64d9eaa54495b5b7d11d6f87beecc24569ac9c296bc70fc9f6d773289b0b5"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_load_ram_example/README.md",
+      "productMode": "100644",
+      "productSha256": "eb610963b6058754c454b480c81252069ed1314e00be67c0e8ae8a9fb1365bf3"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_load_ram_example/main/CMakeLists.txt",
+      "productMode": "100644",
+      "productSha256": "ba701fcda35fd64ddbf28b5a2561573b873bc750b05a594a7ba97864bc8901e9"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_load_ram_example/main/main.c",
+      "productMode": "100644",
+      "productSha256": "3e1d22ad89a59ba832e77eb41a12d38b7de57837ca08f00a47060d58261e1a4a"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_load_ram_example/pytest_esp32_load_ram_example.py",
+      "productMode": "100644",
+      "productSha256": "46c7144961f0472f5e2999c6b14b2584e6420592014795ba1909f514193ffd5a"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_load_ram_example/sdkconfig.defaults",
+      "productMode": "100644",
+      "productSha256": "b5cb63deea9b1e4d616752e09fab4ed18fbb039e5f980ea26431acf1307d67cb"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_read_flash_example/CMakeLists.txt",
+      "productMode": "100644",
+      "productSha256": "bffed7bac09a834451c08c04434ccede7720c31c8d599e3559b02dafafeaa2ec"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_read_flash_example/README.md",
+      "productMode": "100644",
+      "productSha256": "01c22547b7ebbd300c2598fc0a7b2a52ab4263fe9936c1d24121e85131ebb221"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_read_flash_example/main/CMakeLists.txt",
+      "productMode": "100644",
+      "productSha256": "5816729ed28457376b8c93ce57ce3fcf62a7f902891ed17a649b93b5dd10cdd3"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_read_flash_example/main/main.c",
+      "productMode": "100644",
+      "productSha256": "8630ea7ec5467231e37119547b08047497bd5661b4876a520b5c90ccf7e8a75f"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_read_flash_example/pytest_esp32_read_flash_example.py",
+      "productMode": "100644",
+      "productSha256": "ace2cc282ab55f89345db7142de669a8685dcdd7f0cc6e7d867e2322539a6cee"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_read_flash_example/sdkconfig.defaults",
+      "productMode": "100644",
+      "productSha256": "b5cb63deea9b1e4d616752e09fab4ed18fbb039e5f980ea26431acf1307d67cb"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_sdio_example/CMakeLists.txt",
+      "productMode": "100644",
+      "productSha256": "bffed7bac09a834451c08c04434ccede7720c31c8d599e3559b02dafafeaa2ec"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_sdio_example/README.md",
+      "productMode": "100644",
+      "productSha256": "8b3171561590d9d257a18a10478211da36e2628198435d2973cc54fea296c5c2"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_sdio_example/main/CMakeLists.txt",
+      "productMode": "100644",
+      "productSha256": "42c786c04dab6ae76d35816616335cbf08165dacf230f20dbdcb0c24c47a1e59"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_sdio_example/main/main.c",
+      "productMode": "100644",
+      "productSha256": "c8a5ec75db1d7c7e64ca5bbecba15a1816ffdd6a4ad94f2e2542a78e38835236"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_sdio_example/partitions.csv",
+      "productMode": "100644",
+      "productSha256": "6400703bd35b54f624cf0c0ead350ca515241fcb89ad68b9b74b73bb017ee1c7"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_sdio_example/pytest_esp32_sdio_example.py",
+      "productMode": "100644",
+      "productSha256": "9e958914650cbe57c907653641f20cd29ee3e22248e1a196a7f9e4f173bba4b2"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_sdio_example/sdkconfig.defaults",
+      "productMode": "100644",
+      "productSha256": "285a699f7bbc7bc332314e9462ab4b01097e7ab2e5d19171ad96373eb566856c"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_sdio_load_ram_example/CMakeLists.txt",
+      "productMode": "100644",
+      "productSha256": "3e5018abb8fb5020ab046871fd08166e19a52fcc9197b951ee3aaae125372125"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_sdio_load_ram_example/README.md",
+      "productMode": "100644",
+      "productSha256": "3451e4ec2a30c96cf6aa6318edebe5f99609a8dd4e0da3da7efbe48db1b0c59a"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_sdio_load_ram_example/main/CMakeLists.txt",
+      "productMode": "100644",
+      "productSha256": "ba701fcda35fd64ddbf28b5a2561573b873bc750b05a594a7ba97864bc8901e9"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_sdio_load_ram_example/main/main.c",
+      "productMode": "100644",
+      "productSha256": "74f9a1d4fae57aeeff243549a7e3da490f40e8502902db51527f9c5710ee4910"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_sdio_load_ram_example/partitions.csv",
+      "productMode": "100644",
+      "productSha256": "6400703bd35b54f624cf0c0ead350ca515241fcb89ad68b9b74b73bb017ee1c7"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_sdio_load_ram_example/pytest_esp32_sdio_load_ram_example.py",
+      "productMode": "100644",
+      "productSha256": "23882ee6d37ab26ea09933692196d55ca504e512fe1ab014c23ba0fe60faed26"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_sdio_load_ram_example/sdkconfig.defaults",
+      "productMode": "100644",
+      "productSha256": "285a699f7bbc7bc332314e9462ab4b01097e7ab2e5d19171ad96373eb566856c"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_spi_load_ram_example/CMakeLists.txt",
+      "productMode": "100644",
+      "productSha256": "71b4e5cdd9c0082017165fb2362620268b242a119ba501d3370c587025d4b737"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_spi_load_ram_example/README.md",
+      "productMode": "100644",
+      "productSha256": "71b2cf84fd3c493875397a84c67719033ecffc7ba17c60a223bd2998922ee3f1"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_spi_load_ram_example/main/CMakeLists.txt",
+      "productMode": "100644",
+      "productSha256": "ba701fcda35fd64ddbf28b5a2561573b873bc750b05a594a7ba97864bc8901e9"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_spi_load_ram_example/main/main.c",
+      "productMode": "100644",
+      "productSha256": "337be2e2511c6f8a6c69b15b3c27ea1ab5ee90a3eff8315a0e10ddf1dfdc88e8"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_spi_load_ram_example/pytest_esp32_spi_load_ram_example.py",
+      "productMode": "100644",
+      "productSha256": "6a4d506c7576189ebb43f46995bd550ec63c3a12316425ddefcdcb91f4ba1cdd"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_spi_load_ram_example/sdkconfig.defaults",
+      "productMode": "100644",
+      "productSha256": "a82dd8b2793596a98612ee7521820f312d1df5405e82b2bf254ff203f9cf7ae1"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_stub_example/CMakeLists.txt",
+      "productMode": "100644",
+      "productSha256": "bffed7bac09a834451c08c04434ccede7720c31c8d599e3559b02dafafeaa2ec"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_stub_example/README.md",
+      "productMode": "100644",
+      "productSha256": "8e598363e096d3aa41826c2e396b2f095ac94b49bf59e14f38345fac5d1231b9"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_stub_example/main/CMakeLists.txt",
+      "productMode": "100644",
+      "productSha256": "42c786c04dab6ae76d35816616335cbf08165dacf230f20dbdcb0c24c47a1e59"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_stub_example/main/main.c",
+      "productMode": "100644",
+      "productSha256": "bee8eb8b810168d2355d27b0498e91e31c9bdf3bdfed7c86b5486f8695dcd5bc"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_stub_example/partitions.csv",
+      "productMode": "100644",
+      "productSha256": "6400703bd35b54f624cf0c0ead350ca515241fcb89ad68b9b74b73bb017ee1c7"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_stub_example/pytest_esp32_stub_example.py",
+      "productMode": "100644",
+      "productSha256": "4ccbe096435f59978eb97d4e48a793a6f169b0f0b4a30f0f4a13625d00179963"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_stub_example/sdkconfig.defaults",
+      "productMode": "100644",
+      "productSha256": "3686c5b94a31cf6e61ba9b154e07e1a0988adc7bc16f9ad32869083d733003dd"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_usb_cdc_acm_example/CMakeLists.txt",
+      "productMode": "100644",
+      "productSha256": "9a784516ae31f135a2a3c61ecfbfe3d353c599d80857cd655a5a16df374da7af"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_usb_cdc_acm_example/README.md",
+      "productMode": "100644",
+      "productSha256": "5b98483d75afc70ce5f12c839b1895269d5ab502cb1903b801ffe924c48bcf68"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_usb_cdc_acm_example/main/CMakeLists.txt",
+      "productMode": "100644",
+      "productSha256": "8aadb1317daec60679fca69770e9533d120a454de12c0596d3cd5bd77cc8f989"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_usb_cdc_acm_example/main/idf_component.yml",
+      "productMode": "100644",
+      "productSha256": "73433fa1d20336470b303da50be4a4c57b06584e3d23023da199e4214d8edf24"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_usb_cdc_acm_example/main/main.c",
+      "productMode": "100644",
+      "productSha256": "56f5bb6c39cc3993f31e3df317a95cd665b56283f016ad6f188f2ad6ab5be81f"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_usb_cdc_acm_example/partitions.csv",
+      "productMode": "100644",
+      "productSha256": "6400703bd35b54f624cf0c0ead350ca515241fcb89ad68b9b74b73bb017ee1c7"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_usb_cdc_acm_example/pytest_esp32_usb_cdc_acm_example.py",
+      "productMode": "100644",
+      "productSha256": "6af2e83c33b99054cc2029421dd67104528ea0f991e3c84b717d821fb6570429"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/esp32_usb_cdc_acm_example/sdkconfig.defaults",
+      "productMode": "100644",
+      "productSha256": "e95c3eb549a2d647e90af8bd3c017097ccdc3c79def0c34ec5d034252644a252"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/pi_pico_example/CMakeLists.txt",
+      "productMode": "100644",
+      "productSha256": "2a67c8cb9cc70b373b2b81f4ee178f8056e54341ca619f9f5368721dd1c8ba46"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/pi_pico_example/README.md",
+      "productMode": "100644",
+      "productSha256": "00d65c7c20c9366a478c0fa48763d6452f11b5faf0aafe03cc3e150cf89d6986"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/pi_pico_example/main.c",
+      "productMode": "100644",
+      "productSha256": "edc05246a4f8cdc2242f5bb9d63c7f336531f24d2cea2ac4d4a5cddc60f117d3"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/pi_pico_example/pico_sdk_import.cmake",
+      "productMode": "100644",
+      "productSha256": "7b4db98ec410049c12567288304afb0186fcf20f6b2b8d446e6173d118a56881"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/pi_pico_example/pytest_pi_pico_example.py",
+      "productMode": "100644",
+      "productSha256": "2f0fd70c6b3c607f99f14afe21ba5f5702aee573f12a7a67275abeca8791bf97"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/raspberry_example/CMakeLists.txt",
+      "productMode": "100644",
+      "productSha256": "9a56b0b57025ac2571527f9d7d9d4d6c68b92992b3b891f53092b10b55bffaa0"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/raspberry_example/README.md",
+      "productMode": "100644",
+      "productSha256": "b259fd484b8e10c9a1459218356a390c08d2152b95ff6742c45d0ba4c0930619"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/raspberry_example/Src/main.c",
+      "productMode": "100644",
+      "productSha256": "be0a789be963bdd63e0e8d70448246770e3354da685b776998dc1058326ed138"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/raspberry_example/pytest_raspberry_example.py",
+      "productMode": "100644",
+      "productSha256": "b715d3db0fec9375a7ea250aba766ef984a50ddbc7bd5bf1d3992c01ce463c56"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/stm32_example/CMakeLists.txt",
+      "productMode": "100644",
+      "productSha256": "a217a54360ebf32357a866318c2b9db7f48cd5a5f299e98a6495685e7c2d5190"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/stm32_example/Core/Inc/main.h",
+      "productMode": "100644",
+      "productSha256": "a11ee85440d157c7d1228a68f3d343f196919bc7c72cabd1940538cfa472f771"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/stm32_example/Core/Inc/stm32h7xx_hal_conf.h",
+      "productMode": "100644",
+      "productSha256": "98afc1958a6e9a566f4b9e92f1c249112977db2df473317cf960fae1cbbb70ed"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/stm32_example/Core/Inc/stm32h7xx_it.h",
+      "productMode": "100644",
+      "productSha256": "49e72974934e6d0bc0a918716886c6c511a17e78324621c565a343e26b788b65"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/stm32_example/Core/Src/libc_compat.c",
+      "productMode": "100644",
+      "productSha256": "42b640a301f8fe82411538a10065fc6ab61fa65bc506cdbf3d34194a1d63a342"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/stm32_example/Core/Src/main.c",
+      "productMode": "100644",
+      "productSha256": "d69e9d1c77a3719ca885e3e37e63b2aa6584a2a539a09fb039e0bfbaf091afd8"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/stm32_example/Core/Src/stm32h7xx_hal_msp.c",
+      "productMode": "100644",
+      "productSha256": "c44cac5d0d9cf857061e69e11d89dfa99981d0b941bd490948fa2be4cf2b2456"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/stm32_example/Core/Src/stm32h7xx_it.c",
+      "productMode": "100644",
+      "productSha256": "3552e8571b803e7d14a768491ac4bd0282c1b9dfdd2326980f8074109835f3d2"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/stm32_example/README.md",
+      "productMode": "100644",
+      "productSha256": "447060e1da8c4a5d13399a13a4486e888c19d1084a4ac7dff7f44c366b8e6299"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/stm32_example/pytest_stm32_example.py",
+      "productMode": "100644",
+      "productSha256": "ab5338b857d57b71fa50b489375612fb2c0f8bc7fa8d467a0c0cd5260f6474b5"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/stm32_example/stm32_flasher.ioc",
+      "productMode": "100644",
+      "productSha256": "61e92a853d5098770484d230477c429c09f85e0c0e2b9436d58ef49a391800ff"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/zephyr_example/CMakeLists.txt",
+      "productMode": "100644",
+      "productSha256": "4dcb79facd5b2e7da810490169c2fbf91a4b592101e1e4363b3b2cb3b7d3027b"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/zephyr_example/README.md",
+      "productMode": "100644",
+      "productSha256": "d59eb1e1184a65c3bf648a0d03349dd1b755deae07cc652990d6b18ddc1340e7"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/zephyr_example/prj.conf",
+      "productMode": "100644",
+      "productSha256": "213542e02932e6a7c9821663e7e09daa855c31c057e642c313135ef4f738c33c"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/zephyr_example/pytest_zephyr_example.py",
+      "productMode": "100644",
+      "productSha256": "ca95821699f7c0dea432c9939342ee3297fbe598e9255c0f4991ad47f18c3f3b"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/zephyr_example/sample.yaml",
+      "productMode": "100644",
+      "productSha256": "699c60659ae9330ce9845621cbe0b7f4c18084c33faa18093ecc970c940d1cb2"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/zephyr_example/socs/esp32_procpu.overlay",
+      "productMode": "100644",
+      "productSha256": "d0c09b8c93d67ce85759a51dd4e3e9d8b0e58ee413335445bfa3b682dce89f12"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/examples/zephyr_example/src/main.c",
+      "productMode": "100644",
+      "productSha256": "b4efbbce3b0a991907fa74e77d86f89ac4339ae87d2da071e63ec668b73766b9"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/idf_component.yml",
+      "productMode": "100644",
+      "productSha256": "87eb3efaa41277d8d0ac4abbbc5db0e6bbb9258f37566b8039d728154f87ea0c"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/include/esp_loader.h",
+      "productMode": "100644",
+      "productSha256": "78a01c0ebe3ee96246b22fc52b580e096204816dc3cf988b0bc17689bb761cbd"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/include/esp_loader_io.h",
+      "productMode": "100644",
+      "productSha256": "f6ce3e2b3bbf9099b850107de103d9d9bcdd52dd30eefc1bc47d13d34eec9e52"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/include/serial_io.h",
+      "productMode": "100644",
+      "productSha256": "3171712065fb3c22a996d9d8352dc88b8270da88552d5e4228e489be86efa352"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/port/esp32_port.c",
+      "productMode": "100644",
+      "productSha256": "b9f0b2b1595251f0c679286b66ff3daf41da0d436c73083efe15b0f0dc0a5b4c"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/port/esp32_port.h",
+      "productMode": "100644",
+      "productSha256": "b58498c46a0f452b37ac7a8e5573b50871f5894aa7cbd61d8b45bf28352a5856"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/port/esp32_sdio_port.c",
+      "productMode": "100644",
+      "productSha256": "1fd63c827c06c8ed20d8c35db859785a1e68a1db7e83e0690599dadfed4245c3"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/port/esp32_sdio_port.h",
+      "productMode": "100644",
+      "productSha256": "0202d592c3396e56e30f065c6f53a1332f636a56cd7f7458f07c0ae4fbd37b66"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/port/esp32_spi_port.c",
+      "productMode": "100644",
+      "productSha256": "0cc1eb58c6e00c24052b46c9e578491eb91df73a495b3888fd984f010eb4b382"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/port/esp32_spi_port.h",
+      "productMode": "100644",
+      "productSha256": "1ab9dfb35c6b8e65784138f358d307626faa1fcfe1c5e6f1bc75640d6429704f"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/port/esp32_usb_cdc_acm_port.c",
+      "productMode": "100644",
+      "productSha256": "fe923e2099522dfc260609193961dbeafae32ee8459082789f9d37bf9f67d94c"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/port/esp32_usb_cdc_acm_port.h",
+      "productMode": "100644",
+      "productSha256": "700767ba91a2c01faf21b7ff76998db8d88bed50dd128036388a17d47bae1c1f"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/port/pi_pico_port.c",
+      "productMode": "100644",
+      "productSha256": "bff2051b5fc52f4fc2675e94b1432b64e92491e6180cb34c4847114eab54d73a"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/port/pi_pico_port.h",
+      "productMode": "100644",
+      "productSha256": "95f36a1e66515030134ad5b38fb38f02047768ebbbd53e1a7253b28c7ab05d1a"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/port/raspberry_port.c",
+      "productMode": "100644",
+      "productSha256": "ac4f2ae039fec115bf1d3cf0dfd42778fc7bb94a600c36f35a86a074e778ddd6"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/port/raspberry_port.h",
+      "productMode": "100644",
+      "productSha256": "d72930d3dfcc447faa1010f4b8a22a5fd3b8ea3725c801de14c9c17b3cbdd289"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/port/stm32_port.c",
+      "productMode": "100644",
+      "productSha256": "205af519b19293b5cb2419c83a70e2a7b87d80117e1b6bbde962a01f866a9524"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/port/stm32_port.h",
+      "productMode": "100644",
+      "productSha256": "1979507bbb3df750018d59deabeff3492384ab28fc5e4595003398f958576383"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/port/zephyr_port.c",
+      "productMode": "100644",
+      "productSha256": "a548186612feb3e2eb13e5e13fa07ed895f08612583cd3acfab21b6177c793f7"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/port/zephyr_port.h",
+      "productMode": "100644",
+      "productSha256": "b98afe6f13ab94ac037d74de0d470ce9cc58e272b1b76195f6c196a3cc5782b4"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/private_include/esp_stubs.h",
+      "productMode": "100644",
+      "productSha256": "9b72870330da4354772dbf0d5e9ef169345e99f4fe346478eda25e8af5266492"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/private_include/esp_targets.h",
+      "productMode": "100644",
+      "productSha256": "03fd5a11bfc693ff37bc8f89b38be2e3a9b99a15342ca275c22a785d10800edd"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/private_include/md5_hash.h",
+      "productMode": "100644",
+      "productSha256": "990eceff3d0671974b6346a71abd6779efe8e2e323797e8bf1e78859bcc3e73d"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/private_include/protocol.h",
+      "productMode": "100644",
+      "productSha256": "4974d7698f83b8c6e5a9ed039fa02232d67757f10df26ceab4179a6a46481d2e"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/private_include/protocol_prv.h",
+      "productMode": "100644",
+      "productSha256": "c807c3f1b56b2fe91309c4bbad6a4d7c6359abd51c2f2749062901bc2ec5494c"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/private_include/sip.h",
+      "productMode": "100644",
+      "productSha256": "d70b1f3ea9a9d3a2f49dfb571a9ec29e988b70ff6a8f6fc642416f990c2c8c9e"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/private_include/slip.h",
+      "productMode": "100644",
+      "productSha256": "2d40fd7a000096373d72ca1e136465156589d64eb5d9dccd6b342cd5eb0a44c1"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/pytest.ini",
+      "productMode": "100644",
+      "productSha256": "8bce11b44396b5a561aa050e66f61f762838620537d88ce380deaeaf3131827f"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/src/esp_loader.c",
+      "productMode": "100644",
+      "productSha256": "1dace195dde6de853c01ec45718c4522a545a7737efa0d3c3ee362cb56db9867"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/src/esp_sdio_stubs.c",
+      "productMode": "100644",
+      "productSha256": "6e3ed9decd3a5d495c011116a21d8653f4560b83945f35c77a009627b5d58db9"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/src/esp_stubs.c",
+      "productMode": "100644",
+      "productSha256": "9388bceff129465572d5eb9964c00205a1d862012ab77b89495109a74c6ddd33"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/src/esp_targets.c",
+      "productMode": "100644",
+      "productSha256": "8cdd0257d19431426296c34493bb54c9f1c1c7d1c28195a2d321ca9422e26c78"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/src/md5_hash.c",
+      "productMode": "100644",
+      "productSha256": "9e577ae555dab8931c4900322864cc810fd43c759511b2014881861b295f19cc"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/src/protocol_sdio.c",
+      "productMode": "100644",
+      "productSha256": "1e930685960af8ca82e0080d64cd4eaaa8b3f82eea27a2da9602b159ca523dcd"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/src/protocol_serial.c",
+      "productMode": "100644",
+      "productSha256": "0e8a3013c490731dbbad0d60710ae52b47aa852ad8143449302d8d784670a0e2"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/src/protocol_spi.c",
+      "productMode": "100644",
+      "productSha256": "fe0c1fc316ab5336b4b92359ce5e86ee012016d4709cfa22a9b808c3031300ba"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/src/protocol_uart.c",
+      "productMode": "100644",
+      "productSha256": "099688201bce106e7e5c0d72de0b0503975be79ca7746b5030e1152a8013a859"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/src/slip.c",
+      "productMode": "100644",
+      "productSha256": "f154addb991caa069a201792d7f73bfdb6dfaabf0b7ba422ac2ef336e9ec67aa"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/.github/ISSUE_TEMPLATE/bug-report.md",
+      "productMode": "100644",
+      "productSha256": "1063ff5bdbd90855767f95a879f2389422369b36742e09a2b3cc00a4ace9d6ff"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/.github/ISSUE_TEMPLATE/feature_request.md",
+      "productMode": "100644",
+      "productSha256": "1f48c52f209a971b8e7eae4120144d28fcf8ee38a7778a7b4d8cf1ab356617d2"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/.github/workflows/cmake.yml",
+      "productMode": "100644",
+      "productSha256": "8a942026712ed6c51f1408a7d3ade6f50021cba98f0f156cfbe96c25c3fcf4f6"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/.gitignore",
+      "productMode": "100644",
+      "productSha256": "181314065df2f2fdaf920b1a8b5311daa216a2d6489a06ada5b49cc514d89417"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/.gitmodules",
+      "productMode": "100644",
+      "productSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/.gitsubtree",
+      "productMode": "100644",
+      "productSha256": "2cde178e191ec6a7c7207793c94e2908d9e3fef03d86d63b6ecdd74c1960fef0"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/CHANGELOG.md",
+      "productMode": "100644",
+      "productSha256": "b7ba7dc9b77263a6576239ddd2d00235c1a01dc12eb2e1be90fea6ad85f425d9"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/LICENSE",
+      "productMode": "100644",
+      "productSha256": "8ea6ad7176447f4dd39b93c6c9a75f15a4ed42a215ab560173a075cbed2ed3cb"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/README.md",
+      "productMode": "100644",
+      "productSha256": "7e39180bb3926430cb31a7174cf49383ad43b70cf81986abc3e0bdcadfc115d0"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/cmake/FindBSP.cmake",
+      "productMode": "100644",
+      "productSha256": "c17b9fd44e9a3617a24c06bf03ebc06e0e0ac716cac07f0cdbeae25905a81c21"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/cmake/FindCMSIS.cmake",
+      "productMode": "100644",
+      "productSha256": "f069e2e2c4107a557562fcf16e9df37a7bf5682d60f286d23cfb264ab03a1ab9"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/cmake/FindFreeRTOS.cmake",
+      "productMode": "100644",
+      "productSha256": "f16e4edb3ba55f440c31b7f61a0e354f31a95a062b75c507e112b33be0f28968"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/cmake/FindHAL.cmake",
+      "productMode": "100644",
+      "productSha256": "18393da5824d7bd99a49577d1a9be9bb1a3ca88db2b74b0bbbbb26d29f0922b8"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/cmake/stm32/c0.cmake",
+      "productMode": "100644",
+      "productSha256": "58d79029045108eccc073acfe76067d19cccdf8b88a08a94ffd12033206b1a57"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/cmake/stm32/common.cmake",
+      "productMode": "100644",
+      "productSha256": "a3789bdfdee95b3721d85b2e7c69b199ecce140faa7b2e69f9ede4af0519585c"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/cmake/stm32/devices.cmake",
+      "productMode": "100644",
+      "productSha256": "7789001fff088f6b70345582b5446099b6adad4c0809ca7b903d39e3b652b758"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/cmake/stm32/f0.cmake",
+      "productMode": "100644",
+      "productSha256": "fe561a6a5721756a06e5c0b5f79fa82f03e70393e0df3cdee0edd5ea5b130305"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/cmake/stm32/f1.cmake",
+      "productMode": "100644",
+      "productSha256": "b8b8c3f53e64d0b372fdc459acc3bd3ea5f6c1ecd3791a3b764645e0ff863899"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/cmake/stm32/f2.cmake",
+      "productMode": "100644",
+      "productSha256": "7297fae3a229e8b7b61d842bde09d7587c87178d3ce65392bdaef6e3163489e5"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/cmake/stm32/f3.cmake",
+      "productMode": "100644",
+      "productSha256": "695fbcf6bd3c49d0cba31c2aaa3b5e83f53749169dccda2ff1d3733068d6e2ef"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/cmake/stm32/f4.cmake",
+      "productMode": "100644",
+      "productSha256": "e4214ad28a76a7cea19da5fd2f57972b4b04dceab0eea69955c4382d06990c48"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/cmake/stm32/f7.cmake",
+      "productMode": "100644",
+      "productSha256": "09c3a789a47873bd08f6151ee64116ab2a0fdf1fc9f9e08e95d0b79b8ccca7e9"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/cmake/stm32/g0.cmake",
+      "productMode": "100644",
+      "productSha256": "16e0c8a827fd320e8db50d71d778d9bdd191a71e5762813242b3dd1c1b9ddfdc"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/cmake/stm32/g4.cmake",
+      "productMode": "100644",
+      "productSha256": "ae3350fb72c184169aefbd78ef5e3d1c5f8655117d30f69b1d16163d16fbb561"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/cmake/stm32/h7.cmake",
+      "productMode": "100644",
+      "productSha256": "0eba0cef6697ee508d921a07aacc0a18f9e519a12f1407dc87c659a45847ea8f"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/cmake/stm32/l0.cmake",
+      "productMode": "100644",
+      "productSha256": "133bbf0b49aa77e546298c4bb83aab05a5d7ea3be1c93974afac277d06332e64"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/cmake/stm32/l1.cmake",
+      "productMode": "100644",
+      "productSha256": "29329162a25ff3743c7e9ba2a19ddb610d042ac87a0b7b0fafcc4ff8e33fced5"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/cmake/stm32/l4.cmake",
+      "productMode": "100644",
+      "productSha256": "f80e65dee30fb84c46239db8abedd88267595c6d48aad8397982faa19566d018"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/cmake/stm32/l5.cmake",
+      "productMode": "100644",
+      "productSha256": "d9bfdd39c18e0274574f413233aaa395962e3e68b2a5c7c79790598c20d27cc6"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/cmake/stm32/linker_ld.cmake",
+      "productMode": "100644",
+      "productSha256": "3bb9661ac817c250f58a940d453f35f3c740f42824794b95cc9e2ac16ae3d2aa"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/cmake/stm32/mp1.cmake",
+      "productMode": "100644",
+      "productSha256": "6d9b93df38d4b8807d5becd1c7cd74b7d56021411f9c7208e1743ad977177681"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/cmake/stm32/u5.cmake",
+      "productMode": "100644",
+      "productSha256": "77dbf58bf96fbdb821774b0ed0544ae8ffea646d3bc7b5741bbff7a751e6b681"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/cmake/stm32/utilities.cmake",
+      "productMode": "100644",
+      "productSha256": "32a8bb641d68292066700015d5cb4a4218afecadcc2335ac05a67d6254be4cd1"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/cmake/stm32/wb.cmake",
+      "productMode": "100644",
+      "productSha256": "cb52434058558a5d88efeece85ea11dcaabae7b7ad38b7ea1cbd9f5faf4b29e7"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/cmake/stm32/wl.cmake",
+      "productMode": "100644",
+      "productSha256": "f8e0cce62ccd70cf4ded0b8d2096ad27b6958c70a14e9e9e48602260046b4cc7"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/cmake/stm32_gcc.cmake",
+      "productMode": "100644",
+      "productSha256": "a69a4c667c754b1c5134a766a64e270f5bf452a04aae1ade6de6d859c26a670b"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/examples/blinky-ll/CMakeLists.txt",
+      "productMode": "100644",
+      "productSha256": "518f048b1f716f87cccf5c5ef56c37038cfa9f0b8cc246d4727c6edcf220c8e5"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/examples/blinky-ll/blinky.c",
+      "productMode": "100644",
+      "productSha256": "05988bfd0c945eab0b2294ed8eef4d97295f50a0282fe553e437552c6713b746"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/examples/blinky/CMakeLists.txt",
+      "productMode": "100644",
+      "productSha256": "2a6394476d69c0878189f5c9ba45502c7d874c0adda5324782790814e2644d9a"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/examples/blinky/blinky.c",
+      "productMode": "100644",
+      "productSha256": "39511d042c3b4776e9e118e9051cb78c3b13c5494537a2ad68914c127b65c068"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/examples/blinky/blinky.cpp",
+      "productMode": "100644",
+      "productSha256": "c34013efba82808cad2bd39367d4c72dde195e5b72a1f564eb70743457ff8ed8"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/examples/blinky/stm32f1xx_hal_conf.h",
+      "productMode": "100755",
+      "productSha256": "2c8b3d4ed2fa9b8f2161e457fff8a9d8b4695ee64ed43f32f6e075b089e1764c"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/examples/blinky/stm32f4xx_hal_conf.h",
+      "productMode": "100755",
+      "productSha256": "6a5e6c800c79139af94c60b6dc0108fc0e012b837bf277f9fece4bc9b20f26d5"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/examples/blinky/stm32l0xx_hal_conf.h",
+      "productMode": "100755",
+      "productSha256": "379170bb0efb92407a86cd8b8de65aaef2ea900d2df440cc2f0f4aaa7c7ec7d3"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/examples/custom-linker-script/CMakeLists.txt",
+      "productMode": "100644",
+      "productSha256": "5850c0feaa9305bf1be9abc9f5d9c180a6fe1e120a377163923fe7c8f62d272e"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/examples/custom-linker-script/F407VG.ld",
+      "productMode": "100644",
+      "productSha256": "eda821995139686ac55fcaf8004571838d61770fd48865c396974d0904d51127"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/examples/custom-linker-script/main.c",
+      "productMode": "100644",
+      "productSha256": "7c81ff90393f5047fff4f697ea164c14bf88b3b710fa877034e70134e152bc52"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/examples/fetch-cmsis-hal/CMakeLists.txt",
+      "productMode": "100644",
+      "productSha256": "f47df62c9f7bc9ed8e43feaf9150d4c8e1ace7550f9ac73da9d04bc1c1619a5a"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/examples/fetch-cmsis-hal/main.c",
+      "productMode": "100644",
+      "productSha256": "7c81ff90393f5047fff4f697ea164c14bf88b3b710fa877034e70134e152bc52"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/examples/fetch-cube/CMakeLists.txt",
+      "productMode": "100644",
+      "productSha256": "08bf78bc0f9822f6d2de47521ba57a24ee4267caafbdb56d4b5978b29f0c38c0"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/examples/fetch-cube/main.c",
+      "productMode": "100644",
+      "productSha256": "7c81ff90393f5047fff4f697ea164c14bf88b3b710fa877034e70134e152bc52"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/examples/freertos/CMakeLists.txt",
+      "productMode": "100644",
+      "productSha256": "e8a50a96d48aa0f719f0ff1b312ba6eaf31e2877ddd3dd25c10036ee765b904c"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/examples/freertos/FreeRTOSConfig.h",
+      "productMode": "100644",
+      "productSha256": "1b80fb2ff1a21753b41dec31d6f3beb2821d72a27e7c3baca35e2dca887aacc0"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/examples/freertos/main.cpp",
+      "productMode": "100644",
+      "productSha256": "49b297a527f9c7c0d4a5dd355809f7e9b6c1b750d3899746f96f533cacb55540"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/examples/freertos/main.h",
+      "productMode": "100644",
+      "productSha256": "7dc137be36e02f4742d30c8f7e3045d822a9e8c98635eca2b13f5dc0d8b7001e"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/examples/freertos/stm32f1xx_hal_conf.h",
+      "productMode": "100755",
+      "productSha256": "2c8b3d4ed2fa9b8f2161e457fff8a9d8b4695ee64ed43f32f6e075b089e1764c"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/examples/freertos/stm32f4xx_hal_conf.h",
+      "productMode": "100644",
+      "productSha256": "fe050126f074881fa8838ee87e13a9a7ba1b6ddab5d842a67e3fb00989fd159f"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/examples/freertos/stm32h7xx_hal_conf.h",
+      "productMode": "100644",
+      "productSha256": "400599e3f497172447a9dd62b5bbb7a9635abf9d8274c50ce79ee157822f6084"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/examples/freertos/stm32l5xx_hal_conf.h",
+      "productMode": "100644",
+      "productSha256": "21d9f0ece68b29bedcd91912594a61af7514d09645f22a1a231d0fe97ed89c94"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/examples/multi-core/CMakeLists.txt",
+      "productMode": "100644",
+      "productSha256": "f4cea2365de92bcc8c370ee07c727eff9ed3a5f5c733f3126a4138aa06f24dd5"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/examples/multi-core/Inc/stm32f4xx_hal_conf.h",
+      "productMode": "100644",
+      "productSha256": "6a5e6c800c79139af94c60b6dc0108fc0e012b837bf277f9fece4bc9b20f26d5"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/examples/multi-core/Inc/stm32h7xx_hal_conf.h",
+      "productMode": "100644",
+      "productSha256": "426f8870763d94e25b899001f35e51a5a68e0aed73a5d6db44f01cba06f071c1"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/examples/multi-core/main.c",
+      "productMode": "100644",
+      "productSha256": "7c81ff90393f5047fff4f697ea164c14bf88b3b710fa877034e70134e152bc52"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/examples/template/CMakeLists.txt",
+      "productMode": "100644",
+      "productSha256": "a10c5f95cb0b04d27d8320452b8f3a9f5a39fd6811827deaddf774b7cbf8ebd2"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/examples/template/main.c",
+      "productMode": "100644",
+      "productSha256": "7c81ff90393f5047fff4f697ea164c14bf88b3b710fa877034e70134e152bc52"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/bsp/CMakeLists.txt",
+      "productMode": "100644",
+      "productSha256": "dbde71f080cb18c1082080782748a5f4e6191ea9db719606959025c4ef9261fe"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/bsp/b_g474e_dpow1_conf.h",
+      "productMode": "100755",
+      "productSha256": "98f54c9c7fb67bb3ba5bfc54e9dceeecfd444a536ed9067ce27798015fb82be0"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/bsp/main.c",
+      "productMode": "100644",
+      "productSha256": "7c81ff90393f5047fff4f697ea164c14bf88b3b710fa877034e70134e152bc52"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/bsp/stm32c0xx_hal_conf.h",
+      "productMode": "100644",
+      "productSha256": "31dc0e4c03f86529aa14d522c51c5cd2a77754e34c3ea70185873fd9f8d45a66"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/bsp/stm32f0xx_hal_conf.h",
+      "productMode": "100755",
+      "productSha256": "6b9d978781e796f65aca4d7d6fcdf6858ee6a160c5e6fbc93e634eda4a276c30"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/bsp/stm32f1xx_hal_conf.h",
+      "productMode": "100755",
+      "productSha256": "f31972f4bb9936040f689cceeee04c08f8cefcf202ac3e2ff9ce38daead716c3"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/bsp/stm32f2xx_hal_conf.h",
+      "productMode": "100755",
+      "productSha256": "72479f1aa3d9730531172e57b5e2110077e402a791628b2f0482675bd126276c"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/bsp/stm32f3xx_hal_conf.h",
+      "productMode": "100755",
+      "productSha256": "76c1ecff87d0b3e5f0a684b29df8768b4fb9973d25a04164ae55673ad1251375"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/bsp/stm32f4xx_hal_conf.h",
+      "productMode": "100755",
+      "productSha256": "daf490dc12e53491e6898b8a061576f06f0accf114d6d07ba15d17c340ca5f9b"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/bsp/stm32f7xx_hal_conf.h",
+      "productMode": "100755",
+      "productSha256": "f862e6f4888418c38a78ad167944ba4c4b51acbcb03323198544814394bd22d3"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/bsp/stm32g0xx_hal_conf.h",
+      "productMode": "100755",
+      "productSha256": "507f3019bbf8958d3036941634909489278d9ec636584321355dabb815fb92e1"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/bsp/stm32g474e_eval_conf.h",
+      "productMode": "100755",
+      "productSha256": "7f25ba814fe9daf3d4caeaca998e0d84a011023947ee3946ca4fa6f5929095e1"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/bsp/stm32g4xx_hal_conf.h",
+      "productMode": "100755",
+      "productSha256": "54280e8497f5c6c214b5acd5d2fd28d9522132e1e6bca7bfc6aa851219060abf"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/bsp/stm32g4xx_nucleo_conf.h",
+      "productMode": "100755",
+      "productSha256": "9c0d9afa47862578435425f8e80a596469e71ceb50f81b6d1f998836eba35050"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/bsp/stm32h7xx_hal_conf.h",
+      "productMode": "100755",
+      "productSha256": "2131b21803537c8fb41df27403fac5b274074a860fac4588606b67d50af78520"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/bsp/stm32l0xx_hal_conf.h",
+      "productMode": "100755",
+      "productSha256": "0423e4889d8861e31b0d260a3ac756dc6aab4faa5f371c0065ef4dec7c209f82"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/bsp/stm32l1xx_hal_conf.h",
+      "productMode": "100755",
+      "productSha256": "d1a417f2fc63e4a1041f2a3601fd5bf44c25877487c4c59cf907ebfa43b0eb34"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/bsp/stm32l4xx_hal_conf.h",
+      "productMode": "100755",
+      "productSha256": "86207ef534498fed9e9fb4a7d58ca3782ad7274ec6e56c1eef28e88755abe2f9"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/bsp/stm32l5xx_hal_conf.h",
+      "productMode": "100644",
+      "productSha256": "cd0eba54325482645b1eab0ed39a4033f1619f3c145cc24c7ad29a75c29f1d35"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/bsp/stm32u5xx_hal_conf.h",
+      "productMode": "100644",
+      "productSha256": "30f51c22c9e202ecbcd34d9bee95e38adea822024e5e8a608cceb3c13fe40b42"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/bsp/stm32wbxx_hal_conf.h",
+      "productMode": "100644",
+      "productSha256": "dca9af84bc990ae3edb6f847e58446b5bab499cbd8fa5be03eb4780e2f4bde19"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/bsp/stm32wlxx_hal_conf.h",
+      "productMode": "100644",
+      "productSha256": "c688599c1c9744796580ce9776d8d9c3304027780141446460b68ff8a0bfd80e"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/cmsis/CMakeLists.txt",
+      "productMode": "100644",
+      "productSha256": "d11aad79bbc6de1c109a9c248ad3fec988ada6cbd4daa1855cd6b98d20ca1d5c"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/cmsis/main.c",
+      "productMode": "100644",
+      "productSha256": "7c81ff90393f5047fff4f697ea164c14bf88b3b710fa877034e70134e152bc52"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/fetch/CMakeLists.txt",
+      "productMode": "100644",
+      "productSha256": "255924e3a696bda1ce9c7d3713f7db16d8f424b3729e6f79ba65c78f1abcd394"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/fetch/main.c",
+      "productMode": "100644",
+      "productSha256": "7c81ff90393f5047fff4f697ea164c14bf88b3b710fa877034e70134e152bc52"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/fetch/stm32c0xx_hal_conf.h",
+      "productMode": "100644",
+      "productSha256": "1bf37acb21299acd90aae91befb3b4a2cfb341925a6bfde79470392dfaa2601c"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/fetch/stm32f0xx_hal_conf.h",
+      "productMode": "100644",
+      "productSha256": "af6eb67e5a04d7e8bd1840aafbe084f5c667ea556d864396d4f1f8a40b62d0b0"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/fetch/stm32f1xx_hal_conf.h",
+      "productMode": "100644",
+      "productSha256": "7f711a4069006333e7c1e27808b2c0a5cb7fcf651fc7f433a0927cb22afe03db"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/fetch/stm32f2xx_hal_conf.h",
+      "productMode": "100644",
+      "productSha256": "72479f1aa3d9730531172e57b5e2110077e402a791628b2f0482675bd126276c"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/fetch/stm32f3xx_hal_conf.h",
+      "productMode": "100644",
+      "productSha256": "76c1ecff87d0b3e5f0a684b29df8768b4fb9973d25a04164ae55673ad1251375"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/fetch/stm32f4xx_hal_conf.h",
+      "productMode": "100644",
+      "productSha256": "3b549cd3f746cb91a8c7431537e1a9915b8542ddd651004030077e68039ae3a2"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/fetch/stm32f7xx_hal_conf.h",
+      "productMode": "100644",
+      "productSha256": "f862e6f4888418c38a78ad167944ba4c4b51acbcb03323198544814394bd22d3"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/fetch/stm32g0xx_hal_conf.h",
+      "productMode": "100644",
+      "productSha256": "7b6ca62de1b83856bf1180bd85658297fc1a388135b19a40bf17e915910f30fa"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/fetch/stm32g4xx_hal_conf.h",
+      "productMode": "100644",
+      "productSha256": "54280e8497f5c6c214b5acd5d2fd28d9522132e1e6bca7bfc6aa851219060abf"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/fetch/stm32h7xx_hal_conf.h",
+      "productMode": "100644",
+      "productSha256": "2131b21803537c8fb41df27403fac5b274074a860fac4588606b67d50af78520"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/fetch/stm32l0xx_hal_conf.h",
+      "productMode": "100644",
+      "productSha256": "0423e4889d8861e31b0d260a3ac756dc6aab4faa5f371c0065ef4dec7c209f82"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/fetch/stm32l1xx_hal_conf.h",
+      "productMode": "100644",
+      "productSha256": "d1a417f2fc63e4a1041f2a3601fd5bf44c25877487c4c59cf907ebfa43b0eb34"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/fetch/stm32l4xx_hal_conf.h",
+      "productMode": "100644",
+      "productSha256": "86207ef534498fed9e9fb4a7d58ca3782ad7274ec6e56c1eef28e88755abe2f9"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/fetch/stm32l5xx_hal_conf.h",
+      "productMode": "100644",
+      "productSha256": "cd0eba54325482645b1eab0ed39a4033f1619f3c145cc24c7ad29a75c29f1d35"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/fetch/stm32mp1xx_hal_conf.h",
+      "productMode": "100644",
+      "productSha256": "7e14db7dead1fc88b7e2353e9d1f615bf017f7fc24c65214fcfebc998c2918fb"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/fetch/stm32u5xx_hal_conf.h",
+      "productMode": "100644",
+      "productSha256": "30f51c22c9e202ecbcd34d9bee95e38adea822024e5e8a608cceb3c13fe40b42"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/fetch/stm32wbxx_hal_conf.h",
+      "productMode": "100644",
+      "productSha256": "dca9af84bc990ae3edb6f847e58446b5bab499cbd8fa5be03eb4780e2f4bde19"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/fetch/stm32wlxx_hal_conf.h",
+      "productMode": "100644",
+      "productSha256": "c688599c1c9744796580ce9776d8d9c3304027780141446460b68ff8a0bfd80e"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/hal/CMakeLists.txt",
+      "productMode": "100644",
+      "productSha256": "938d9f5c26e27cb4af55946176510a5a90cfd777e262ee277db4b4ede4b16d9f"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/hal/main.c",
+      "productMode": "100644",
+      "productSha256": "7c81ff90393f5047fff4f697ea164c14bf88b3b710fa877034e70134e152bc52"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/hal/stm32c0xx_hal_conf.h",
+      "productMode": "100644",
+      "productSha256": "1bf37acb21299acd90aae91befb3b4a2cfb341925a6bfde79470392dfaa2601c"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/hal/stm32f0xx_hal_conf.h",
+      "productMode": "100755",
+      "productSha256": "6b9d978781e796f65aca4d7d6fcdf6858ee6a160c5e6fbc93e634eda4a276c30"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/hal/stm32f1xx_hal_conf.h",
+      "productMode": "100755",
+      "productSha256": "f31972f4bb9936040f689cceeee04c08f8cefcf202ac3e2ff9ce38daead716c3"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/hal/stm32f2xx_hal_conf.h",
+      "productMode": "100755",
+      "productSha256": "72479f1aa3d9730531172e57b5e2110077e402a791628b2f0482675bd126276c"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/hal/stm32f3xx_hal_conf.h",
+      "productMode": "100755",
+      "productSha256": "76c1ecff87d0b3e5f0a684b29df8768b4fb9973d25a04164ae55673ad1251375"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/hal/stm32f4xx_hal_conf.h",
+      "productMode": "100755",
+      "productSha256": "0c969ea8beccc46489ab991e78e2fbed5b9136966e97bccf8e8f593d9c301790"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/hal/stm32f7xx_hal_conf.h",
+      "productMode": "100755",
+      "productSha256": "f862e6f4888418c38a78ad167944ba4c4b51acbcb03323198544814394bd22d3"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/hal/stm32g0xx_hal_conf.h",
+      "productMode": "100755",
+      "productSha256": "7b6ca62de1b83856bf1180bd85658297fc1a388135b19a40bf17e915910f30fa"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/hal/stm32g4xx_hal_conf.h",
+      "productMode": "100755",
+      "productSha256": "54280e8497f5c6c214b5acd5d2fd28d9522132e1e6bca7bfc6aa851219060abf"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/hal/stm32h7xx_hal_conf.h",
+      "productMode": "100755",
+      "productSha256": "2131b21803537c8fb41df27403fac5b274074a860fac4588606b67d50af78520"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/hal/stm32l0xx_hal_conf.h",
+      "productMode": "100755",
+      "productSha256": "0423e4889d8861e31b0d260a3ac756dc6aab4faa5f371c0065ef4dec7c209f82"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/hal/stm32l1xx_hal_conf.h",
+      "productMode": "100755",
+      "productSha256": "d1a417f2fc63e4a1041f2a3601fd5bf44c25877487c4c59cf907ebfa43b0eb34"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/hal/stm32l4xx_hal_conf.h",
+      "productMode": "100755",
+      "productSha256": "86207ef534498fed9e9fb4a7d58ca3782ad7274ec6e56c1eef28e88755abe2f9"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/hal/stm32l5xx_hal_conf.h",
+      "productMode": "100644",
+      "productSha256": "cd0eba54325482645b1eab0ed39a4033f1619f3c145cc24c7ad29a75c29f1d35"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/hal/stm32mp1xx_hal_conf.h",
+      "productMode": "100644",
+      "productSha256": "7e14db7dead1fc88b7e2353e9d1f615bf017f7fc24c65214fcfebc998c2918fb"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/hal/stm32u5xx_hal_conf.h",
+      "productMode": "100644",
+      "productSha256": "30f51c22c9e202ecbcd34d9bee95e38adea822024e5e8a608cceb3c13fe40b42"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/hal/stm32wbxx_hal_conf.h",
+      "productMode": "100644",
+      "productSha256": "dca9af84bc990ae3edb6f847e58446b5bab499cbd8fa5be03eb4780e2f4bde19"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/submodules/stm32-cmake/tests/hal/stm32wlxx_hal_conf.h",
+      "productMode": "100644",
+      "productSha256": "c688599c1c9744796580ce9776d8d9c3304027780141446460b68ff8a0bfd80e"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/test/CMakeLists.txt",
+      "productMode": "100644",
+      "productSha256": "c01c8aa70b013d36eddf809f5db740587a5c9a76cf2173fd6ab35ce6b459070f"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/test/README.md",
+      "productMode": "100644",
+      "productSha256": "e8dbb34d6fa945a69dd0f44430ab802eacffa85e68780b60afdc90d848580e6a"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/test/catch.hpp",
+      "productMode": "100644",
+      "productSha256": "3fb598b2b9375a9990d125e1108d4b0975f62416b03728abddad8143f798127a"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/test/hello-world.bin",
+      "productMode": "100644",
+      "productSha256": "e3992ca5ad3069abf49a8cf117b0da302d97302e1b3c9a6ad77ceee9efe144b9"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/test/qemu_test.cpp",
+      "productMode": "100644",
+      "productSha256": "5448b0a0ab153edaf3678f7df9d3d24e46636fe6e8d8a95c477bf7246db0d836"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/test/requirements_test.txt",
+      "productMode": "100644",
+      "productSha256": "0fb71c5ac03c71037d9c135bb1883c711411f1b9cb934e5a5418b5ac64d7d47a"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/test/run_qemu_test.sh",
+      "productMode": "100755",
+      "productSha256": "bb25f8e7ba305eb892c0696a69f0121116a7a3340ad9fc0c25e8fd2e3b141601"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/test/test_main.cpp",
+      "productMode": "100644",
+      "productSha256": "be28bf7dddb03201e8adf8ab0f0f1b902d3640d80a7849e29dde138d9d5abcd2"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/test/test_port.h",
+      "productMode": "100644",
+      "productSha256": "b116854c82b7ae55da95971c8da38cf94901cf1548efd0ba6d0b2523090d9e59"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/test/test_tcp_port.cpp",
+      "productMode": "100644",
+      "productSha256": "3649a40827d598a5a547de565c27fc93267542f0246372d87cb6453bb5754366"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/zephyr/CMakeLists.txt",
+      "productMode": "100644",
+      "productSha256": "a3d4d3cbbad150c2d3e0fb9e850fa577244e182a9a5af25f378793d99646a1d8"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/zephyr/Kconfig",
+      "productMode": "100644",
+      "productSha256": "dca2cb722dc52f57ef4aa7aae82cb0ed7e551a03884fb7ca16e13da229a15cf2"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/lib/esp-serial-flasher/zephyr/module.yml",
+      "productMode": "100644",
+      "productSha256": "3f62eb5e885b182eb1ac7d6b266626141de8f084dce7ec1738559a9ec71bf3d0"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/resources/apps_data/esp_flasher/assets/blackmagic/s2/blackmagic.bin",
+      "productMode": "100644",
+      "productSha256": "89386c52b34a9112f7c0c445fdd7e48ce9ceac05aae52c9a7d2bfb820d675f1d"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/resources/apps_data/esp_flasher/assets/blackmagic/s2/bootloader.bin",
+      "productMode": "100644",
+      "productSha256": "5b56bdebde96e6e8293a9c64d3ed376a322393b4af770053478157de0e32770b"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/resources/apps_data/esp_flasher/assets/blackmagic/s2/partition-table.bin",
+      "productMode": "100644",
+      "productSha256": "780113ca839df500db3940bc4e15bdcdbd6553c292874c0f18bcbb137514723f"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/resources/apps_data/esp_flasher/assets/flipperhttp/s2/flipper_http_bootloader.bin",
+      "productMode": "100644",
+      "productSha256": "5a186c8b05608f1a9a3eebc4cb0add24effbf451f9ce05189fd4808165ec6782"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/resources/apps_data/esp_flasher/assets/flipperhttp/s2/flipper_http_firmware_a.bin",
+      "productMode": "100644",
+      "productSha256": "8fba69d74152d542172e334a256ecc70683e76ee7286b1d7be68d3082e2227e1"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/resources/apps_data/esp_flasher/assets/flipperhttp/s2/flipper_http_partitions.bin",
+      "productMode": "100644",
+      "productSha256": "0a8b5720e7b77ff11f1462458c3a509dee79224e5279898f26d6a2e3ae0517b7"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/resources/apps_data/esp_flasher/assets/marauder/boot_app0.bin",
+      "productMode": "100644",
+      "productSha256": "f94c5d786a7a8fab06ac5d10e33bf37711a6697636dc037559ea19cc410a17f0"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/resources/apps_data/esp_flasher/assets/marauder/esp32_marauder.ino.partitions.bin",
+      "productMode": "100644",
+      "productSha256": "0a8b5720e7b77ff11f1462458c3a509dee79224e5279898f26d6a2e3ae0517b7"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/resources/apps_data/esp_flasher/assets/marauder/s2/esp32_marauder.flipper.bin",
+      "productMode": "100644",
+      "productSha256": "bdbe518e3404dbc12d15bb4d80f0a092adce14a80cf6193bec50559854f88b40"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/resources/apps_data/esp_flasher/assets/marauder/s2/esp32_marauder.ino.bootloader.bin",
+      "productMode": "100644",
+      "productSha256": "0b49d993df8be7cda46aba5f084ae0f0b3e8996515143383d9cce916af0545d7"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/resources/apps_data/esp_flasher/assets/marauder/s3/esp32_marauder.ino.bootloader.bin",
+      "productMode": "100644",
+      "productSha256": "531dc34cc20496d838c448540e02160a4daa5d044ea9d5493599146c504f7221"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/resources/apps_data/esp_flasher/assets/marauder/s3/esp32_marauder.multiboardS3.bin",
+      "productMode": "100644",
+      "productSha256": "77d847e58ec3dd94f4893b99fd3669fbf8f6b391175f42714e13130a78507e55"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/resources/apps_data/esp_flasher/assets/marauder/wroom/esp32_marauder.dev_board_pro.bin",
+      "productMode": "100644",
+      "productSha256": "bfc3b75caa35fde5299d4c514ed4ea1870d8d480f78fac81d1e15ea553e78d93"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/resources/apps_data/esp_flasher/assets/marauder/wroom/esp32_marauder.ino.bootloader.bin",
+      "productMode": "100644",
+      "productSha256": "fcd88c125aa29a80e680b803e9d482c914a27047ccd44e8e33930ced51f91858"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/resources/apps_data/esp_flasher/assets/wardriver/f0-wardrive-s3.bin",
+      "productMode": "100644",
+      "productSha256": "a0db70e0be1672d4b6f3977ee12846cc4347b5f784fb1313bd762d42a8afc285"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/resources/apps_data/esp_flasher/assets/wardriver/f0-wardrive-wroom.bin",
+      "productMode": "100644",
+      "productSha256": "91902fee87e9192760eb7932720e8f39022c8c0b32157f1a6646bf64cc40b174"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/scenes/esp_flasher_scene.c",
+      "productMode": "100644",
+      "productSha256": "a8db372f0df934b8969942188fd043c20570512cfa3adc7f457efe7a4802b657"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/scenes/esp_flasher_scene.h",
+      "productMode": "100644",
+      "productSha256": "4e987c8c79700944c3335c3519785407ba9af264eee4146600bf97143914db82"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/scenes/esp_flasher_scene_about.c",
+      "productMode": "100644",
+      "productSha256": "fcecaaac8bd30f55fe8f17254f288a3cd145bf179d2666e85e9600b9a4f8cf55"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/scenes/esp_flasher_scene_browse.c",
+      "productMode": "100644",
+      "productSha256": "ce0571e0fa6d3628892b376797d8deef779afc4de963b7970538e7d05d956456"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/scenes/esp_flasher_scene_config.h",
+      "productMode": "100644",
+      "productSha256": "9fb69c1e3c9013d56c107acc64af010de6868e73810743a65a42f7c1178e1c56"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/scenes/esp_flasher_scene_console_output.c",
+      "productMode": "100644",
+      "productSha256": "e3bf5e1a6a79f7f17910c8edfbc24b9324851db2428f33a39ff260a3cffd7773"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/scenes/esp_flasher_scene_quick.c",
+      "productMode": "100644",
+      "productSha256": "91b22e96613088f46730cd82dd41ae46e9732c65e5d0e4c976448ea5744ba523"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/scenes/esp_flasher_scene_start.c",
+      "productMode": "100644",
+      "productSha256": "4d679cf0cfdb9fe85385060dadc5c918e5f745b5c9e86a6293cb9f7591cec1de"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/screenshots/esp-flasher-browse.png",
+      "productMode": "100755",
+      "productSha256": "25868831e557d743fad7a071cc2f3b819c1ee569110fb585e7e3d1687fea1d3b"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/screenshots/esp-flasher-flashing.png",
+      "productMode": "100755",
+      "productSha256": "4c955cae6c6d4468c54f0ff5833136f243a971d73058c5624ce9af41ddc5c1ec"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_esp_flasher/wifi_10px.png",
+      "productMode": "100644",
+      "productSha256": "c44a9e22d4ab529485545ce3122c050c0f535845c8988b370cfb544ef01e124a"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_marauder/application.fam",
+      "productMode": "100644",
+      "productSha256": "913296144ee611f9187f3523988b00dbeabcba194b8124fb3273e9ff6953a4b8"
+    },
+    {
+      "classification": "poison-added",
+      "path": "applications/external/poison_marauder/poison_marauder.c",
+      "productMode": "100644",
+      "productSha256": "0f19aa22cc1997371157ca9b98a37f8778f7924c8e8720b10f39ee3df6e96c90"
+    },
+    {
       "classification": "identical",
       "path": "applications/main/application.fam",
       "productMode": "100644",
@@ -4077,10 +6539,13 @@
       "upstreamSha256": "298dcf739fdd95731a35919b36fa96bb4254c25f9f51734b4e95c21e7ed338fd"
     },
     {
-      "classification": "identical",
+      "classification": "poison-modified",
+      "differences": [
+        "content"
+      ],
       "path": "applications/main/gpio/gpio_app.c",
       "productMode": "100644",
-      "productSha256": "3dc632ef537dbe223eb388e9af261fbd8525574c283cde6f2a46b0e6906903f2",
+      "productSha256": "3d526e52080033a605d1b0fc218b19b5cae0e1dd1bfaa2d2251775bc885c14c4",
       "upstreamMode": "100644",
       "upstreamSha256": "3dc632ef537dbe223eb388e9af261fbd8525574c283cde6f2a46b0e6906903f2"
     },
@@ -4093,10 +6558,13 @@
       "upstreamSha256": "5c4fc1791ee8e22de5c6ebc795100cbf4b6e8cefe3396850145bc97bbfddbaab"
     },
     {
-      "classification": "identical",
+      "classification": "poison-modified",
+      "differences": [
+        "content"
+      ],
       "path": "applications/main/gpio/gpio_app_i.h",
       "productMode": "100644",
-      "productSha256": "8822960ceeb8d2018e61f8ce837c832e5b60b89eb776e5cf4a90866dd381ba44",
+      "productSha256": "4d2433ac57d634c89c75e24d6f533fecebcbe7dd60abeec15354b3fe519b58e8",
       "upstreamMode": "100644",
       "upstreamSha256": "8822960ceeb8d2018e61f8ce837c832e5b60b89eb776e5cf4a90866dd381ba44"
     },
@@ -4157,10 +6625,13 @@
       "upstreamSha256": "7eda44c449a8e34a656472fb55522e1a3f68a8e47d6390b070984e56f63589bf"
     },
     {
-      "classification": "identical",
+      "classification": "poison-modified",
+      "differences": [
+        "content"
+      ],
       "path": "applications/main/gpio/scenes/gpio_scene_start.c",
       "productMode": "100644",
-      "productSha256": "1cc37f6d046ad66b47d659deed8b546da0c0a9d23c926bea6e711e8add23f43f",
+      "productSha256": "ad69c319fcf0b167d65872fca6e8a49d5d4effdad3db06767ce47d16ad38aae6",
       "upstreamMode": "100644",
       "upstreamSha256": "1cc37f6d046ad66b47d659deed8b546da0c0a9d23c926bea6e711e8add23f43f"
     },
@@ -4173,10 +6644,13 @@
       "upstreamSha256": "d14767a8957fc2d83a2395467ff50f705a8d2129bccecc5ec360b10a4a4fb850"
     },
     {
-      "classification": "identical",
+      "classification": "poison-modified",
+      "differences": [
+        "content"
+      ],
       "path": "applications/main/gpio/scenes/gpio_scene_usb_uart.c",
       "productMode": "100644",
-      "productSha256": "70266fc3de217a3d2d0e566ea21257395e3a0a2ffb3af17e67166548c06c871e",
+      "productSha256": "574822b145a45aabd4f9c0d27455b8d91ac2aff7e4bd709424ce69efbf3a0b96",
       "upstreamMode": "100644",
       "upstreamSha256": "70266fc3de217a3d2d0e566ea21257395e3a0a2ffb3af17e67166548c06c871e"
     },
@@ -8405,10 +10879,13 @@
       "upstreamSha256": "686155ca2617d1bda069a7aa1687aa2dc4a96dab1bb4933a3a46a62b84233b77"
     },
     {
-      "classification": "identical",
+      "classification": "poison-modified",
+      "differences": [
+        "content"
+      ],
       "path": "applications/services/desktop/desktop.c",
       "productMode": "100644",
-      "productSha256": "c834f586ee08a722f338c45d19688e7739aef0d137d2665e8e0557f84a6dcd2d",
+      "productSha256": "fe1ea7d6310460908d6ea7ed27b82e410d6020506e01ac9ff1cead64d03917bf",
       "upstreamMode": "100644",
       "upstreamSha256": "c834f586ee08a722f338c45d19688e7739aef0d137d2665e8e0557f84a6dcd2d"
     },
@@ -8565,10 +11042,13 @@
       "upstreamSha256": "31d72033437600377fb8ebd9c19098eeebffa3e6dc9e329c56c66eceeef3f7a8"
     },
     {
-      "classification": "identical",
+      "classification": "poison-modified",
+      "differences": [
+        "content"
+      ],
       "path": "applications/services/desktop/scenes/desktop_scene_main.c",
       "productMode": "100644",
-      "productSha256": "ced38e9ad0948c252a0358cba05868e86146e995f0887cc7d645313691ccab0c",
+      "productSha256": "99633806c55c74417e450d40930ff867b41fabd14156e8cf90fe754b5cc9feb0",
       "upstreamMode": "100644",
       "upstreamSha256": "ced38e9ad0948c252a0358cba05868e86146e995f0887cc7d645313691ccab0c"
     },
@@ -8605,18 +11085,24 @@
       "upstreamSha256": "10d9435c83d35d4ff7b0997d155663a6b2b407aec75bd01d7c341aa9574ee1a2"
     },
     {
-      "classification": "identical",
+      "classification": "poison-modified",
+      "differences": [
+        "content"
+      ],
       "path": "applications/services/desktop/views/desktop_events.h",
       "productMode": "100644",
-      "productSha256": "0dacb396cdfb8a0864a52afd3608fec09a79c8744cff3a02f43d3032a5715bf3",
+      "productSha256": "1ead5802ab557b540775cd9718971f23f354cd24980f6d0fe063383a945efaa8",
       "upstreamMode": "100644",
       "upstreamSha256": "0dacb396cdfb8a0864a52afd3608fec09a79c8744cff3a02f43d3032a5715bf3"
     },
     {
-      "classification": "identical",
+      "classification": "poison-modified",
+      "differences": [
+        "content"
+      ],
       "path": "applications/services/desktop/views/desktop_view_debug.c",
       "productMode": "100644",
-      "productSha256": "e06ef88d2bc67c3493b94c7bf08aad7ac167bef5e60179fe9110dd43cc4d01ea",
+      "productSha256": "0575cc64b24950f6441145bd613e59be7f6589a36b0e16c22cc20b1fbbd68bd3",
       "upstreamMode": "100644",
       "upstreamSha256": "e06ef88d2bc67c3493b94c7bf08aad7ac167bef5e60179fe9110dd43cc4d01ea"
     },
@@ -8629,10 +11115,13 @@
       "upstreamSha256": "8956db8697d7778034d98fa92fbbcb1a95c0e1041f7609d60af9c0995e530b6b"
     },
     {
-      "classification": "identical",
+      "classification": "poison-modified",
+      "differences": [
+        "content"
+      ],
       "path": "applications/services/desktop/views/desktop_view_lock_menu.c",
       "productMode": "100644",
-      "productSha256": "2a1769ba958f05fcd86d8c2e99bb54ec41c4eb601cce9d51b40482809680c37a",
+      "productSha256": "38c4e3ff32e2c882802e685a80823298d0de36e7f15663fc9b2e434fdaa15fe0",
       "upstreamMode": "100644",
       "upstreamSha256": "2a1769ba958f05fcd86d8c2e99bb54ec41c4eb601cce9d51b40482809680c37a"
     },
@@ -8645,10 +11134,13 @@
       "upstreamSha256": "201698bdf87c3379a6e78fe2d0cfc76b0fca8cb99115a41569ba2965af68cce6"
     },
     {
-      "classification": "identical",
+      "classification": "poison-modified",
+      "differences": [
+        "content"
+      ],
       "path": "applications/services/desktop/views/desktop_view_locked.c",
       "productMode": "100644",
-      "productSha256": "b4642f94e5e6f943125877f8c0a97eaa72e33930fbb603d04368d22dc466c6d6",
+      "productSha256": "b75d3a131f0b5851bf398495718079a244fb75041107953837f16f180ac8f751",
       "upstreamMode": "100644",
       "upstreamSha256": "b4642f94e5e6f943125877f8c0a97eaa72e33930fbb603d04368d22dc466c6d6"
     },
@@ -8661,10 +11153,13 @@
       "upstreamSha256": "7e64ad8db5938209be02f53a9611c3b08958cd6ce4afd8b2f4426c331ef9fa9a"
     },
     {
-      "classification": "identical",
+      "classification": "poison-modified",
+      "differences": [
+        "content"
+      ],
       "path": "applications/services/desktop/views/desktop_view_main.c",
       "productMode": "100644",
-      "productSha256": "a8f44cfb0c914af24100f10df417bd33bec669f859abae800dbf4f634aa4b99c",
+      "productSha256": "bc624aabfc99dbb9bb66262d7dc35a02b2be1eee19f9736d8e14905b910af02d",
       "upstreamMode": "100644",
       "upstreamSha256": "a8f44cfb0c914af24100f10df417bd33bec669f859abae800dbf4f634aa4b99c"
     },
@@ -8693,10 +11188,13 @@
       "upstreamSha256": "4061a60a4e9aad9562b599f8344cc58d0ce266cc032672fc5b6aa24e43f5d205"
     },
     {
-      "classification": "identical",
+      "classification": "poison-modified",
+      "differences": [
+        "content"
+      ],
       "path": "applications/services/desktop/views/desktop_view_pin_timeout.c",
       "productMode": "100644",
-      "productSha256": "a8fa6bd0ae4dd439a8aeb95d575822363e0cc4f6062d5d64e5037cca51764dfe",
+      "productSha256": "609710b17f61c25d163815bed7c2647842ad024e87e70e6cce733668f472a80e",
       "upstreamMode": "100644",
       "upstreamSha256": "a8fa6bd0ae4dd439a8aeb95d575822363e0cc4f6062d5d64e5037cca51764dfe"
     },
@@ -8997,10 +11495,13 @@
       "upstreamSha256": "c06d0fea5a0028644dedf7ff7da5e8e5891395905cc36119cd03aaa36fc97677"
     },
     {
-      "classification": "identical",
+      "classification": "poison-modified",
+      "differences": [
+        "content"
+      ],
       "path": "applications/services/gui/gui.c",
       "productMode": "100644",
-      "productSha256": "79d062e0bf93ca40a0dc73be68159304746c1e8cbf948f4ed3c5e1e1339bc6e3",
+      "productSha256": "4474bed9a39530e6b44dd0c9247eb3d7872552d79f55f1e77d66d3706cf320df",
       "upstreamMode": "100644",
       "upstreamSha256": "79d062e0bf93ca40a0dc73be68159304746c1e8cbf948f4ed3c5e1e1339bc6e3"
     },
@@ -9213,18 +11714,24 @@
       "upstreamSha256": "18990b33aac3653e1f73ba7c2174aeb3875f0816a601ff1638e0c9991fbe710a"
     },
     {
-      "classification": "identical",
+      "classification": "poison-modified",
+      "differences": [
+        "content"
+      ],
       "path": "applications/services/gui/modules/menu.c",
       "productMode": "100644",
-      "productSha256": "b1a11b767d9e99885a12930cc8e5f5fb411df113b6f97a5e4d75107a2f701650",
+      "productSha256": "f32c075335e2b9e7676eb8818e76e1cf68fc38bbede14573014d0134313fd00f",
       "upstreamMode": "100644",
       "upstreamSha256": "b1a11b767d9e99885a12930cc8e5f5fb411df113b6f97a5e4d75107a2f701650"
     },
     {
-      "classification": "identical",
+      "classification": "poison-modified",
+      "differences": [
+        "content"
+      ],
       "path": "applications/services/gui/modules/menu.h",
       "productMode": "100644",
-      "productSha256": "8706578499820ef1e7a142be8190922ba08a64d16a6d676206f5dd5c7d97cd2f",
+      "productSha256": "97441e5c20c5e8dc83144b4dd311767d518ab69cc370aeac9a89d0d37bd7b3c2",
       "upstreamMode": "100644",
       "upstreamSha256": "8706578499820ef1e7a142be8190922ba08a64d16a6d676206f5dd5c7d97cd2f"
     },
@@ -9261,10 +11768,13 @@
       "upstreamSha256": "96daec769c47529465ace426d80870696e07dbe3b938fa766a7be4d07270c08d"
     },
     {
-      "classification": "identical",
+      "classification": "poison-modified",
+      "differences": [
+        "content"
+      ],
       "path": "applications/services/gui/modules/submenu.c",
       "productMode": "100644",
-      "productSha256": "0a3fb5208e7139d3ac041e1e1cc9a946234ecd04c72ac3ce39e14fbbd63468d3",
+      "productSha256": "6ac1226c81b4bc1edd3939a6691a45a81307b391c5cd91c6b4c639adc646e9a7",
       "upstreamMode": "100644",
       "upstreamSha256": "0a3fb5208e7139d3ac041e1e1cc9a946234ecd04c72ac3ce39e14fbbd63468d3"
     },
@@ -9325,10 +11835,13 @@
       "upstreamSha256": "c535bd6b9b79014808176fbf498be6c37bbf81ba7de5d2229b6d5261f2a109dd"
     },
     {
-      "classification": "identical",
+      "classification": "poison-modified",
+      "differences": [
+        "content"
+      ],
       "path": "applications/services/gui/modules/variable_item_list.c",
       "productMode": "100644",
-      "productSha256": "aa1a7fd73e140a8f9048aeebc0385c6364215eb199fa1927a3c904e25a62920d",
+      "productSha256": "45f5cd7eabc0ec0e9ed6cb7d8a47387cb95edb59ee18524b12210466cac0b151",
       "upstreamMode": "100644",
       "upstreamSha256": "aa1a7fd73e140a8f9048aeebc0385c6364215eb199fa1927a3c904e25a62920d"
     },
@@ -9677,10 +12190,13 @@
       "upstreamSha256": "6b9af655bb7daab51ba0bfe8759bda3c5ca7d5813be67a39760ce38794de63ab"
     },
     {
-      "classification": "identical",
+      "classification": "poison-modified",
+      "differences": [
+        "content"
+      ],
       "path": "applications/services/loader/loader_menu.c",
       "productMode": "100644",
-      "productSha256": "761f89935c4ab37bff0aadc8d5606e4efbacf60d6ca2d9aeb49648b47d4dd875",
+      "productSha256": "f2b5d23122c1bb6809d1eb2a32d23d7c4e21c05349d3b46a5cfe462f55d7075d",
       "upstreamMode": "100644",
       "upstreamSha256": "761f89935c4ab37bff0aadc8d5606e4efbacf60d6ca2d9aeb49648b47d4dd875"
     },
@@ -9869,10 +12385,13 @@
       "upstreamSha256": "bdd5292ef7074dc305b8c15544b8a7b3f4a65def858fba96a45e3024fa6cb4d9"
     },
     {
-      "classification": "identical",
+      "classification": "poison-modified",
+      "differences": [
+        "content"
+      ],
       "path": "applications/services/power/power_service/views/power_off.c",
       "productMode": "100644",
-      "productSha256": "74199db346cf337b5e7c1b05c14d063e5bde7d5cf86a156d91ec99e7805ae9e5",
+      "productSha256": "0e2a9e043588563978e6e8b1ccbec896c3054c63c0e81115072681b23c0b7db5",
       "upstreamMode": "100644",
       "upstreamSha256": "74199db346cf337b5e7c1b05c14d063e5bde7d5cf86a156d91ec99e7805ae9e5"
     },
@@ -9885,10 +12404,13 @@
       "upstreamSha256": "4eecde9711cc5f57f9af813db9d055eeb7ed6cfce06871ba1ede153987764637"
     },
     {
-      "classification": "identical",
+      "classification": "poison-modified",
+      "differences": [
+        "content"
+      ],
       "path": "applications/services/power/power_service/views/power_unplug_usb.c",
       "productMode": "100644",
-      "productSha256": "7271a76ca1f13ff127841b2843ca905e16917976a00c7cd6790ce11acf2d7a24",
+      "productSha256": "80fc5279b4c3c08bbe986eae7673abefc0e719db13f3597e264db5e8a92f00c8",
       "upstreamMode": "100644",
       "upstreamSha256": "7271a76ca1f13ff127841b2843ca905e16917976a00c7cd6790ce11acf2d7a24"
     },
@@ -12725,10 +15247,13 @@
       "upstreamSha256": "5507c69f242301dc27aff91fc83f952ac74134384d5a8516cab6b55257777267"
     },
     {
-      "classification": "identical",
+      "classification": "poison-modified",
+      "differences": [
+        "content"
+      ],
       "path": "applications/system/updater/views/updater_main.c",
       "productMode": "100644",
-      "productSha256": "55d25303090a26129447a3d114f3709bae146db1e5d65f3c4ee48c92a191f66f",
+      "productSha256": "c2aa9db6f3578df2188d255b9b090171f0203ed9cb92699d79331526fe0a63f9",
       "upstreamMode": "100644",
       "upstreamSha256": "55d25303090a26129447a3d114f3709bae146db1e5d65f3c4ee48c92a191f66f"
     },
@@ -12779,10 +15304,13 @@
       "upstreamSha256": "54dba4f2a5265a5411c522a7012d03fc98d107c49165eff9202b1fd2a9c143bb"
     },
     {
-      "classification": "identical",
+      "classification": "poison-modified",
+      "differences": [
+        "content"
+      ],
       "path": "assets/SConscript",
       "productMode": "100644",
-      "productSha256": "d5142e9a7a757e70e46eadf8d45cefc806c4e04045d9e385afa789a6bafe7c7f",
+      "productSha256": "31ebe32992644e367a18a09b05aaf4470e00e3e289ff84d7eed7a1c798462650",
       "upstreamMode": "100644",
       "upstreamSha256": "d5142e9a7a757e70e46eadf8d45cefc806c4e04045d9e385afa789a6bafe7c7f"
     },
@@ -23499,6 +26027,12 @@
       "upstreamSha256": "8f28568825757bbed0b7c9f5ea267062ecb1bb664121fbce677c9a3209902dda"
     },
     {
+      "classification": "poison-added",
+      "path": "assets/poison/README.md",
+      "productMode": "100644",
+      "productSha256": "113e93f30b10ba45f7f16cc0757ea98d9fc29d5250bc6ea6060099b454ea4298"
+    },
+    {
       "classification": "dependency",
       "dependencyPath": "assets/protobuf",
       "path": "assets/protobuf",
@@ -23721,9 +26255,21 @@
     },
     {
       "classification": "poison-added",
+      "path": "docs/decisions/ADR-0004-signing-authorities.md",
+      "productMode": "100644",
+      "productSha256": "ba3f3138703620d58962be2075cc816fecbc6f2257755eec97a3aefa1c999a94"
+    },
+    {
+      "classification": "poison-added",
+      "path": "docs/development/build-baseline.md",
+      "productMode": "100644",
+      "productSha256": "20e8b677985a041705ce6510f4ea04b97ae7798310e0ed44a8fc5ec37740d430"
+    },
+    {
+      "classification": "poison-added",
       "path": "docs/plans/2026-08-21-m0-baseline-and-governance.md",
       "productMode": "100644",
-      "productSha256": "ea578454a02b5dc9b84f792bb7e55691635f9f6cd79292c0028673b770e01053"
+      "productSha256": "181b91d433ad6cc1e0a32cca377177fb3c86fba0bea97968ebfac2da18c8e166"
     },
     {
       "classification": "poison-added",
@@ -23741,13 +26287,13 @@
       "classification": "poison-added",
       "path": "docs/plans/2026-08-21-m3-apps-tools-education-customization.md",
       "productMode": "100644",
-      "productSha256": "757102b80fc01cb074f2644a4285b3b98cc26d42b3411410961eafbe808279d5"
+      "productSha256": "71f0615a58362f8688b2089ad77c69d1f9f01d6afdd886fe43520c18a2b749bd"
     },
     {
       "classification": "poison-added",
       "path": "docs/plans/2026-08-21-m4-javascript-platform.md",
       "productMode": "100644",
-      "productSha256": "d6bb005974835bdc9dba7970db8225c3a624cdf129fc0c932bb62d928ed93263"
+      "productSha256": "980ed4fc87fd90d9abe09a5cf0ccb8b28836ec1ca2f56157277dd15eee27a574"
     },
     {
       "classification": "poison-added",
@@ -23765,13 +26311,37 @@
       "classification": "poison-added",
       "path": "docs/plans/2026-08-21-poisonedos-v1-master-plan.md",
       "productMode": "100644",
-      "productSha256": "d4ace3f377ef5fa104aa02831eb3fb3e864d10941b4c961f654efe115f35d727"
+      "productSha256": "c15456aad942a5fd09b2a2bbe6977639309f10e91b33ea85b9130ef42643e773"
+    },
+    {
+      "classification": "poison-added",
+      "path": "docs/release/key-ceremony.md",
+      "productMode": "100644",
+      "productSha256": "84349294d5c14d8707965e8f7d16c8af652189656b6d230ee650f8f3e8b5ee27"
+    },
+    {
+      "classification": "poison-added",
+      "path": "docs/release/signing-policy.md",
+      "productMode": "100644",
+      "productSha256": "97da6eac572251268292a7e203e625096b1ca0bd35f077e392c78ff5c54674f1"
+    },
+    {
+      "classification": "poison-added",
+      "path": "docs/security/threat-model.md",
+      "productMode": "100644",
+      "productSha256": "476e1002d944b28b14d50246bcd7eb56f6cfafe4bab7785534ec254ac9ecb6c8"
     },
     {
       "classification": "poison-added",
       "path": "docs/specs/SPEC-1-poisonedos-for-the-flipper-zero.md",
       "productMode": "100644",
-      "productSha256": "c3418dd5d4cfe7ff5f292f8d06e3e20c2b5092d603678466a3cf03834e856656"
+      "productSha256": "4da4eac16fd8cd33d58e4c09dd4bd5b0de3110488e313f29af5656eeca5a5b6f"
+    },
+    {
+      "classification": "poison-added",
+      "path": "docs/testing/ofw-parity.md",
+      "productMode": "100644",
+      "productSha256": "be1f5a29d348707ae6dd98dc1efe5cf7aab810bc318ba7171d8e445cbb92e704"
     },
     {
       "classification": "identical",
@@ -24859,10 +27429,13 @@
       "upstreamSha256": "43092b1cf497abc932f56cce8e4ddce7cbf2585e587f9944585c13d55c6d584e"
     },
     {
-      "classification": "identical",
+      "classification": "poison-modified",
+      "differences": [
+        "content"
+      ],
       "path": "fbt_options.py",
       "productMode": "100644",
-      "productSha256": "2353f7bd8b87f9959270ea0b6633c4bdab0fa3d5c61497325159c98aea0b6c30",
+      "productSha256": "ae7b1e97613e62774c9df162e34b86e0cfda39f99427a75aed50bc042bc22b12",
       "upstreamMode": "100644",
       "upstreamSha256": "2353f7bd8b87f9959270ea0b6633c4bdab0fa3d5c61497325159c98aea0b6c30"
     },
@@ -25305,6 +27878,216 @@
       "productSha256": "4a17ef6756cfb7f2541100f85d7339abc0db10d6ba81e215f9b392570827855d",
       "upstreamMode": "100644",
       "upstreamSha256": "4a17ef6756cfb7f2541100f85d7339abc0db10d6ba81e215f9b392570827855d"
+    },
+    {
+      "classification": "poison-added",
+      "path": "generated/protocol/c/application.pb.c",
+      "productMode": "100644",
+      "productSha256": "f0aeb5fe7fea81317d7191bd81698a71963a061aa017afe22568e720f14bd874"
+    },
+    {
+      "classification": "poison-added",
+      "path": "generated/protocol/c/application.pb.h",
+      "productMode": "100644",
+      "productSha256": "624d848b0e8e183655534fb5aaa4fbc535ef759d2c3e06609ed053955433ea75"
+    },
+    {
+      "classification": "poison-added",
+      "path": "generated/protocol/c/desktop.pb.c",
+      "productMode": "100644",
+      "productSha256": "06df14f61f5ae63cd1415e359b20ac5e2ccee91eb144186f6f7a9469e6144503"
+    },
+    {
+      "classification": "poison-added",
+      "path": "generated/protocol/c/desktop.pb.h",
+      "productMode": "100644",
+      "productSha256": "4305e8ceaf578e7a21122dc87673c992d64a2d84c35220eea350a4b920db3358"
+    },
+    {
+      "classification": "poison-added",
+      "path": "generated/protocol/c/flipper.pb.c",
+      "productMode": "100644",
+      "productSha256": "112bb142d83d5d542114094d802607ecce77066d694c6b9110a271e018067b72"
+    },
+    {
+      "classification": "poison-added",
+      "path": "generated/protocol/c/flipper.pb.h",
+      "productMode": "100644",
+      "productSha256": "cbfc2c5ba59d2c1c1ff314ecf8cef2b64be0a5f4485189b3be5c5e65e74a2ff3"
+    },
+    {
+      "classification": "poison-added",
+      "path": "generated/protocol/c/gpio.pb.c",
+      "productMode": "100644",
+      "productSha256": "901e562ec3a5e6571c9aa6f73279d29c9eea0279e8cb46889d71097918181ac3"
+    },
+    {
+      "classification": "poison-added",
+      "path": "generated/protocol/c/gpio.pb.h",
+      "productMode": "100644",
+      "productSha256": "e657361886f6244b6ec1ed12ebf842205b999c7ee30089ada5a54d02563a1267"
+    },
+    {
+      "classification": "poison-added",
+      "path": "generated/protocol/c/gui.pb.c",
+      "productMode": "100644",
+      "productSha256": "ab15ffaa9ed9dbe21595726d15ecd9fb2ee1792918cc89f7506a1edabc5979eb"
+    },
+    {
+      "classification": "poison-added",
+      "path": "generated/protocol/c/gui.pb.h",
+      "productMode": "100644",
+      "productSha256": "1ca1c0680d01bcb8cd94f78309f31d3593ef489ef531bd0dab02294d5c145a06"
+    },
+    {
+      "classification": "poison-added",
+      "path": "generated/protocol/c/property.pb.c",
+      "productMode": "100644",
+      "productSha256": "9bc18aa99f17752fc515c88774e7a23b86bb8eea116669d8d1076719ae983f26"
+    },
+    {
+      "classification": "poison-added",
+      "path": "generated/protocol/c/property.pb.h",
+      "productMode": "100644",
+      "productSha256": "7e10eff957610a2c475bac2ea323c103cdbb97ede6bc97d0aa87f8026647ce52"
+    },
+    {
+      "classification": "poison-added",
+      "path": "generated/protocol/c/storage.pb.c",
+      "productMode": "100644",
+      "productSha256": "d8b6929c20479c9e3aee32eb7c1cfb54793ca73995c0053f6c1688753b8d4050"
+    },
+    {
+      "classification": "poison-added",
+      "path": "generated/protocol/c/storage.pb.h",
+      "productMode": "100644",
+      "productSha256": "517a7fc0f6a0a14cedd43e6ee9c6bef4876a05b474d958c7baec0e11e4b146e6"
+    },
+    {
+      "classification": "poison-added",
+      "path": "generated/protocol/c/system.pb.c",
+      "productMode": "100644",
+      "productSha256": "de1746b8e57854ead3dafdff350bf9b20894449f09170a784d52d17487a54161"
+    },
+    {
+      "classification": "poison-added",
+      "path": "generated/protocol/c/system.pb.h",
+      "productMode": "100644",
+      "productSha256": "3112b2338a3a7e21d61a9742a8610002c449722710d94d057ce66a7cd1eedd88"
+    },
+    {
+      "classification": "poison-added",
+      "path": "generated/protocol/manifest.json",
+      "productMode": "100644",
+      "productSha256": "ffb8953935a8e4d006992ffa054d5d008374668f1dc417713d9a89738d56268f"
+    },
+    {
+      "classification": "poison-added",
+      "path": "generated/protocol/rust/pb.rs",
+      "productMode": "100644",
+      "productSha256": "aeece13e019d06662fa3e71c154840e7084f5bde1870c9320a3e45fbcafe24ee"
+    },
+    {
+      "classification": "poison-added",
+      "path": "generated/protocol/rust/pb_app.rs",
+      "productMode": "100644",
+      "productSha256": "272bb14e41e32b994a66536454ff70b19a5584873af5962d3b91020cb540e03a"
+    },
+    {
+      "classification": "poison-added",
+      "path": "generated/protocol/rust/pb_desktop.rs",
+      "productMode": "100644",
+      "productSha256": "bf1d1f3b38f43caab62bdc79eb93059f890b8ed1d6368b1f0c10cba5af1e1201"
+    },
+    {
+      "classification": "poison-added",
+      "path": "generated/protocol/rust/pb_gpio.rs",
+      "productMode": "100644",
+      "productSha256": "cc06dbdab1795eb7ba47b0199524b36976de5d9083074bd41b527e9bc6dfbecc"
+    },
+    {
+      "classification": "poison-added",
+      "path": "generated/protocol/rust/pb_gui.rs",
+      "productMode": "100644",
+      "productSha256": "2ab1c7f68c57718e6e1087f604af0780d1b91c742da86b480d0a855197a155bc"
+    },
+    {
+      "classification": "poison-added",
+      "path": "generated/protocol/rust/pb_property.rs",
+      "productMode": "100644",
+      "productSha256": "c4aaf81ea2f77de048cd9b7007305afe191b1b06a3930a3c85457d99db6c90e8"
+    },
+    {
+      "classification": "poison-added",
+      "path": "generated/protocol/rust/pb_storage.rs",
+      "productMode": "100644",
+      "productSha256": "9fa88336e44c491d17c36094508149349ded87b2826e595ca94185ac6c29f646"
+    },
+    {
+      "classification": "poison-added",
+      "path": "generated/protocol/rust/pb_system.rs",
+      "productMode": "100644",
+      "productSha256": "424c2f63ef907b1b826ad83ea21394140f55e6e9facea0b76f94d68fa5f453e9"
+    },
+    {
+      "classification": "poison-added",
+      "path": "generated/protocol/schema.descriptor.pb",
+      "productMode": "100644",
+      "productSha256": "828abec1fb0589319c27f17e0bb9ccf5d85ecfae79bebca5e8580c973efbbc67"
+    },
+    {
+      "classification": "poison-added",
+      "path": "generated/protocol/schema.snapshot.json",
+      "productMode": "100644",
+      "productSha256": "cb6189706f31007cb3e981ebc0a2e68720182ff88459ce2fb170decc712b9dad"
+    },
+    {
+      "classification": "poison-added",
+      "path": "generated/protocol/typescript/application_pb.ts",
+      "productMode": "100644",
+      "productSha256": "8149bcba744174967049a91fc2ff97abaaf7982511551926506183bf5983f059"
+    },
+    {
+      "classification": "poison-added",
+      "path": "generated/protocol/typescript/desktop_pb.ts",
+      "productMode": "100644",
+      "productSha256": "10a77c260e31fa6794102acb1f54039ef46d7be94c652d7c3af6fa199e9e4a52"
+    },
+    {
+      "classification": "poison-added",
+      "path": "generated/protocol/typescript/flipper_pb.ts",
+      "productMode": "100644",
+      "productSha256": "48d35353dd2ecb59a9367832155e18127dd83709d0716e08ed155c95455807f6"
+    },
+    {
+      "classification": "poison-added",
+      "path": "generated/protocol/typescript/gpio_pb.ts",
+      "productMode": "100644",
+      "productSha256": "9e4869cb346f831499985b6dd0fa0d04553d76b969b9a01541d73623e7d062c4"
+    },
+    {
+      "classification": "poison-added",
+      "path": "generated/protocol/typescript/gui_pb.ts",
+      "productMode": "100644",
+      "productSha256": "cdd5829d6b6b3151b9092ad1b5ff4d1be58fda8d6c55a975f8d986114ebf08c8"
+    },
+    {
+      "classification": "poison-added",
+      "path": "generated/protocol/typescript/property_pb.ts",
+      "productMode": "100644",
+      "productSha256": "c66c68431154bdb107d7728cf79f2fc435d8ee5f03184aafa3d4effac9b41dd9"
+    },
+    {
+      "classification": "poison-added",
+      "path": "generated/protocol/typescript/storage_pb.ts",
+      "productMode": "100644",
+      "productSha256": "7ee5afd2de0cf06fc3a5e4151a74191267f346b1851b96fbd1c46c9f14b61c9c"
+    },
+    {
+      "classification": "poison-added",
+      "path": "generated/protocol/typescript/system_pb.ts",
+      "productMode": "100644",
+      "productSha256": "3e02ce9d50d9375feb025c836c40b58fe4cd24151fe39f729a9091949afe16b1"
     },
     {
       "classification": "dependency",
@@ -72530,13 +75313,43 @@
       "classification": "poison-added",
       "path": "provenance/components.json",
       "productMode": "100644",
-      "productSha256": "1423750f37d6f530608ec67bbb772f91f7ad1f63727561b6bbe9b9a17610bac8"
+      "productSha256": "2ff5b362bcbeb695ce8b1f759f062cf9200c09a4f19c8b188481986a21f2d49d"
+    },
+    {
+      "classification": "poison-added",
+      "path": "provenance/firmware-api.lock.csv",
+      "productMode": "100644",
+      "productSha256": "f1e9513250becc473a4b08bcfec85ddc57cc6ec13b5c0260678db47e2042f1bc"
     },
     {
       "classification": "poison-added",
       "path": "provenance/licenses.json",
       "productMode": "100644",
       "productSha256": "7b78cefba485d73b4db25e0b9bc3bcf6513884ad28ae2c725df99c8f8ca8350d"
+    },
+    {
+      "classification": "poison-added",
+      "path": "provenance/marauder.lock.json",
+      "productMode": "100644",
+      "productSha256": "f4dd157b89c8ae07433b82e1bebf7b53cc28f34f6471621de22aa7452a5912ad"
+    },
+    {
+      "classification": "poison-added",
+      "path": "provenance/protocol-previous.json",
+      "productMode": "100644",
+      "productSha256": "cb6189706f31007cb3e981ebc0a2e68720182ff88459ce2fb170decc712b9dad"
+    },
+    {
+      "classification": "poison-added",
+      "path": "schemas/poison/revocation-manifest.schema.json",
+      "productMode": "100644",
+      "productSha256": "9281a24704029766fb8cb8d8b3dbefeeb70b09aab7fe202f82c345c4b2a2ee27"
+    },
+    {
+      "classification": "poison-added",
+      "path": "schemas/protocol/bounds.yaml",
+      "productMode": "100644",
+      "productSha256": "b3084a1d58bff80033a8fb93d1c2ccb4a2455ed91719b4f882fe51ce83aa4c7d"
     },
     {
       "classification": "identical",
@@ -72779,10 +75592,13 @@
       "upstreamSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
-      "classification": "identical",
+      "classification": "poison-modified",
+      "differences": [
+        "content"
+      ],
       "path": "scripts/fbt/appmanifest.py",
       "productMode": "100644",
-      "productSha256": "55ee7a3f8232436cc5d2e688e8a9d088bc81b5b2dc19b0247f820c0a9034ea11",
+      "productSha256": "351f2edbb5a9fe4576e49c048314ccd11abee75e2fedd4dbe51059509533d300",
       "upstreamMode": "100644",
       "upstreamSha256": "55ee7a3f8232436cc5d2e688e8a9d088bc81b5b2dc19b0247f820c0a9034ea11"
     },
@@ -72899,10 +75715,13 @@
       "upstreamSha256": "da41c0d7f892c25de0ca742d614da768e8bae82119f2adfe32747a1edda1838f"
     },
     {
-      "classification": "identical",
+      "classification": "poison-modified",
+      "differences": [
+        "content"
+      ],
       "path": "scripts/fbt_tools/fbt_assets.py",
       "productMode": "100644",
-      "productSha256": "81d59f736a6889c01277631fde43c1c4d4f651a7c553024bc900aced790f13e1",
+      "productSha256": "bb17dbd07586268c5aaa9ce8e829e2bd3ddeb6dc79151343d656994e1e537628",
       "upstreamMode": "100644",
       "upstreamSha256": "81d59f736a6889c01277631fde43c1c4d4f651a7c553024bc900aced790f13e1"
     },
@@ -72915,10 +75734,13 @@
       "upstreamSha256": "91e27d4716453e6838d07b1fb820e33b77b5a331ce883f73f9c55341ec5187c7"
     },
     {
-      "classification": "identical",
+      "classification": "poison-modified",
+      "differences": [
+        "content"
+      ],
       "path": "scripts/fbt_tools/fbt_dist.py",
       "productMode": "100644",
-      "productSha256": "295010a777e8526c40e9828802e2d88975112acd706c74c36e60251a63932af6",
+      "productSha256": "168d0b32f3d661a3407e65a9aee8d0e14a2199dbc00c2b09b0b55073fdcf71d4",
       "upstreamMode": "100644",
       "upstreamSha256": "295010a777e8526c40e9828802e2d88975112acd706c74c36e60251a63932af6"
     },
@@ -72955,10 +75777,13 @@
       "upstreamSha256": "abadf77daeac9849d5cae9e3628fc2e276de314e74fc3e2ed27e10867260db5b"
     },
     {
-      "classification": "identical",
+      "classification": "poison-modified",
+      "differences": [
+        "content"
+      ],
       "path": "scripts/fbt_tools/fbt_resources.py",
       "productMode": "100644",
-      "productSha256": "1609e2784e2d72da37f7620caecfce00d765c11414175509257618c961a6fe0b",
+      "productSha256": "b78f7113c2525a3c96dfe045a0141d229e3cf4276d1fc2539a7fd603dc87d3b8",
       "upstreamMode": "100644",
       "upstreamSha256": "1609e2784e2d72da37f7620caecfce00d765c11414175509257618c961a6fe0b"
     },
@@ -73051,10 +75876,13 @@
       "upstreamSha256": "61bb5ffe8fe6918762f611b7c3d681d8c929b886545e32e2b2a45a8de12d17a2"
     },
     {
-      "classification": "identical",
+      "classification": "poison-modified",
+      "differences": [
+        "content"
+      ],
       "path": "scripts/fbt_tools/sconsrecursiveglob.py",
       "productMode": "100644",
-      "productSha256": "7e78cad49637fd31a0cd27ac9bb90af908620afced31c864139aef37aa0f3f56",
+      "productSha256": "21f96a06851cd2012a9f46d2a11d8808d2c3d3f5f6704f2e176754266b4ed5ea",
       "upstreamMode": "100644",
       "upstreamSha256": "7e78cad49637fd31a0cd27ac9bb90af908620afced31c864139aef37aa0f3f56"
     },
@@ -73187,10 +76015,13 @@
       "upstreamSha256": "3adbd15561456aaed472709a5b9eb6d2e296a8bcf2660bc4904f5ce278a7bf6b"
     },
     {
-      "classification": "identical",
+      "classification": "poison-modified",
+      "differences": [
+        "content"
+      ],
       "path": "scripts/flipper/storage.py",
       "productMode": "100644",
-      "productSha256": "b7f57908e5f2858b84139f0c67cf5c337340c20efeb4b6019dda346356ef2857",
+      "productSha256": "965011b78f9856771c9e290ff7445b6529a9aee6f2e7f16a302ef68150be10ab",
       "upstreamMode": "100644",
       "upstreamSha256": "b7f57908e5f2858b84139f0c67cf5c337340c20efeb4b6019dda346356ef2857"
     },
@@ -73347,6 +76178,12 @@
       "upstreamSha256": "76f780fa9c8be620383a7d0ea4895e3bf1728f5cfe41ef0c1f7b3ce5b9ff8428"
     },
     {
+      "classification": "poison-added",
+      "path": "scripts/marauder.py",
+      "productMode": "100644",
+      "productSha256": "8cac3c13ec1a107564408b52858d53f045ce6e7c38ab56de7596ebe519857a17"
+    },
+    {
       "classification": "identical",
       "path": "scripts/merge_report_qa.py",
       "productMode": "100755",
@@ -73411,10 +76248,13 @@
       "upstreamSha256": "56f98596a7d34447904b2237cc460de4450c02c2874632e6107ea28769e72989"
     },
     {
-      "classification": "identical",
+      "classification": "poison-modified",
+      "differences": [
+        "content"
+      ],
       "path": "scripts/selfupdate.py",
       "productMode": "100755",
-      "productSha256": "36d50d00540cfe15afc2e2bb49a7089cef86047f377a2ca9bfe986a69f185da0",
+      "productSha256": "6e4e920dc22ea62e6253186848062210d6efc5c5b7ec7e31078c124e8ee9ebc8",
       "upstreamMode": "100755",
       "upstreamSha256": "36d50d00540cfe15afc2e2bb49a7089cef86047f377a2ca9bfe986a69f185da0"
     },
@@ -73459,10 +76299,13 @@
       "upstreamSha256": "552f5510a2494ad4399cbdc2018d687e943b59c3563edce0303d4a0d0b848fb0"
     },
     {
-      "classification": "identical",
+      "classification": "poison-modified",
+      "differences": [
+        "content"
+      ],
       "path": "scripts/testops.py",
       "productMode": "100644",
-      "productSha256": "6e1ad6c9f2aba455ca8d1ba8a3aa8252b9466e3127a9c377b167a177201d368d",
+      "productSha256": "99ecd750eee1958f14d9f73aec879976ea2c60988c6c803e63344d67af78af4e",
       "upstreamMode": "100644",
       "upstreamSha256": "6e1ad6c9f2aba455ca8d1ba8a3aa8252b9466e3127a9c377b167a177201d368d"
     },
@@ -73475,10 +76318,13 @@
       "upstreamSha256": "51422ccf763400fadfe8eda5d1ca709ffeb216e08ec1089d0efe731ab5eca772"
     },
     {
-      "classification": "identical",
+      "classification": "poison-modified",
+      "differences": [
+        "content"
+      ],
       "path": "scripts/toolchain/fbtenv.sh",
       "productMode": "100755",
-      "productSha256": "1e4f74f355ba2b063ffc3843a449b98f7cad3185693268bb515338eb59256f20",
+      "productSha256": "d8fab758cb4073da5035cf3ee592572ba5fe175843992d2392081350670f4a70",
       "upstreamMode": "100755",
       "upstreamSha256": "1e4f74f355ba2b063ffc3843a449b98f7cad3185693268bb515338eb59256f20"
     },
@@ -73659,18 +76505,24 @@
       "upstreamSha256": "693f41077b2994707a31e2f0538578cfd319d3ff53896208864558201f84b0f9"
     },
     {
-      "classification": "identical",
+      "classification": "poison-modified",
+      "differences": [
+        "content"
+      ],
       "path": "site_scons/cc.scons",
       "productMode": "100644",
-      "productSha256": "8f476fd558ec3c76f26f30eab9fce4de4aede7ea6634e83772cca719fc465866",
+      "productSha256": "fdac1ab4fb3c18b94d7c3fafa329c33d318ff653d233ff00a68f3166c7be38bd",
       "upstreamMode": "100644",
       "upstreamSha256": "8f476fd558ec3c76f26f30eab9fce4de4aede7ea6634e83772cca719fc465866"
     },
     {
-      "classification": "identical",
+      "classification": "poison-modified",
+      "differences": [
+        "content"
+      ],
       "path": "site_scons/commandline.scons",
       "productMode": "100644",
-      "productSha256": "d4eae4b6112207d9f1fcb91f5ccb3b65587c30f5932ee1eb7fb68194a5e9c66a",
+      "productSha256": "2a68f26d4b077c6fb7f2916ee38aea7b3629f8f8677282709891fd5f54169afe",
       "upstreamMode": "100644",
       "upstreamSha256": "d4eae4b6112207d9f1fcb91f5ccb3b65587c30f5932ee1eb7fb68194a5e9c66a"
     },
@@ -73811,10 +76663,13 @@
       "upstreamSha256": "b12f9e66987628f24a4594704a294e18f2387bd853756333d822ab1048c06133"
     },
     {
-      "classification": "identical",
+      "classification": "poison-modified",
+      "differences": [
+        "content"
+      ],
       "path": "targets/f7/api_symbols.csv",
       "productMode": "100644",
-      "productSha256": "5c9505984a19be218c19400d43ab9c7056996d003e69809945d9db03e95c04bb",
+      "productSha256": "f03fcf534700c95db84a3e1875f005bd2e56a4f8a9e3c0490d923abd4badd08d",
       "upstreamMode": "100644",
       "upstreamSha256": "5c9505984a19be218c19400d43ab9c7056996d003e69809945d9db03e95c04bb"
     },
@@ -75156,6 +78011,18 @@
     },
     {
       "classification": "poison-added",
+      "path": "toolchains/manifest.lock.json",
+      "productMode": "100644",
+      "productSha256": "29e12233ead9a65e3bcebc713cc93cc411a74ac7df85be7dbadc241ea181fae9"
+    },
+    {
+      "classification": "poison-added",
+      "path": "tools/check_reproducible_build.py",
+      "productMode": "100644",
+      "productSha256": "5f3f67b272f9ca8865f71a392473c2f07950316bfcb6a3e5fb937007122cd088"
+    },
+    {
+      "classification": "poison-added",
       "path": "tools/compare_upstream.py",
       "productMode": "100644",
       "productSha256": "a70976091e96aec9d1b4ff124ee829115d72f112b1e104fccb05f3b0e6ff9a63"
@@ -75168,27 +78035,207 @@
     },
     {
       "classification": "poison-added",
+      "path": "tools/hil/README.md",
+      "productMode": "100644",
+      "productSha256": "2668a73a456bc00a78d7871d1485185a96d4a3a4bf32f6aec700bfc0984b195f"
+    },
+    {
+      "classification": "poison-added",
+      "path": "tools/hil/inventory.example.json",
+      "productMode": "100644",
+      "productSha256": "6284095c0f6ae3122f89b437a26a2017ed6386d1293436c7e202b1f7956c6602"
+    },
+    {
+      "classification": "poison-added",
+      "path": "tools/hil/run_suite.py",
+      "productMode": "100644",
+      "productSha256": "c1293db40e624dd583ed739da3d97331882c948d0a13d456729c44b5d96c4b00"
+    },
+    {
+      "classification": "poison-added",
+      "path": "tools/hil/suites/baseline.py",
+      "productMode": "100644",
+      "productSha256": "2372ab4df1f2817bdc92205ce2e4b506f928c5e15a89d7a699906a4628c7d299"
+    },
+    {
+      "classification": "poison-added",
+      "path": "tools/hil/suites/firmware_units.py",
+      "productMode": "100644",
+      "productSha256": "15490c8374d04702b597cbf028861ae5951b71b27513d68bb8c382cd200767ed"
+    },
+    {
+      "classification": "poison-added",
+      "path": "tools/protocol/Cargo.lock",
+      "productMode": "100644",
+      "productSha256": "c3681d5c0701c8ac455fd355c8b1e317e27ce73a2b428e13cc815e4b1fb8cf5c"
+    },
+    {
+      "classification": "poison-added",
+      "path": "tools/protocol/Cargo.toml",
+      "productMode": "100644",
+      "productSha256": "3c73cbe58bf6d008bfd2012eda676c59e418a121759259109827816756c9844a"
+    },
+    {
+      "classification": "poison-added",
+      "path": "tools/protocol/check_generated.py",
+      "productMode": "100644",
+      "productSha256": "246b5cfd71c2ba6fe46bea311b0005812b38ec0a68d57e9315cbde45901570e5"
+    },
+    {
+      "classification": "poison-added",
+      "path": "tools/protocol/compatibility.py",
+      "productMode": "100644",
+      "productSha256": "b29fbc11fb199cce28ea2738408ca02b295cba83823ac6ce5a3816eb2c4f47c9"
+    },
+    {
+      "classification": "poison-added",
+      "path": "tools/protocol/generate.py",
+      "productMode": "100644",
+      "productSha256": "9891bf09c93463c066c4a64efe15d6852c8a4d0d1531a91f7a7560dd917ff33e"
+    },
+    {
+      "classification": "poison-added",
+      "path": "tools/protocol/package.json",
+      "productMode": "100644",
+      "productSha256": "e6a499e80cb45890dad08143b9090d6e57c2e223d6193c3e30a22f3188712284"
+    },
+    {
+      "classification": "poison-added",
+      "path": "tools/protocol/pnpm-lock.yaml",
+      "productMode": "100644",
+      "productSha256": "8f570b8e13cd348e7b4bc24b3f54f9ddf00b8a4d09949069f784afb0a51952f8"
+    },
+    {
+      "classification": "poison-added",
+      "path": "tools/protocol/rust-toolchain.toml",
+      "productMode": "100644",
+      "productSha256": "9e71f14ec24ed40f9011f8da9428699a576c62f9eabd74e5dcf2720dfdefcfc4"
+    },
+    {
+      "classification": "poison-added",
+      "path": "tools/protocol/src/main.rs",
+      "productMode": "100644",
+      "productSha256": "b87e0ab5a582902bd00574b8d97362d0fb6f32321cd4bd654743f8d6e01fabc6"
+    },
+    {
+      "classification": "poison-added",
+      "path": "tools/run_official_parity.py",
+      "productMode": "100644",
+      "productSha256": "0e2e9edca04a11d6668558d716ddc9a1705cb0b90d9606245dc30786f8bfb13f"
+    },
+    {
+      "classification": "poison-added",
+      "path": "tools/signing/verify_manifest.py",
+      "productMode": "100644",
+      "productSha256": "1b06693b801840f15fde004c5332a2865471a70dcea370300b11b6e1225530b5"
+    },
+    {
+      "classification": "poison-added",
+      "path": "tools/snapshot_firmware_api.py",
+      "productMode": "100644",
+      "productSha256": "e5885193a54e4957d263e9c318625427dc4b46c81c9dfb41a39cd362fd0b48e3"
+    },
+    {
+      "classification": "poison-added",
+      "path": "tools/tests/test_check_reproducible_build.py",
+      "productMode": "100644",
+      "productSha256": "81b6296be1583bdfb11a1ce24f04240554b307bcd66d91d71e3b27ecb3ce8f7c"
+    },
+    {
+      "classification": "poison-added",
       "path": "tools/tests/test_compare_upstream.py",
       "productMode": "100644",
       "productSha256": "96a10a4e35439f80ec5dc6c8af4a3eae77b025b50d2d61434a79daa082f6aedd"
     },
     {
       "classification": "poison-added",
+      "path": "tools/tests/test_flipper_storage.py",
+      "productMode": "100644",
+      "productSha256": "2228e53ee8fad8ce10f3803d2a8d1e59e88fd5b27dd992b63bd7146af4dc5f89"
+    },
+    {
+      "classification": "poison-added",
       "path": "tools/tests/test_generate_sbom.py",
       "productMode": "100644",
-      "productSha256": "0de7dd144fa697a87be9db1c4d83565d598f5cb3b01dee1232d99e36e51826c6"
+      "productSha256": "976d769d9e95a36f927dec03f400dd7aab06bc34dfc5904ba6bdbd6a8ba70479"
+    },
+    {
+      "classification": "poison-added",
+      "path": "tools/tests/test_hil_inventory.py",
+      "productMode": "100644",
+      "productSha256": "c07a9c8b779c27e99cbe98623605972f6905c832af32738d4a3e99ff8724cdf6"
+    },
+    {
+      "classification": "poison-added",
+      "path": "tools/tests/test_marauder.py",
+      "productMode": "100644",
+      "productSha256": "3b7eedc468a1bcb69121d9643770d0f1df9ac55dcb3bb0bf533f1ce25c89ac00"
+    },
+    {
+      "classification": "poison-added",
+      "path": "tools/tests/test_poison_ui.py",
+      "productMode": "100644",
+      "productSha256": "affd7f26c19132473cb3c185f1221eaa00a648701597090cf5ca3e59ae0c146c"
+    },
+    {
+      "classification": "poison-added",
+      "path": "tools/tests/test_protocol_codegen.py",
+      "productMode": "100644",
+      "productSha256": "e939ac9e23bbdbff771500f6a6e30e6c72549f9688d4033ee19aab5594c3b867"
+    },
+    {
+      "classification": "poison-added",
+      "path": "tools/tests/test_protocol_compatibility.py",
+      "productMode": "100644",
+      "productSha256": "253e8d576f2f90a73d8b756e604016c97b9976eb4673012667aab28456993b65"
+    },
+    {
+      "classification": "poison-added",
+      "path": "tools/tests/test_run_official_parity.py",
+      "productMode": "100644",
+      "productSha256": "3315068de480d4cc4a67ddcc7dcc4108958f8d00dd6b26cc0d5342afe2888384"
+    },
+    {
+      "classification": "poison-added",
+      "path": "tools/tests/test_snapshot_firmware_api.py",
+      "productMode": "100644",
+      "productSha256": "fa7745bcb11322bf3983f43a3539a6e0b871c275e5f7ffe94726364c2d29017f"
     },
     {
       "classification": "poison-added",
       "path": "tools/tests/test_verify_baseline.py",
       "productMode": "100644",
-      "productSha256": "541a6dddcb42bce8555d07739b302a5198b22fede3b9f35624164db59632697d"
+      "productSha256": "8ca3f0193ca896095c9cb695a74e12b6f04e66c34b16460d0ddefed5e7aa4d5b"
+    },
+    {
+      "classification": "poison-added",
+      "path": "tools/tests/test_verify_docs.py",
+      "productMode": "100644",
+      "productSha256": "777cc581377a0e4026450a5328733b8f5969707bc9f3f188cdc542fea6915645"
+    },
+    {
+      "classification": "poison-added",
+      "path": "tools/tests/test_verify_manifest.py",
+      "productMode": "100644",
+      "productSha256": "bde7000b8548ad784c34623a8002062f00e1710ea1de786e16007d45924efba6"
     },
     {
       "classification": "poison-added",
       "path": "tools/verify_baseline.py",
       "productMode": "100644",
-      "productSha256": "7534116eb82b4c825dcba4b711981d9507de25bae20ee6d0c58a26cc32602fb0"
+      "productSha256": "28d9b85a9af735a6aa043488ec6177383a2f22a5cb63ea2e354f8e0a5a463852"
+    },
+    {
+      "classification": "poison-added",
+      "path": "tools/verify_docs.py",
+      "productMode": "100644",
+      "productSha256": "442fbc74b20cde416ea040663316020dade38265bb025c466276d52ab5d77f55"
+    },
+    {
+      "classification": "poison-added",
+      "path": "tools/verify_toolchain.py",
+      "productMode": "100644",
+      "productSha256": "269edba3fff7dc3a81f7f8e45fbbff78d5cafffc706838a9a1fdd870c057216d"
     },
     {
       "classification": "identical",
@@ -75203,10 +78250,10 @@
   "sourcePath": "do_not_include/flipperzero-firmware",
   "summary": {
     "dependency": 5118,
-    "identical": 4248,
-    "poison-added": 22,
-    "poison-modified": 2,
-    "upstream-omitted": 21
+    "identical": 4212,
+    "poison-added": 511,
+    "poison-modified": 39,
+    "upstream-omitted": 20
   },
   "upstream": "flipperdevices/flipperzero-firmware"
 }

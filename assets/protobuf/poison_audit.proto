@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package PB_Poison;
+
+enum AuditDecision {
+    AUDIT_DENIED = 0;
+    AUDIT_ALLOWED = 1;
+    AUDIT_EXPIRED = 2;
+    AUDIT_REVOKED = 3;
+}
+
+message AuditSnapshotRequest {
+    uint64 after_event_id = 1;
+    uint32 max_events = 2;
+}
+
+message AuditEvent {
+    uint64 event_id = 1;
+    bytes prior_digest = 2;
+    bytes actor_digest = 3;
+    string action = 4;
+    string resource = 5;
+    AuditDecision decision = 6;
+    uint64 timestamp_ms = 7;
+    bytes correlation_id = 8;
+    string safe_metadata = 9;
+    bytes digest = 10;
+}
+
+message AuditSnapshotEnd {
+    uint64 next_event_id = 1;
+    bytes last_digest = 2;
+    bool truncated = 3;
+}

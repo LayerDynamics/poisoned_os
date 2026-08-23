@@ -1,0 +1,8 @@
+[package]
+name = "poison-fuzz-wasm"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "module_loader"
+path = "fuzz_targets/module_loader.rs"

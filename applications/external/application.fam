@@ -1,0 +1,6 @@
+App(
+    appid="poison_external_apps",
+    name="PoisonedOS curated external applications",
+    apptype=FlipperAppType.METAPACKAGE,
+    provides=[],
+)

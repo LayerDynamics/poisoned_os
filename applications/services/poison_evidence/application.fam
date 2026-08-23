@@ -1,0 +1,10 @@
+App(
+    appid="poison_evidence",
+    name="Poison Evidence",
+    apptype=FlipperAppType.STARTUP,
+    entry_point="poison_evidence_on_system_start",
+    order=125,
+    sources=["*.c"],
+    requires=["storage"],
+    sdk_headers=["poison_evidence.h", "poison_case.h", "poison_tool_run.h"],
+)

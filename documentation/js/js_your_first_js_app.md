@@ -80,4 +80,33 @@ js /ext/apps/Scripts/first_app.js
 
 As you can see, unlike running JavaScript apps from the Flipper Zero UI, all output from the `print()` function is sent to the CLI, not the device screen.
 
+### Interactive console and source debugger
+
+Poisoned OS also provides a persistent JavaScript console. Variables, functions,
+and loaded modules remain available between entries until the console is closed:
+
+\code{.sh}
+js console
+\endcode
+
+Enter `.help` for console commands or `.exit` to close the session. Both
+`print()` and `console.log()`, `console.warn()`, `console.error()`, and
+`console.debug()` write to the attached CLI session. Press **Ctrl+C** while an
+expression is running to interrupt that expression without restarting the
+console.
+
+To debug a source file, run:
+
+\code{.sh}
+js debug /ext/apps/Scripts/first_app.js
+\endcode
+
+Execution pauses at the first source line. The debugger supports source
+breakpoints (`break [file:]line`), breakpoint deletion and listing, `continue`,
+`step`, step-over with `next`, expression evaluation with `print`, visible
+bindings with `locals`, and a non-destructive call stack with `where`. A
+JavaScript `debugger;` statement also pauses execution. Press **Ctrl+C** while
+the script is running to pause at the next source location; use `quit` at the
+debugger prompt to terminate it.
+
 **Next step:** [Developing apps using JavaScript SDK](#js_developing_apps_using_js_sdk)

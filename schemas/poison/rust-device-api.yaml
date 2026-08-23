@@ -1,0 +1,13 @@
+schema: poison.rust-device-api/v1
+api_version: 1
+abi_version: 1
+limits:
+  max_path: 128
+  max_chunk: 1024
+  max_text: 256
+statuses:
+  ok: 0
+  invalid_argument: 1
+  denied: 2
+  cancelled: 3
+  resource_limit: 4

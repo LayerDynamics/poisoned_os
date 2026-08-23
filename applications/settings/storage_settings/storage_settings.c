@@ -1,18 +1,15 @@
 #include "storage_settings.h"
 
-const SubmenuSettingsHelperDescriptor descriptor_template = {
-    .app_name = "Storage",
-    .options_cnt = 6,
-    .options =
-        {
-            {.name = "About Internal Storage", .scene_id = StorageSettingsInternalInfo},
-            {.name = "About SD Card", .scene_id = StorageSettingsSDInfo},
-            {.name = "Unmount SD Card", .scene_id = StorageSettingsUnmountConfirm},
-            {.name = "Format SD Card", .scene_id = StorageSettingsFormatConfirm},
-            {.name = "Benchmark SD Card", .scene_id = StorageSettingsBenchmarkConfirm},
-            {.name = "Factory Reset", .scene_id = StorageSettingsFactoryReset},
-        },
+static const SubmenuSettingsHelperOption storage_settings_options[] = {
+    {.name = "About Internal Storage", .scene_id = StorageSettingsInternalInfo},
+    {.name = "About SD Card", .scene_id = StorageSettingsSDInfo},
+    {.name = "Unmount SD Card", .scene_id = StorageSettingsUnmountConfirm},
+    {.name = "Format SD Card", .scene_id = StorageSettingsFormatConfirm},
+    {.name = "Benchmark SD Card", .scene_id = StorageSettingsBenchmarkConfirm},
+    {.name = "Factory Reset", .scene_id = StorageSettingsFactoryReset},
 };
+
+_Static_assert(COUNT_OF(storage_settings_options) == STORAGE_SETTINGS_OPTION_COUNT);
 
 static bool storage_settings_custom_event_callback(void* context, uint32_t event) {
     furi_assert(context);
@@ -54,12 +51,13 @@ static StorageSettings* storage_settings_alloc(void) {
     view_dispatcher_add_view(
         app->view_dispatcher, StorageSettingsViewDialogEx, dialog_ex_get_view(app->dialog_ex));
 
-    size_t descriptor_size =
-        sizeof(SubmenuSettingsHelperDescriptor) +
-        (descriptor_template.options_cnt * sizeof(SubmenuSettingsHelperOption));
-    app->helper_descriptor = malloc(descriptor_size);
-    memcpy(app->helper_descriptor, &descriptor_template, descriptor_size);
-    app->settings_helper = submenu_settings_helpers_alloc(app->helper_descriptor);
+    memcpy(app->helper_options, storage_settings_options, sizeof(storage_settings_options));
+    app->helper_descriptor = (SubmenuSettingsHelperDescriptor){
+        .app_name = "Storage",
+        .options_cnt = COUNT_OF(app->helper_options),
+        .options = app->helper_options,
+    };
+    app->settings_helper = submenu_settings_helpers_alloc(&app->helper_descriptor);
     submenu_settings_helpers_assign_objects(
         app->settings_helper,
         app->view_dispatcher,
@@ -73,8 +71,6 @@ static StorageSettings* storage_settings_alloc(void) {
 
 static void storage_settings_free(StorageSettings* app) {
     submenu_settings_helpers_free(app->settings_helper);
-    free(app->helper_descriptor);
-
     view_dispatcher_remove_view(app->view_dispatcher, StorageSettingsViewSubmenu);
     submenu_free(app->submenu);
 

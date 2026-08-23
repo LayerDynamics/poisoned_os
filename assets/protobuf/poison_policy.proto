@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package PB_Poison;
+
+enum Role {
+    ROLE_OWNER = 0;
+    ROLE_OPERATOR = 1;
+    ROLE_INSTRUCTOR = 2;
+    ROLE_STUDENT = 3;
+    ROLE_OBSERVER = 4;
+}
+
+message PolicyRequest {
+    Role role = 1;
+    uint32 requested_capabilities = 2;
+    bool device_locked = 3;
+    bool physical_confirmation = 4;
+    uint32 policy_version = 5;
+}
+
+message PolicyDecision {
+    uint32 granted_capabilities = 1;
+    bool allowed = 2;
+    uint32 policy_version = 3;
+    string denial_reason = 4;
+}

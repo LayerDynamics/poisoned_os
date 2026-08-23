@@ -1,0 +1,195 @@
+syntax = "proto3";
+
+package PB_Poison;
+
+enum WorkloadRuntime {
+    WORKLOAD_RUNTIME_UNSPECIFIED = 0;
+    WORKLOAD_RUNTIME_JAVASCRIPT = 1;
+    WORKLOAD_RUNTIME_NATIVE = 2;
+    WORKLOAD_RUNTIME_WASM = 3;
+}
+
+enum WorkloadOperation {
+    WORKLOAD_OPERATION_UNSPECIFIED = 0;
+    WORKLOAD_OPERATION_CREATE = 1;
+    WORKLOAD_OPERATION_RUN = 2;
+    WORKLOAD_OPERATION_CANCEL = 3;
+    WORKLOAD_OPERATION_INSPECT = 4;
+    WORKLOAD_OPERATION_FINALIZE_ARTIFACT = 5;
+}
+
+enum WorkloadState {
+    WORKLOAD_STATE_UNSPECIFIED = 0;
+    WORKLOAD_STATE_QUEUED = 1;
+    WORKLOAD_STATE_RUNNING = 2;
+    WORKLOAD_STATE_CANCELLING = 3;
+    WORKLOAD_STATE_COMPLETED = 4;
+    WORKLOAD_STATE_FAILED = 5;
+    WORKLOAD_STATE_CANCELLED = 6;
+    WORKLOAD_STATE_TIMED_OUT = 7;
+    WORKLOAD_STATE_CRASHED = 8;
+    WORKLOAD_STATE_DISCONNECTED = 9;
+}
+
+enum WorkloadTerminalReason {
+    WORKLOAD_TERMINAL_NONE = 0;
+    WORKLOAD_TERMINAL_COMPLETED = 1;
+    WORKLOAD_TERMINAL_CANCELLED = 2;
+    WORKLOAD_TERMINAL_TIMEOUT = 3;
+    WORKLOAD_TERMINAL_CRASH = 4;
+    WORKLOAD_TERMINAL_DISCONNECT = 5;
+    WORKLOAD_TERMINAL_HEAP_LIMIT = 6;
+    WORKLOAD_TERMINAL_SOURCE_LIMIT = 7;
+    WORKLOAD_TERMINAL_MODULE_LIMIT = 8;
+    WORKLOAD_TERMINAL_PARSER_LIMIT = 9;
+    WORKLOAD_TERMINAL_STACK_LIMIT = 10;
+    WORKLOAD_TERMINAL_FUEL_LIMIT = 11;
+    WORKLOAD_TERMINAL_CALLBACK_LIMIT = 12;
+    WORKLOAD_TERMINAL_TIMER_LIMIT = 13;
+    WORKLOAD_TERMINAL_HANDLE_LIMIT = 14;
+    WORKLOAD_TERMINAL_LOG_LIMIT = 15;
+    WORKLOAD_TERMINAL_ARTIFACT_LIMIT = 16;
+}
+
+enum WorkloadConsoleType {
+    WORKLOAD_CONSOLE_STDOUT = 0;
+    WORKLOAD_CONSOLE_STDERR = 1;
+    WORKLOAD_CONSOLE_LOG = 2;
+    WORKLOAD_CONSOLE_EVENT = 3;
+    WORKLOAD_CONSOLE_TRUNCATION = 4;
+}
+
+message WorkloadLimits {
+    uint32 heap_bytes = 1;
+    uint32 source_bytes = 2;
+    uint32 modules = 3;
+    uint32 parser_depth = 4;
+    uint32 stack_depth = 5;
+    uint32 fuel = 6;
+    uint32 callbacks = 7;
+    uint32 timers = 8;
+    uint32 open_handles = 9;
+    uint32 logs = 10;
+    uint32 artifacts = 11;
+    uint32 wall_ms = 12;
+    uint32 artifact_bytes = 13;
+}
+
+message WorkloadUsage {
+    uint32 heap_bytes = 1;
+    uint32 source_bytes = 2;
+    uint32 modules = 3;
+    uint32 parser_depth = 4;
+    uint32 stack_depth = 5;
+    uint32 fuel = 6;
+    uint32 callbacks = 7;
+    uint32 timers = 8;
+    uint32 open_handles = 9;
+    uint32 logs = 10;
+    uint32 artifacts = 11;
+    uint32 wall_ms = 12;
+    uint32 artifact_bytes = 13;
+}
+
+enum WorkloadArtifactState {
+    WORKLOAD_ARTIFACT_UNSPECIFIED = 0;
+    WORKLOAD_ARTIFACT_PARTIAL = 1;
+    WORKLOAD_ARTIFACT_PROJECT = 2;
+    WORKLOAD_ARTIFACT_EVIDENCE = 3;
+}
+
+message WorkloadArtifact {
+    string artifact_id = 1;
+    string path = 2;
+    uint64 size = 3;
+    string sha256 = 4;
+    WorkloadArtifactState state = 5;
+    string evidence_id = 6;
+}
+
+message WorkloadRequest {
+    WorkloadOperation operation = 1;
+    string workload_id = 2;
+    WorkloadRuntime runtime = 3;
+    string project_digest = 4;
+    string capabilities_digest = 5;
+    string entrypoint = 6;
+    WorkloadLimits limits = 7;
+    uint64 from_sequence = 8;
+    bool evidence_requested = 9;
+    string artifact_id = 10;
+    string artifact_path = 11;
+    uint64 artifact_size = 12;
+    string artifact_sha256 = 13;
+    string evidence_id = 14;
+    string case_id = 15;
+    uint32 capability_mask = 16;
+}
+
+message WorkloadStatus {
+    string workload_id = 1;
+    WorkloadRuntime runtime = 2;
+    WorkloadState state = 3;
+    WorkloadTerminalReason terminal_reason = 4;
+    WorkloadUsage usage = 5;
+    uint64 next_sequence = 6;
+    uint32 artifact_count = 7;
+    bool accepted = 8;
+    string message = 9;
+    WorkloadArtifact artifact = 10;
+    uint32 effective_capability_mask = 11;
+}
+
+message WorkloadConsoleFrame {
+    string workload_id = 1;
+    uint64 sequence = 2;
+    WorkloadConsoleType type = 3;
+    string text = 4;
+}
+
+enum JsBundleOperation {
+    JS_BUNDLE_OPERATION_UNSPECIFIED = 0;
+    JS_BUNDLE_OPERATION_DESCRIBE = 1;
+    JS_BUNDLE_OPERATION_READ_ASSET = 2;
+}
+
+enum JsBundleFrameKind {
+    JS_BUNDLE_FRAME_UNSPECIFIED = 0;
+    JS_BUNDLE_FRAME_CAPABILITY = 1;
+    JS_BUNDLE_FRAME_ASSET = 2;
+    JS_BUNDLE_FRAME_DATA = 3;
+}
+
+message JsBundleRequest {
+    JsBundleOperation operation = 1;
+    string bundle_id = 2;
+    string version = 3;
+    string content_sha256 = 4;
+    string asset_path = 5;
+    uint32 offset = 6;
+    uint32 length = 7;
+}
+
+message JsBundleFrame {
+    JsBundleFrameKind kind = 1;
+    string capability = 2;
+    string asset_path = 3;
+    string asset_sha256 = 4;
+    uint32 asset_size = 5;
+    uint32 offset = 6;
+    bytes data = 7;
+    bool eof = 8;
+}
+
+message JsBundleStatus {
+    bool accepted = 1;
+    string message = 2;
+    string bundle_id = 3;
+    string version = 4;
+    uint32 api_version = 5;
+    string entrypoint = 6;
+    string content_sha256 = 7;
+    uint32 size = 8;
+    uint32 capability_count = 9;
+    uint32 asset_count = 10;
+}

@@ -14,6 +14,8 @@
 
 #define LOADER_MAGIC_THREAD_VALUE 0xDEADBEEF
 
+extern void firmware_api_init(void);
+
 // helpers
 
 static const char* loader_find_external_application_by_name(const char* app_name) {
@@ -819,6 +821,7 @@ static bool loader_do_get_application_launch_path(Loader* loader, FuriString* pa
 int32_t loader_srv(void* p) {
     UNUSED(p);
     Loader* loader = loader_alloc();
+    firmware_api_init();
     furi_record_create(RECORD_LOADER, loader);
 
     FURI_LOG_I(TAG, "Executing system start hooks");

@@ -1,0 +1,9 @@
+App(
+    appid="poison_rust_api",
+    name="Poison Rust device API",
+    apptype=FlipperAppType.STARTUP,
+    entry_point="poison_rust_api_on_system_start",
+    order=124,
+    sources=["*.c"],
+    sdk_headers=["poison_rust_api.h"],
+)

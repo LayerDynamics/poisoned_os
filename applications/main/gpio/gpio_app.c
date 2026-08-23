@@ -21,8 +21,12 @@ static void gpio_app_tick_event_callback(void* context) {
     scene_manager_handle_tick_event(app->scene_manager);
 }
 
-GpioApp* gpio_app_alloc(void) {
+GpioApp* gpio_app_alloc(bool marauder_bridge) {
     GpioApp* app = malloc(sizeof(GpioApp));
+
+    app->marauder_bridge = marauder_bridge;
+    app->usb_uart_bridge = NULL;
+    app->usb_uart_cfg = NULL;
 
     app->expansion = furi_record_open(RECORD_EXPANSION);
     expansion_disable(app->expansion);
@@ -112,8 +116,8 @@ void gpio_app_free(GpioApp* app) {
 }
 
 int32_t gpio_app(void* p) {
-    UNUSED(p);
-    GpioApp* gpio_app = gpio_app_alloc();
+    const bool marauder_bridge = p && (strcmp(p, "marauder_bridge") == 0);
+    GpioApp* gpio_app = gpio_app_alloc(marauder_bridge);
 
     view_dispatcher_run(gpio_app->view_dispatcher);
 

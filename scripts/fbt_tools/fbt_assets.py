@@ -80,6 +80,7 @@ def __invoke_git(args, source_dir):
 def _proto_ver_generator(target, source, env):
     target_file = target[0]
     src_dir = source[0].dir.abspath
+    git_describe = env.get("PROTOBUF_VERSION")
 
     def fetch(unshallow=False):
         git_args = ["fetch", "--tags"]
@@ -101,11 +102,12 @@ def _proto_ver_generator(target, source, env):
         except (subprocess.CalledProcessError, EnvironmentError):
             return None
 
-    fetch()
-    git_describe = describe()
     if not git_describe:
-        fetch(unshallow=True)
+        fetch()
         git_describe = describe()
+        if not git_describe:
+            fetch(unshallow=True)
+            git_describe = describe()
 
     if not git_describe:
         raise StopError("Failed to process git tags for protobuf versioning")
@@ -130,17 +132,62 @@ def CompileIcons(env, target_dir, source_dir, *, icon_bundle_name="assets_icons"
     )
 
 
+def GenerateProtocolBindings(env, target, source):
+    generated = env.Command(
+        target,
+        source,
+        Action(
+            [
+                [
+                    "${PYTHON3}",
+                    "${PROTOCOL_GENERATOR}",
+                    "--root",
+                    "${ROOT_DIR}",
+                    "--output",
+                    "${TARGET.dir}",
+                ],
+                [
+                    "${PYTHON3}",
+                    "${PROTOCOL_CHECKER}",
+                    "--root",
+                    "${ROOT_DIR}",
+                    "--generated",
+                    "${TARGET.dir}",
+                ],
+                [
+                    "${PYTHON3}",
+                    "${PROTOCOL_COMPATIBILITY}",
+                    "--against",
+                    "${PROTOCOL_PREVIOUS}",
+                    "--current",
+                    "${TARGET.dir}/schema.snapshot.json",
+                ],
+            ],
+            "${PROTOGOVCOMSTR}",
+        ),
+    )
+    env.AlwaysBuild(generated)
+    return generated
+
+
 def generate(env):
     env.SetDefault(
         ASSETS_COMPILER="${FBT_SCRIPT_DIR}/assets.py",
         NANOPB_COMPILER="${ROOT_DIR}/lib/nanopb/generator/nanopb_generator.py",
+        PROTOCOL_GENERATOR="${ROOT_DIR}/tools/protocol/generate.py",
+        PROTOCOL_CHECKER="${ROOT_DIR}/tools/protocol/check_generated.py",
+        PROTOCOL_COMPATIBILITY="${ROOT_DIR}/tools/protocol/compatibility.py",
+        PROTOCOL_PREVIOUS="${ROOT_DIR}/provenance/protocol-previous.json",
+        PROTOBUF_VERSION="0.25",
     )
     env.AddMethod(CompileIcons)
+    env.AddMethod(GenerateProtocolBindings)
 
     if not env["VERBOSE"]:
         env.SetDefault(
             ICONSCOMSTR="\tICONS\t${TARGET}",
             PROTOCOMSTR="\tPROTO\t${SOURCE}",
+            PROTOGOVCOMSTR="\tPROTO-GOV\t${TARGET.dir}",
             DOLPHINCOMSTR="\tDOLPHIN\t${DOLPHIN_RES_TYPE}",
             PBVERCOMSTR="\tPBVER\t${TARGET}",
         )

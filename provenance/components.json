@@ -8,16 +8,28 @@
       "modificationStatus": "poison-modified",
       "name": "PoisonedOS",
       "path": ".",
-      "sha256": "65471172eb0b0451e82516312ec25e3506ffb00f7183b92195547569b68266d7",
+      "sha256": "564e9f3c4a697c7fe0550ab0487098f4efbae3dfc60343e2ed6a5eb588e9a1f8",
       "sourceUrl": "https://github.com/flipperdevices/flipperzero-firmware/tree/a55e39395ff31bd5fdf3929c70720a7fb76e5968",
       "version": "c5934ab83766019600619327710637a8414abb69",
       "digestExcludes": [
+        ".cache",
+        ".fbt",
+        ".sconsign.dblite",
         "artifacts",
+        "bridge/target",
+        "build",
+        "dashboard/.vite",
+        "dashboard/coverage",
+        "dashboard/node_modules",
+        "dist",
         "docs",
         "provenance",
         "tools",
         "do_not_include",
-        "toolchain"
+        "toolchain",
+        "keys",
+        "release/keys",
+        "rust/target"
       ]
     },
     {
@@ -30,6 +42,7 @@
       "path": "assets/protobuf",
       "sha256": "031e276fd0678cc6b56cc9f3163ce6deaabb213a43a76e137b5022c17370843f",
       "sourceUrl": "https://github.com/flipperdevices/flipperzero-protobuf",
+      "upstreamTag": "0.25",
       "version": "1c84fa48919cbb71d1cc65236fc0ee36740e24c6"
     },
     {
@@ -128,7 +141,10 @@
       "path": "lib/nanopb",
       "sha256": "69e5d1b2b36136e06a7b556048dca0d76cb8ff7ecccf4bbec2fabc02a2bc4a6b",
       "sourceUrl": "https://github.com/nanopb/nanopb",
-      "version": "6cfe48d6f1593f8fa5c0f90437f5e6522587745e"
+      "version": "6cfe48d6f1593f8fa5c0f90437f5e6522587745e",
+      "digestExcludes": [
+        "generator/proto/nanopb_pb2.py"
+      ]
     },
     {
       "licenseExpression": "Apache-2.0",

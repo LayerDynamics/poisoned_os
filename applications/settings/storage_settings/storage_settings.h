@@ -18,7 +18,8 @@
 
 #include <settings_helpers/submenu_based.h>
 
-#define STORAGE_SETTINGS_MOUNT_INDEX 2
+#define STORAGE_SETTINGS_MOUNT_INDEX  2
+#define STORAGE_SETTINGS_OPTION_COUNT 6
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,7 +43,8 @@ typedef struct {
     FuriString* text_string;
 
     // helpers
-    SubmenuSettingsHelperDescriptor* helper_descriptor;
+    SubmenuSettingsHelperOption helper_options[STORAGE_SETTINGS_OPTION_COUNT];
+    SubmenuSettingsHelperDescriptor helper_descriptor;
     SubmenuSettingsHelper* settings_helper;
 } StorageSettings;
 

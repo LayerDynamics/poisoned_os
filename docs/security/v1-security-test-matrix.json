@@ -1,0 +1,16 @@
+{
+  "schema": "poison.security-matrix/v1",
+  "findings": [],
+  "checks": [
+    {"id": "session-replay", "boundary": "session authentication and replay", "severity": "critical", "owner": "firmware", "command": ["python3", "-m", "unittest", "tools.security.tests.test_fuzz_matrix"]},
+    {"id": "origin-auth", "boundary": "Node runtime HTTPS/WS origin, browser token, admin token, and same-origin service proxy", "severity": "critical", "owner": "dashboard-runtime", "command": ["pnpm", "--dir", "dashboard", "test", "server/runtime-server.test.ts"]},
+    {"id": "release-signature", "boundary": "release signature and revocation", "severity": "critical", "owner": "release", "command": ["python3", "-m", "unittest", "tools.release.tests.test_verify_release"]},
+    {"id": "package-paths", "boundary": "package path and digest admission", "severity": "high", "owner": "packages", "command": ["python3", "-m", "unittest", "tools.tests.test_verify_manifest"]},
+    {"id": "evidence-integrity", "boundary": "evidence digest and audit ancestry", "severity": "high", "owner": "evidence", "command": ["python3", "-m", "unittest", "tools.security.tests.test_verify_redaction"]},
+    {"id": "js-capabilities", "boundary": "JavaScript capability and resource limits", "severity": "critical", "owner": "javascript", "command": ["python3", "-m", "unittest", "tools.javascript.tests.test_vendor_package"]},
+    {"id": "rust-admission", "boundary": "native Rust artifact admission", "severity": "critical", "owner": "rust", "command": ["python3", "-m", "unittest", "tools.rust.tests.test_cargo"]},
+    {"id": "wasm-boundary", "boundary": "Wasm imports and resource limits", "severity": "critical", "owner": "rust", "command": ["python3", "-m", "unittest", "tools.security.tests.test_fuzz_matrix"]},
+    {"id": "redaction", "boundary": "diagnostic and support export redaction", "severity": "high", "owner": "support", "command": ["python3", "-m", "unittest", "tools.security.tests.test_verify_redaction"]},
+    {"id": "migration-rollback", "boundary": "legacy migration and rollback", "severity": "high", "owner": "storage", "command": ["python3", "-m", "unittest", "tools.migration.tests.test_verify_manifest"]}
+  ]
+}

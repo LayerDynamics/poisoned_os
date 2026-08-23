@@ -7,6 +7,8 @@ def GetProjetDirName(env, project=None):
     parts = [f"f{env['TARGET_HW']}"]
     if project:
         parts.append(project)
+    if env["FIRMWARE_APP_SET"] != "default":
+        parts.append(env["FIRMWARE_APP_SET"])
 
     suffix = ""
     if env["DEBUG"]:
@@ -85,10 +87,32 @@ def AddUsbFlashTarget(env, file_flag, extra_deps, **kw):
             env["DIST_DEPENDS"],
             *extra_deps,
         ),
+        **kw,
     )
     if env["FORCE"]:
         env.AlwaysBuild(usb_update)
     return usb_update
+
+
+def UsbPreflight(env):
+    result = env.Execute(
+        Action(
+            [
+                [
+                    "${PYTHON3}",
+                    "${DEVICE_INSTALL_SCRIPT}",
+                    "-p",
+                    "${FLIP_PORT}",
+                    "--preflight-only",
+                ]
+            ],
+            "${USBPREFLIGHTCOMSTR}",
+        )
+    )
+    if result:
+        from SCons.Errors import StopError
+
+        raise StopError("Live Flipper preflight failed; firmware build was not started")
 
 
 def DistCommand(env, name, source, **kw):
@@ -123,6 +147,7 @@ def generate(env):
         env.SetDefault(
             COPROCOMSTR="\tCOPRO\t${TARGET}",
             DISTCOMSTR="\tDIST\t${TARGET}",
+            USBPREFLIGHTCOMSTR="\tPREFLIGHT\tFlipper protobuf RPC",
         )
     env.AddMethod(AddFwProject)
     env.AddMethod(DistCommand)
@@ -130,13 +155,16 @@ def generate(env):
     env.AddMethod(GetProjetDirName)
     env.AddMethod(AddJFlashTarget)
     env.AddMethod(AddUsbFlashTarget)
+    env.AddMethod(UsbPreflight)
 
     env.SetDefault(
         COPRO_MCU_FAMILY="STM32WB5x",
         SELFUPDATE_SCRIPT="${FBT_SCRIPT_DIR}/selfupdate.py",
+        DEVICE_INSTALL_SCRIPT="${FBT_SCRIPT_DIR}/device_install.py",
         DIST_SCRIPT="${FBT_SCRIPT_DIR}/sconsdist.py",
         COPRO_ASSETS_SCRIPT="${FBT_SCRIPT_DIR}/assets.py",
         FW_FLASH_SCRIPT="${FBT_SCRIPT_DIR}/fwflash.py",
+        POST_INSTALL_ARGS=[],
     )
 
     env.Append(
@@ -159,10 +187,11 @@ def generate(env):
                 action=[
                     [
                         "${PYTHON3}",
-                        "${SELFUPDATE_SCRIPT}",
+                        "${DEVICE_INSTALL_SCRIPT}",
                         "-p",
                         "${FLIP_PORT}",
                         "${UPDATE_BUNDLE_DIR}/update.fuf",
+                        "${POST_INSTALL_ARGS}",
                         "${ARGS}",
                     ],
                     Touch("${TARGET}"),

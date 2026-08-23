@@ -1,0 +1,719 @@
+{
+  "schema": "poison.protocol.bounds/v1",
+  "fields": {
+    "PB_Poison.CancelRequest.reason": {
+      "maxBytes": 128
+    },
+    "PB_Poison.ChannelOpen.channel": {
+      "maxBytes": 32
+    },
+    "PB_Poison.ChannelOpened.channel": {
+      "maxBytes": 32
+    },
+    "PB_Poison.CreditUpdate.channel": {
+      "maxBytes": 32
+    },
+    "PB_Poison.PairingChallenge.confirmation_code": {
+      "maxBytes": 12
+    },
+    "PB_Poison.PairingChallenge.device_ephemeral_public_key": {
+      "maxBytes": 65
+    },
+    "PB_Poison.PairingChallenge.device_nonce": {
+      "maxBytes": 32
+    },
+    "PB_Poison.PairingChallenge.transcript_digest": {
+      "maxBytes": 32
+    },
+    "PB_Poison.PairingConfirm.confirmation_code": {
+      "maxBytes": 12
+    },
+    "PB_Poison.PairingConfirm.client_identity_signature": {
+      "maxBytes": 72
+    },
+    "PB_Poison.PairingConfirm.transcript_digest": {
+      "maxBytes": 32
+    },
+    "PB_Poison.PairingHello.client_ephemeral_public_key": {
+      "maxBytes": 65
+    },
+    "PB_Poison.PairingHello.client_name": {
+      "maxBytes": 64
+    },
+    "PB_Poison.PairingHello.client_nonce": {
+      "maxBytes": 32
+    },
+    "PB_Poison.PairingHello.client_identity_public_key": {
+      "maxBytes": 65
+    },
+    "PB_Poison.PolicyDecision.denial_reason": {
+      "maxBytes": 96
+    },
+    "PB_Poison.DiagnosticEvent.category": {
+      "maxBytes": 24
+    },
+    "PB_Poison.DiagnosticEvent.summary": {
+      "maxBytes": 96
+    },
+    "PB_Poison.DiagnosticEvent.correlation_digest": {
+      "maxBytes": 32
+    },
+    "PB_Poison.AuditEvent.prior_digest": {"maxBytes": 32},
+    "PB_Poison.AuditEvent.actor_digest": {"maxBytes": 32},
+    "PB_Poison.AuditEvent.action": {"maxBytes": 32},
+    "PB_Poison.AuditEvent.resource": {"maxBytes": 32},
+    "PB_Poison.AuditEvent.correlation_id": {"maxBytes": 32},
+    "PB_Poison.AuditEvent.safe_metadata": {"maxBytes": 160},
+    "PB_Poison.AuditEvent.digest": {"maxBytes": 32},
+    "PB_Poison.AuditSnapshotEnd.last_digest": {"maxBytes": 32},
+    "PB_Poison.LogicalPath.path": {"maxBytes": 256},
+    "PB_Poison.FileStat.path": {"maxBytes": 256},
+    "PB_Poison.FileStat.sha256": {"maxBytes": 64},
+    "PB_Poison.FileListRequest.path": {"maxBytes": 256},
+    "PB_Poison.FileListRequest.cursor": {"maxBytes": 128},
+    "PB_Poison.FileListResponse.next_cursor": {"maxBytes": 128},
+    "PB_Poison.FileTransferBegin.operation_id": {"maxBytes": 64},
+    "PB_Poison.FileTransferBegin.path": {"maxBytes": 256},
+    "PB_Poison.FileTransferBegin.sha256": {"maxBytes": 64},
+    "PB_Poison.FileTransferChunk.operation_id": {"maxBytes": 64},
+    "PB_Poison.FileTransferChunk.data": {"maxBytes": 1024},
+    "PB_Poison.FileTransferChunk.sha256": {"maxBytes": 64},
+    "PB_Poison.FileTransferComplete.operation_id": {"maxBytes": 64},
+    "PB_Poison.FileTransferComplete.sha256": {"maxBytes": 64},
+    "PB_Poison.FileConflict.path": {"maxBytes": 256},
+    "PB_Poison.FileConflict.existing_sha256": {"maxBytes": 64},
+    "PB_Poison.FileConflict.incoming_sha256": {"maxBytes": 64},
+    "PB_Poison.EvidenceLabel.key": {"maxBytes": 64},
+    "PB_Poison.EvidenceLabel.value": {"maxBytes": 128},
+    "PB_Poison.EvidenceRecord.evidence_id": {"maxBytes": 64},
+    "PB_Poison.EvidenceRecord.case_id": {"maxBytes": 64},
+    "PB_Poison.EvidenceRecord.source_app_id": {"maxBytes": 64},
+    "PB_Poison.EvidenceRecord.device_id": {"maxBytes": 64},
+    "PB_Poison.EvidenceRecord.firmware_version": {"maxBytes": 64},
+    "PB_Poison.EvidenceRecord.content_sha256": {"maxBytes": 64},
+    "PB_Poison.EvidenceRecord.media_type": {"maxBytes": 128},
+    "PB_Poison.EvidenceRecord.previous_audit_sha256": {"maxBytes": 64},
+    "PB_Poison.EvidenceRecord.audit_sha256": {"maxBytes": 64},
+    "PB_Poison.EvidenceRecord.operator_id": {"maxBytes": 64},
+    "PB_Poison.EvidenceRecord.tool_id": {"maxBytes": 64},
+    "PB_Poison.EvidenceRecord.tool_version": {"maxBytes": 64},
+    "PB_Poison.EvidenceRecord.canonical_parameters": {"maxBytes": 1024},
+    "PB_Poison.EvidenceRecord.source_path": {"maxBytes": 256},
+    "PB_Poison.Case.case_id": {"maxBytes": 64},
+    "PB_Poison.Case.name": {"maxBytes": 128},
+    "PB_Poison.Case.purpose": {"maxBytes": 256},
+    "PB_Poison.Case.owner_id": {"maxBytes": 64},
+    "PB_Poison.Case.retention_policy": {"maxBytes": 64},
+    "PB_Poison.ToolRun.run_id": {"maxBytes": 64},
+    "PB_Poison.ToolRun.case_id": {"maxBytes": 64},
+    "PB_Poison.ToolRun.tool_id": {"maxBytes": 64},
+    "PB_Poison.ToolRun.tool_version": {"maxBytes": 64},
+    "PB_Poison.ToolRun.state": {"maxBytes": 32},
+    "PB_Poison.Annotation.annotation_id": {"maxBytes": 64},
+    "PB_Poison.Annotation.evidence_id": {"maxBytes": 64},
+    "PB_Poison.Annotation.author_id": {"maxBytes": 64},
+    "PB_Poison.Annotation.text": {"maxBytes": 1024},
+    "PB_Poison.ExportManifest.export_id": {"maxBytes": 64},
+    "PB_Poison.ExportManifest.schema": {"maxBytes": 64},
+    "PB_Poison.ExportManifest.manifest_sha256": {"maxBytes": 64},
+    "PB_Poison.ExportManifest.signature": {"maxBytes": 256},
+    "PB_Poison.PackagePayload.path": {"maxBytes": 256},
+    "PB_Poison.PackagePayload.sha256": {"maxBytes": 64},
+    "PB_Poison.PackageManifest.content_type": {"maxBytes": 32},
+    "PB_Poison.PackageManifest.id": {"maxBytes": 64},
+    "PB_Poison.PackageManifest.version": {"maxBytes": 32},
+    "PB_Poison.PackageManifest.firmware_api": {"maxBytes": 64},
+    "PB_Poison.PackageManifest.entrypoint": {"maxBytes": 256},
+    "PB_Poison.PackageManifest.capabilities": {"maxCount": 32},
+    "PB_Poison.PackageManifest.content_sha256": {"maxBytes": 64},
+    "PB_Poison.PackageManifest.signing_key_id": {"maxBytes": 64},
+    "PB_Poison.PackageManifest.signature": {"maxBytes": 80},
+    "PB_Poison.PackageManifest.payloads": {"maxCount": 32},
+    "PB_Poison.ContentUpdateRequest.update_id": {"maxBytes": 64},
+    "PB_Poison.ContentUpdateRequest.manifest_path": {"maxBytes": 256},
+    "PB_Poison.ContentUpdateRequest.candidate_digest": {"maxBytes": 64},
+    "PB_Poison.ContentUpdateRequest.previous_digest": {"maxBytes": 64},
+    "PB_Poison.ContentUpdateRequest.confirmation_token": {"maxBytes": 16},
+    "PB_Poison.ContentUpdateStatus.update_id": {"maxBytes": 64},
+    "PB_Poison.ContentUpdateStatus.candidate_digest": {"maxBytes": 64},
+    "PB_Poison.ContentUpdateStatus.previous_digest": {"maxBytes": 64},
+    "PB_Poison.ContentUpdateStatus.result": {"maxBytes": 64},
+    "PB_Poison.ContentUpdateStatus.confirmation_token": {"maxBytes": 16},
+    "PB_Poison.PackageOperationRequest.package_id": {"maxBytes": 64},
+    "PB_Poison.PackageOperationRequest.version": {"maxBytes": 32},
+    "PB_Poison.PackageOperationRequest.previous_version": {"maxBytes": 32},
+    "PB_Poison.PackageOperationRequest.manifest_path": {"maxBytes": 256},
+    "PB_Poison.PackageOperationRequest.candidate_digest": {"maxBytes": 64},
+    "PB_Poison.PackageOperationRequest.previous_digest": {"maxBytes": 64},
+    "PB_Poison.PackageOperationRequest.signing_key_id": {"maxBytes": 64},
+    "PB_Poison.PackageOperationRequest.confirmation_token": {"maxBytes": 16},
+    "PB_Poison.PackageOperationStatus.package_id": {"maxBytes": 64},
+    "PB_Poison.PackageOperationStatus.version": {"maxBytes": 32},
+    "PB_Poison.PackageOperationStatus.digest": {"maxBytes": 64},
+    "PB_Poison.PackageOperationStatus.signing_key_id": {"maxBytes": 64},
+    "PB_Poison.PackageOperationStatus.confirmation_token": {"maxBytes": 16},
+    "PB_Poison.PackageOperationStatus.result": {"maxBytes": 64},
+    "PB_Poison.PackageCatalogRecord.id": {"maxBytes": 64},
+    "PB_Poison.PackageCatalogRecord.version": {"maxBytes": 32},
+    "PB_Poison.PackageCatalogRecord.signer": {"maxBytes": 64},
+    "PB_Poison.PackageCatalogRecord.digest": {"maxBytes": 64},
+    "PB_Poison.PackageCatalogRecord.source_path": {"maxBytes": 256},
+    "PB_Poison.AppCommand.app_id": {"maxBytes": 64},
+    "PB_Poison.AppCommand.command_id": {"maxBytes": 64},
+    "PB_Poison.AppCommand.payload_json": {"maxBytes": 4096},
+    "PB_Poison.AppCommand.payload_chunk": {"maxBytes": 384},
+    "PB_Poison.AppCommand.run_id": {"maxBytes": 64},
+    "PB_Poison.AppEvent.app_id": {"maxBytes": 64},
+    "PB_Poison.AppEvent.event_id": {"maxBytes": 64},
+    "PB_Poison.AppEvent.run_id": {"maxBytes": 64},
+    "PB_Poison.AppEvent.message_chunk": {"maxBytes": 384},
+    "PB_Poison.AppEvent.schema_json_chunk": {"maxBytes": 384},
+    "PB_Poison.AppEvent.rows_json_chunk": {"maxBytes": 384},
+    "PB_Poison.AppLog.level": {"maxBytes": 16},
+    "PB_Poison.AppLog.message": {"maxBytes": 1024},
+    "PB_Poison.AppProgress.label": {"maxBytes": 128},
+    "PB_Poison.AppForm.schema_json": {"maxBytes": 4096},
+    "PB_Poison.AppTable.schema_json": {"maxBytes": 4096},
+    "PB_Poison.AppTable.rows_json": {"maxBytes": 8192},
+    "PB_Poison.AppArtifact.name": {"maxBytes": 128},
+    "PB_Poison.AppArtifact.path": {"maxBytes": 256},
+    "PB_Poison.AppArtifact.sha256": {"maxBytes": 64},
+    "PB_Poison.AppResult.message": {"maxBytes": 1024},
+    "PB_Poison.WorkloadRequest.workload_id": {"maxBytes": 64},
+    "PB_Poison.WorkloadRequest.project_digest": {"maxBytes": 64},
+    "PB_Poison.WorkloadRequest.capabilities_digest": {"maxBytes": 64},
+    "PB_Poison.WorkloadRequest.entrypoint": {"maxBytes": 256},
+    "PB_Poison.WorkloadRequest.artifact_id": {"maxBytes": 63},
+    "PB_Poison.WorkloadRequest.artifact_path": {"maxBytes": 256},
+    "PB_Poison.WorkloadRequest.artifact_sha256": {"maxBytes": 64},
+    "PB_Poison.WorkloadRequest.evidence_id": {"maxBytes": 64},
+    "PB_Poison.WorkloadRequest.case_id": {"maxBytes": 64},
+    "PB_Poison.WorkloadStatus.workload_id": {"maxBytes": 64},
+    "PB_Poison.WorkloadStatus.message": {"maxBytes": 96},
+    "PB_Poison.WorkloadArtifact.artifact_id": {"maxBytes": 63},
+    "PB_Poison.WorkloadArtifact.path": {"maxBytes": 256},
+    "PB_Poison.WorkloadArtifact.sha256": {"maxBytes": 64},
+    "PB_Poison.WorkloadArtifact.evidence_id": {"maxBytes": 64},
+    "PB_Poison.WorkloadConsoleFrame.workload_id": {"maxBytes": 64},
+    "PB_Poison.WorkloadConsoleFrame.text": {"maxBytes": 128},
+    "PB_Poison.JsBundleRequest.bundle_id": {"maxBytes": 64},
+    "PB_Poison.JsBundleRequest.version": {"maxBytes": 32},
+    "PB_Poison.JsBundleRequest.content_sha256": {"maxBytes": 64},
+    "PB_Poison.JsBundleRequest.asset_path": {"maxBytes": 256},
+    "PB_Poison.JsBundleFrame.capability": {"maxBytes": 64},
+    "PB_Poison.JsBundleFrame.asset_path": {"maxBytes": 256},
+    "PB_Poison.JsBundleFrame.asset_sha256": {"maxBytes": 64},
+    "PB_Poison.JsBundleFrame.data": {"maxBytes": 384},
+    "PB_Poison.JsBundleStatus.message": {"maxBytes": 96},
+    "PB_Poison.JsBundleStatus.bundle_id": {"maxBytes": 64},
+    "PB_Poison.JsBundleStatus.version": {"maxBytes": 32},
+    "PB_Poison.JsBundleStatus.entrypoint": {"maxBytes": 256},
+    "PB_Poison.JsBundleStatus.content_sha256": {"maxBytes": 64},
+    "PB_Poison.Profile.id": {"maxBytes": 64},
+    "PB_Poison.Profile.version": {"maxBytes": 32},
+    "PB_Poison.Profile.role": {"maxBytes": 32},
+    "PB_Poison.Profile.enabled_tools": {"maxCount": 32, "maxBytes": 64},
+    "PB_Poison.Profile.favorites": {"maxCount": 32, "maxBytes": 64},
+    "PB_Poison.Profile.theme_id": {"maxBytes": 64},
+    "PB_Poison.Profile.font_pack_id": {"maxBytes": 64},
+    "PB_Poison.Profile.icon_pack_id": {"maxBytes": 64},
+    "PB_Poison.Profile.menu_id": {"maxBytes": 64},
+    "PB_Poison.Profile.dashboard_layout": {"maxBytes": 256},
+    "PB_Poison.Profile.policy_id": {"maxBytes": 64},
+    "PB_Poison.Profile.hidden_tools": {"maxCount": 32, "maxBytes": 64},
+    "PB_Poison.Profile.shortcuts": {"maxCount": 32, "maxBytes": 64},
+    "PB_Poison.Profile.home_presentation": {"maxBytes": 64},
+    "PB_Poison.Profile.status_presentation": {"maxBytes": 64},
+    "PB_Poison.Profile.lock_behavior": {"maxBytes": 32},
+    "PB_Poison.Profile.tool_defaults_json": {"maxBytes": 512},
+    "PB_Poison.Profile.transport_policy": {"maxBytes": 64},
+    "PB_Poison.Profile.logging_policy": {"maxBytes": 64},
+    "PB_Poison.Profile.evidence_policy": {"maxBytes": 64},
+    "PB_Poison.Profile.radio_region": {"maxBytes": 8},
+    "PB_Poison.Profile.peripheral_safety": {"maxBytes": 64},
+    "PB_Poison.Profile.classroom_policy": {"maxBytes": 64},
+    "PB_Poison.ProfileApply.profile_id": {"maxBytes": 64},
+    "PB_Poison.ProfileApply.confirmation_token": {"maxBytes": 128},
+    "PB_Poison.ProfileApply.confirmation_token_bytes": {"maxBytes": 16},
+    "PB_Poison.ProfileStatus.profile_id": {"maxBytes": 64},
+    "PB_Poison.ProfileStatus.version": {"maxBytes": 32},
+    "PB_Poison.ProfileStatus.confirmation_token": {"maxBytes": 16},
+    "PB_Poison.FileListResponse.entries": {"maxCount": 64},
+    "PB_Poison.EvidenceRecord.labels": {"maxCount": 32},
+    "PB_Poison.Annotation.tags": {"maxCount": 32},
+    "PB_Poison.ExportManifest.evidence_ids": {"maxCount": 10000},
+    "PB_Poison.ResumeRequest.resume_token": {
+      "maxBytes": 64
+    },
+    "PB_Poison.ResumeResponse.error": {
+      "maxBytes": 128
+    },
+    "PB_Poison.ResumeResponse.resume_token": {
+      "maxBytes": 64
+    },
+    "PB_Poison.SessionEnvelope.authentication_tag": {
+      "maxBytes": 16
+    },
+    "PB_Poison.SessionEnvelope.channel": {
+      "maxBytes": 32
+    },
+    "PB_Poison.SessionEnvelope.payload": {
+      "maxBytes": 1280
+    },
+    "PB.Region.country_code": {
+      "maxBytes": 2
+    },
+    "PB.Region.bands": {
+      "maxCount": 8
+    },
+    "PB_App.AppButtonPressReleaseRequest.args": {
+      "maxBytes": 512
+    },
+    "PB_App.AppButtonPressRequest.args": {
+      "maxBytes": 512
+    },
+    "PB_App.AppLoadFileRequest.path": {
+      "maxBytes": 512
+    },
+    "PB_App.LockStatusResponse.active_application": {
+      "maxBytes": 128
+    },
+    "PB_App.DataExchangeRequest.data": {
+      "maxBytes": 4096
+    },
+    "PB_App.GetErrorResponse.text": {
+      "maxBytes": 512
+    },
+    "PB_App.StartRequest.name": {
+      "maxBytes": 512
+    },
+    "PB_App.StartRequest.args": {
+      "maxBytes": 512
+    },
+    "PB_Gui.ScreenFrame.data": {
+      "maxBytes": 1024
+    },
+    "PB_Property.GetRequest.key": {
+      "maxBytes": 128
+    },
+    "PB_Property.GetResponse.key": {
+      "maxBytes": 128
+    },
+    "PB_Property.GetResponse.value": {
+      "maxBytes": 4096
+    },
+    "PB_Storage.BackupCreateRequest.archive_path": {
+      "maxBytes": 255
+    },
+    "PB_Storage.BackupRestoreRequest.archive_path": {
+      "maxBytes": 255
+    },
+    "PB_Storage.DeleteRequest.path": {
+      "maxBytes": 255
+    },
+    "PB_Storage.File.name": {
+      "maxBytes": 255
+    },
+    "PB_Storage.File.data": {
+      "maxBytes": 512
+    },
+    "PB_Storage.File.md5sum": {
+      "maxBytes": 32
+    },
+    "PB_Storage.InfoRequest.path": {
+      "maxBytes": 255
+    },
+    "PB_Storage.ListRequest.path": {
+      "maxBytes": 255
+    },
+    "PB_Storage.ListResponse.file": {
+      "maxCount": 8
+    },
+    "PB_Storage.Md5sumRequest.path": {
+      "maxBytes": 255
+    },
+    "PB_Storage.Md5sumResponse.md5sum": {
+      "maxBytes": 32
+    },
+    "PB_Storage.MkdirRequest.path": {
+      "maxBytes": 255
+    },
+    "PB_Storage.ReadRequest.path": {
+      "maxBytes": 255
+    },
+    "PB_Storage.RenameRequest.old_path": {
+      "maxBytes": 255
+    },
+    "PB_Storage.RenameRequest.new_path": {
+      "maxBytes": 255
+    },
+    "PB_Storage.StatRequest.path": {
+      "maxBytes": 255
+    },
+    "PB_Storage.TarExtractRequest.tar_path": {
+      "maxBytes": 255
+    },
+    "PB_Storage.TarExtractRequest.out_path": {
+      "maxBytes": 255
+    },
+    "PB_Storage.TimestampRequest.path": {
+      "maxBytes": 255
+    },
+    "PB_Storage.WriteRequest.path": {
+      "maxBytes": 255
+    },
+    "PB_System.DeviceInfoResponse.key": {
+      "maxBytes": 128
+    },
+    "PB_System.DeviceInfoResponse.value": {
+      "maxBytes": 4096
+    },
+    "PB_System.PingRequest.data": {
+      "maxBytes": 1024
+    },
+    "PB_System.PingResponse.data": {
+      "maxBytes": 1024
+    },
+    "PB_System.PowerInfoResponse.key": {
+      "maxBytes": 128
+    },
+    "PB_System.PowerInfoResponse.value": {
+      "maxBytes": 4096
+    },
+    "PB_System.UpdateRequest.update_manifest": {
+      "maxBytes": 255
+    }
+  },
+  "messages": {
+    "PB_Poison.AuditSnapshotRequest": {"maxEncodedBytes": 32},
+    "PB_Poison.AuditEvent": {"maxEncodedBytes": 384},
+    "PB_Poison.AuditSnapshotEnd": {"maxEncodedBytes": 64},
+    "PB_Poison.DiagnosticSnapshotRequest": {
+      "maxEncodedBytes": 32
+    },
+    "PB_Poison.DiagnosticCounters": {
+      "maxEncodedBytes": 128
+    },
+    "PB_Poison.DiagnosticEvent": {
+      "maxEncodedBytes": 192
+    },
+    "PB_Poison.LogicalPath": {"maxEncodedBytes": 512},
+    "PB_Poison.FileStat": {"maxEncodedBytes": 768},
+    "PB_Poison.FileListRequest": {"maxEncodedBytes": 512},
+    "PB_Poison.FileListResponse": {"maxEncodedBytes": 8192},
+    "PB_Poison.FileTransferBegin": {"maxEncodedBytes": 512},
+    "PB_Poison.FileTransferChunk": {"maxEncodedBytes": 1152},
+    "PB_Poison.FileTransferComplete": {"maxEncodedBytes": 256},
+    "PB_Poison.FileConflict": {"maxEncodedBytes": 512},
+    "PB_Poison.EvidenceLabel": {"maxEncodedBytes": 256},
+    "PB_Poison.EvidenceRecord": {"maxEncodedBytes": 4096},
+    "PB_Poison.Case": {"maxEncodedBytes": 1024},
+    "PB_Poison.ToolRun": {"maxEncodedBytes": 768},
+    "PB_Poison.Annotation": {"maxEncodedBytes": 2048},
+    "PB_Poison.ExportManifest": {"maxEncodedBytes": 2048},
+    "PB_Poison.PackagePayload": {"maxEncodedBytes": 512},
+    "PB_Poison.PackageManifest": {"maxEncodedBytes": 4096},
+    "PB_Poison.ContentUpdateRequest": {"maxEncodedBytes": 512},
+    "PB_Poison.ContentUpdateStatus": {"maxEncodedBytes": 384},
+    "PB_Poison.PackageOperationRequest": {"maxEncodedBytes": 768},
+    "PB_Poison.PackageOperationStatus": {"maxEncodedBytes": 384},
+    "PB_Poison.PackageCatalogRequest": {"maxEncodedBytes": 16},
+    "PB_Poison.PackageCatalogRecord": {"maxEncodedBytes": 640},
+    "PB_Poison.PackageCatalogEnd": {"maxEncodedBytes": 32},
+    "PB_Poison.AppCommand": {"maxEncodedBytes": 8192},
+    "PB_Poison.AppEvent": {"maxEncodedBytes": 12288},
+    "PB_Poison.AppLog": {"maxEncodedBytes": 2048},
+    "PB_Poison.AppProgress": {"maxEncodedBytes": 256},
+    "PB_Poison.AppForm": {"maxEncodedBytes": 4096},
+    "PB_Poison.AppTable": {"maxEncodedBytes": 12288},
+    "PB_Poison.AppArtifact": {"maxEncodedBytes": 512},
+    "PB_Poison.AppResult": {"maxEncodedBytes": 2048},
+    "PB_Poison.WorkloadLimits": {"maxEncodedBytes": 128},
+    "PB_Poison.WorkloadUsage": {"maxEncodedBytes": 128},
+    "PB_Poison.WorkloadArtifact": {"maxEncodedBytes": 512},
+    "PB_Poison.WorkloadRequest": {"maxEncodedBytes": 1280},
+    "PB_Poison.WorkloadStatus": {"maxEncodedBytes": 896},
+    "PB_Poison.WorkloadConsoleFrame": {"maxEncodedBytes": 256},
+    "PB_Poison.JsBundleRequest": {"maxEncodedBytes": 512},
+    "PB_Poison.JsBundleFrame": {"maxEncodedBytes": 768},
+    "PB_Poison.JsBundleStatus": {"maxEncodedBytes": 640},
+    "PB_Poison.Profile": {"maxEncodedBytes": 8192},
+    "PB_Poison.ProfileApply": {"maxEncodedBytes": 256},
+    "PB_Poison.ProfileStatus": {"maxEncodedBytes": 256},
+    "PB_Poison.PolicyDecision": {
+      "maxEncodedBytes": 256
+    },
+    "PB_Poison.PolicyRequest": {
+      "maxEncodedBytes": 128
+    },
+    "PB_Poison.CancelRequest": {
+      "maxEncodedBytes": 256
+    },
+    "PB_Poison.Cancelled": {
+      "maxEncodedBytes": 64
+    },
+    "PB_Poison.ChannelOpen": {
+      "maxEncodedBytes": 128
+    },
+    "PB_Poison.ChannelOpened": {
+      "maxEncodedBytes": 128
+    },
+    "PB_Poison.CreditUpdate": {
+      "maxEncodedBytes": 64
+    },
+    "PB_Poison.PairingChallenge": {
+      "maxEncodedBytes": 256
+    },
+    "PB_Poison.PairingConfirm": {
+      "maxEncodedBytes": 128
+    },
+    "PB_Poison.PairingHello": {
+      "maxEncodedBytes": 256
+    },
+    "PB_Poison.ResumeRequest": {
+      "maxEncodedBytes": 128
+    },
+    "PB_Poison.ResumeResponse": {
+      "maxEncodedBytes": 256
+    },
+    "PB_Poison.SessionEnvelope": {
+      "maxEncodedBytes": 1536
+    },
+    "PB.Empty": {
+      "maxEncodedBytes": 16
+    },
+    "PB.Main": {
+      "maxEncodedBytes": 16384
+    },
+    "PB.Region": {
+      "maxEncodedBytes": 8192
+    },
+    "PB.Region.Band": {
+      "maxEncodedBytes": 256
+    },
+    "PB.StopSession": {
+      "maxEncodedBytes": 16
+    },
+    "PB_App.AppButtonPressReleaseRequest": {
+      "maxEncodedBytes": 8192
+    },
+    "PB_App.AppButtonPressRequest": {
+      "maxEncodedBytes": 8192
+    },
+    "PB_App.AppButtonReleaseRequest": {
+      "maxEncodedBytes": 256
+    },
+    "PB_App.AppExitRequest": {
+      "maxEncodedBytes": 256
+    },
+    "PB_App.AppLoadFileRequest": {
+      "maxEncodedBytes": 8192
+    },
+    "PB_App.AppStateResponse": {
+      "maxEncodedBytes": 256
+    },
+    "PB_App.DataExchangeRequest": {
+      "maxEncodedBytes": 8192
+    },
+    "PB_App.GetErrorRequest": {
+      "maxEncodedBytes": 256
+    },
+    "PB_App.GetErrorResponse": {
+      "maxEncodedBytes": 8192
+    },
+    "PB_App.LockStatusRequest": {
+      "maxEncodedBytes": 256
+    },
+    "PB_App.LockStatusResponse": {
+      "maxEncodedBytes": 384
+    },
+    "PB_App.StartRequest": {
+      "maxEncodedBytes": 8192
+    },
+    "PB_Desktop.IsLockedRequest": {
+      "maxEncodedBytes": 256
+    },
+    "PB_Desktop.Status": {
+      "maxEncodedBytes": 256
+    },
+    "PB_Desktop.StatusSubscribeRequest": {
+      "maxEncodedBytes": 256
+    },
+    "PB_Desktop.StatusUnsubscribeRequest": {
+      "maxEncodedBytes": 256
+    },
+    "PB_Desktop.UnlockRequest": {
+      "maxEncodedBytes": 256
+    },
+    "PB_Gpio.GetOtgMode": {
+      "maxEncodedBytes": 256
+    },
+    "PB_Gpio.GetOtgModeResponse": {
+      "maxEncodedBytes": 256
+    },
+    "PB_Gpio.GetPinMode": {
+      "maxEncodedBytes": 256
+    },
+    "PB_Gpio.GetPinModeResponse": {
+      "maxEncodedBytes": 256
+    },
+    "PB_Gpio.ReadPin": {
+      "maxEncodedBytes": 256
+    },
+    "PB_Gpio.ReadPinResponse": {
+      "maxEncodedBytes": 256
+    },
+    "PB_Gpio.SetInputPull": {
+      "maxEncodedBytes": 256
+    },
+    "PB_Gpio.SetOtgMode": {
+      "maxEncodedBytes": 256
+    },
+    "PB_Gpio.SetPinMode": {
+      "maxEncodedBytes": 256
+    },
+    "PB_Gpio.WritePin": {
+      "maxEncodedBytes": 256
+    },
+    "PB_Gui.ScreenFrame": {
+      "maxEncodedBytes": 8192
+    },
+    "PB_Gui.SendInputEventRequest": {
+      "maxEncodedBytes": 256
+    },
+    "PB_Gui.StartScreenStreamRequest": {
+      "maxEncodedBytes": 256
+    },
+    "PB_Gui.StartVirtualDisplayRequest": {
+      "maxEncodedBytes": 256
+    },
+    "PB_Gui.StopScreenStreamRequest": {
+      "maxEncodedBytes": 256
+    },
+    "PB_Gui.StopVirtualDisplayRequest": {
+      "maxEncodedBytes": 256
+    },
+    "PB_Property.GetRequest": {
+      "maxEncodedBytes": 8192
+    },
+    "PB_Property.GetResponse": {
+      "maxEncodedBytes": 8192
+    },
+    "PB_Storage.BackupCreateRequest": {
+      "maxEncodedBytes": 8192
+    },
+    "PB_Storage.BackupRestoreRequest": {
+      "maxEncodedBytes": 8192
+    },
+    "PB_Storage.DeleteRequest": {
+      "maxEncodedBytes": 8192
+    },
+    "PB_Storage.File": {
+      "maxEncodedBytes": 8192
+    },
+    "PB_Storage.InfoRequest": {
+      "maxEncodedBytes": 8192
+    },
+    "PB_Storage.InfoResponse": {
+      "maxEncodedBytes": 256
+    },
+    "PB_Storage.ListRequest": {
+      "maxEncodedBytes": 8192
+    },
+    "PB_Storage.ListResponse": {
+      "maxEncodedBytes": 8192
+    },
+    "PB_Storage.Md5sumRequest": {
+      "maxEncodedBytes": 8192
+    },
+    "PB_Storage.Md5sumResponse": {
+      "maxEncodedBytes": 8192
+    },
+    "PB_Storage.MkdirRequest": {
+      "maxEncodedBytes": 8192
+    },
+    "PB_Storage.ReadRequest": {
+      "maxEncodedBytes": 8192
+    },
+    "PB_Storage.ReadResponse": {
+      "maxEncodedBytes": 256
+    },
+    "PB_Storage.RenameRequest": {
+      "maxEncodedBytes": 8192
+    },
+    "PB_Storage.StatRequest": {
+      "maxEncodedBytes": 8192
+    },
+    "PB_Storage.StatResponse": {
+      "maxEncodedBytes": 256
+    },
+    "PB_Storage.TarExtractRequest": {
+      "maxEncodedBytes": 8192
+    },
+    "PB_Storage.TimestampRequest": {
+      "maxEncodedBytes": 8192
+    },
+    "PB_Storage.TimestampResponse": {
+      "maxEncodedBytes": 256
+    },
+    "PB_Storage.WriteRequest": {
+      "maxEncodedBytes": 8192
+    },
+    "PB_System.DateTime": {
+      "maxEncodedBytes": 256
+    },
+    "PB_System.DeviceInfoRequest": {
+      "maxEncodedBytes": 256
+    },
+    "PB_System.DeviceInfoResponse": {
+      "maxEncodedBytes": 8192
+    },
+    "PB_System.FactoryResetRequest": {
+      "maxEncodedBytes": 256
+    },
+    "PB_System.GetDateTimeRequest": {
+      "maxEncodedBytes": 256
+    },
+    "PB_System.GetDateTimeResponse": {
+      "maxEncodedBytes": 256
+    },
+    "PB_System.PingRequest": {
+      "maxEncodedBytes": 8192
+    },
+    "PB_System.PingResponse": {
+      "maxEncodedBytes": 8192
+    },
+    "PB_System.PlayAudiovisualAlertRequest": {
+      "maxEncodedBytes": 256
+    },
+    "PB_System.PowerInfoRequest": {
+      "maxEncodedBytes": 256
+    },
+    "PB_System.PowerInfoResponse": {
+      "maxEncodedBytes": 8192
+    },
+    "PB_System.ProtobufVersionRequest": {
+      "maxEncodedBytes": 256
+    },
+    "PB_System.ProtobufVersionResponse": {
+      "maxEncodedBytes": 256
+    },
+    "PB_System.RebootRequest": {
+      "maxEncodedBytes": 256
+    },
+    "PB_System.SetDateTimeRequest": {
+      "maxEncodedBytes": 256
+    },
+    "PB_System.UpdateRequest": {
+      "maxEncodedBytes": 8192
+    },
+    "PB_System.UpdateResponse": {
+      "maxEncodedBytes": 256
+    }
+  },
+  "transport": {
+    "chunkBytes": 512,
+    "requestQueueDepth": 4,
+    "responseQueueDepth": 4
+  }
+}

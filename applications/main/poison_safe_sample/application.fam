@@ -1,0 +1,11 @@
+App(
+    appid="poison_safe_sample",
+    name="Poison Safe Sample",
+    fap_version=(1, 0),
+    apptype=FlipperAppType.EXTERNAL,
+    entry_point="poison_safe_sample_app",
+    requires=["gui", "poison_app"],
+    stack_size=3 * 1024,
+    order=89,
+    fap_category="PoisonedOS",
+)

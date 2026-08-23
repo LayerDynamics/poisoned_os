@@ -72,8 +72,12 @@ static void submenu_view_draw_callback(Canvas* canvas, void* _model) {
     canvas_clear(canvas);
 
     if(!furi_string_empty(model->header)) {
-        canvas_set_font(canvas, FontPrimary);
-        canvas_draw_str(canvas, 4, 11, furi_string_get_cstr(model->header));
+        canvas_draw_box(canvas, 0, 0, 128, 13);
+        canvas_set_color(canvas, ColorWhite);
+        canvas_set_font(canvas, FontSecondary);
+        canvas_draw_str(canvas, 4, 10, furi_string_get_cstr(model->header));
+        canvas_set_color(canvas, ColorBlack);
+        canvas_draw_line(canvas, 0, 14, 123, 14);
     }
 
     canvas_set_font(canvas, FontSecondary);
@@ -89,12 +93,8 @@ static void submenu_view_draw_callback(Canvas* canvas, void* _model) {
         if(item_position < items_on_screen) {
             if(position == model->position) {
                 canvas_set_color(canvas, ColorBlack);
-                elements_slightly_rounded_box(
-                    canvas,
-                    0,
-                    y_offset + (item_position * item_height) + 1,
-                    item_width,
-                    item_height - 2);
+                canvas_draw_box(
+                    canvas, 0, y_offset + (item_position * item_height), item_width, item_height);
                 canvas_set_color(canvas, ColorWhite);
             } else {
                 canvas_set_color(canvas, ColorBlack);
@@ -106,7 +106,7 @@ static void submenu_view_draw_callback(Canvas* canvas, void* _model) {
 
             canvas_draw_str(
                 canvas,
-                6,
+                7,
                 y_offset + (item_position * item_height) + item_height - 4,
                 furi_string_get_cstr(disp_str));
 

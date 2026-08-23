@@ -1,0 +1,25 @@
+name: Firmware Unit Image
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  unit-firmware:
+    runs-on: [self-hosted, macOS, ARM64]
+    timeout-minutes: 45
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Verify pinned toolchain
+        run: |
+          ./fbt -h >/dev/null
+          python3 tools/verify_toolchain.py
+      - name: Build the physical-device unit-test firmware image
+        run: ./fbt FIRMWARE_APP_SET=unit_tests firmware_all
+      - name: Assert the unit-test image exists
+        run: test -s build/f7-firmware-D/firmware.dfu

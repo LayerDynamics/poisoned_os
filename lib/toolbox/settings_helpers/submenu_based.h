@@ -16,7 +16,7 @@ typedef struct {
 typedef struct {
     const char* app_name;
     size_t options_cnt;
-    SubmenuSettingsHelperOption options[];
+    SubmenuSettingsHelperOption* options;
 } SubmenuSettingsHelperDescriptor;
 
 typedef struct SubmenuSettingsHelper SubmenuSettingsHelper;

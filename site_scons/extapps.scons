@@ -16,6 +16,13 @@ appenv = ENV["APPENV"] = ENV.Clone(
     ],
 )
 
+# FAPs are relocatable ELF files. Firmware LTO would consume their object
+# sections at the partial link and leave fastfap without relocations to package.
+appenv.Replace(
+    CCFLAGS=[flag for flag in appenv["CCFLAGS"] if flag != "-flto"],
+    LINKFLAGS=[flag for flag in appenv["LINKFLAGS"] if flag != "-flto"],
+)
+
 appenv.Replace(
     LINKER_SCRIPT_PATH=appenv["APP_LINKER_SCRIPT_PATH"],
 )
@@ -125,7 +132,8 @@ firmware_apitable = appenv.ApiSymbolTable(
 )
 Alias("api_table", firmware_apitable)
 ENV.Replace(
-    FW_API_TABLE=firmware_apitable,
+    FW_API_TABLE=firmware_apitable[0],
+    FW_API_KEEP=firmware_apitable[1],
     _APP_ICONS=appenv["_APP_ICONS"],
 )
 

@@ -277,6 +277,18 @@ static void gc_mark_ffi_sig(struct mjs* mjs, mjs_val_t* v) {
     MARK(psig);
 }
 
+static void gc_mark_closure(struct mjs* mjs, mjs_val_t* v) {
+    assert(mjs_is_closure(*v));
+    struct mjs_closure* closure = mjs_get_closure(*v);
+    if(!gc_check_val(mjs, *v)) abort();
+    if(MARKED(closure)) return;
+
+    MARK(closure);
+    for(size_t index = 0u; index < closure->scope_count; ++index) {
+        gc_mark(mjs, &closure->scopes[index]);
+    }
+}
+
 /* Mark an object */
 static void gc_mark_object(struct mjs* mjs, mjs_val_t* v) {
     struct mjs_object* obj_base;
@@ -372,6 +384,9 @@ MJS_PRIVATE void gc_mark(struct mjs* mjs, mjs_val_t* v) {
     }
     if(mjs_is_ffi_sig(*v)) {
         gc_mark_ffi_sig(mjs, v);
+    }
+    if(mjs_is_closure(*v)) {
+        gc_mark_closure(mjs, v);
     }
     if((*v & MJS_TAG_MASK) == MJS_TAG_STRING_O) {
         gc_mark_string(mjs, v);
@@ -499,6 +514,7 @@ void mjs_gc(struct mjs* mjs, int full) {
     gc_sweep(mjs, &mjs->object_arena, 0);
     gc_sweep(mjs, &mjs->property_arena, 0);
     gc_sweep(mjs, &mjs->ffi_sig_arena, 0);
+    gc_sweep(mjs, &mjs->closure_arena, 0);
 
     if(full) {
         /*
@@ -519,6 +535,9 @@ MJS_PRIVATE int gc_check_val(struct mjs* mjs, mjs_val_t v) {
     }
     if(mjs_is_ffi_sig(v)) {
         return gc_check_ptr(&mjs->ffi_sig_arena, mjs_get_ffi_sig_struct(v));
+    }
+    if(mjs_is_closure(v)) {
+        return gc_check_ptr(&mjs->closure_arena, mjs_get_closure(v));
     }
     return 1;
 }

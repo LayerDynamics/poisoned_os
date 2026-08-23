@@ -1,0 +1,7014 @@
+{
+  "enums": [
+    {
+      "name": "PB.CommandStatus",
+      "reservedNames": [],
+      "reservedNumbers": [],
+      "values": [
+        {
+          "name": "OK",
+          "number": 0
+        },
+        {
+          "name": "ERROR",
+          "number": 1
+        },
+        {
+          "name": "ERROR_DECODE",
+          "number": 2
+        },
+        {
+          "name": "ERROR_NOT_IMPLEMENTED",
+          "number": 3
+        },
+        {
+          "name": "ERROR_BUSY",
+          "number": 4
+        },
+        {
+          "name": "ERROR_STORAGE_NOT_READY",
+          "number": 5
+        },
+        {
+          "name": "ERROR_STORAGE_EXIST",
+          "number": 6
+        },
+        {
+          "name": "ERROR_STORAGE_NOT_EXIST",
+          "number": 7
+        },
+        {
+          "name": "ERROR_STORAGE_INVALID_PARAMETER",
+          "number": 8
+        },
+        {
+          "name": "ERROR_STORAGE_DENIED",
+          "number": 9
+        },
+        {
+          "name": "ERROR_STORAGE_INVALID_NAME",
+          "number": 10
+        },
+        {
+          "name": "ERROR_STORAGE_INTERNAL",
+          "number": 11
+        },
+        {
+          "name": "ERROR_STORAGE_NOT_IMPLEMENTED",
+          "number": 12
+        },
+        {
+          "name": "ERROR_STORAGE_ALREADY_OPEN",
+          "number": 13
+        },
+        {
+          "name": "ERROR_CONTINUOUS_COMMAND_INTERRUPTED",
+          "number": 14
+        },
+        {
+          "name": "ERROR_INVALID_PARAMETERS",
+          "number": 15
+        },
+        {
+          "name": "ERROR_APP_CANT_START",
+          "number": 16
+        },
+        {
+          "name": "ERROR_APP_SYSTEM_LOCKED",
+          "number": 17
+        },
+        {
+          "name": "ERROR_STORAGE_DIR_NOT_EMPTY",
+          "number": 18
+        },
+        {
+          "name": "ERROR_VIRTUAL_DISPLAY_ALREADY_STARTED",
+          "number": 19
+        },
+        {
+          "name": "ERROR_VIRTUAL_DISPLAY_NOT_STARTED",
+          "number": 20
+        },
+        {
+          "name": "ERROR_APP_NOT_RUNNING",
+          "number": 21
+        },
+        {
+          "name": "ERROR_APP_CMD_ERROR",
+          "number": 22
+        },
+        {
+          "name": "ERROR_GPIO_MODE_INCORRECT",
+          "number": 58
+        },
+        {
+          "name": "ERROR_GPIO_UNKNOWN_PIN_MODE",
+          "number": 59
+        }
+      ]
+    },
+    {
+      "name": "PB_App.AppState",
+      "reservedNames": [],
+      "reservedNumbers": [],
+      "values": [
+        {
+          "name": "APP_CLOSED",
+          "number": 0
+        },
+        {
+          "name": "APP_STARTED",
+          "number": 1
+        }
+      ]
+    },
+    {
+      "name": "PB_Gpio.GpioInputPull",
+      "reservedNames": [],
+      "reservedNumbers": [],
+      "values": [
+        {
+          "name": "NO",
+          "number": 0
+        },
+        {
+          "name": "UP",
+          "number": 1
+        },
+        {
+          "name": "DOWN",
+          "number": 2
+        }
+      ]
+    },
+    {
+      "name": "PB_Gpio.GpioOtgMode",
+      "reservedNames": [],
+      "reservedNumbers": [],
+      "values": [
+        {
+          "name": "OFF",
+          "number": 0
+        },
+        {
+          "name": "ON",
+          "number": 1
+        }
+      ]
+    },
+    {
+      "name": "PB_Gpio.GpioPin",
+      "reservedNames": [],
+      "reservedNumbers": [],
+      "values": [
+        {
+          "name": "PC0",
+          "number": 0
+        },
+        {
+          "name": "PC1",
+          "number": 1
+        },
+        {
+          "name": "PC3",
+          "number": 2
+        },
+        {
+          "name": "PB2",
+          "number": 3
+        },
+        {
+          "name": "PB3",
+          "number": 4
+        },
+        {
+          "name": "PA4",
+          "number": 5
+        },
+        {
+          "name": "PA6",
+          "number": 6
+        },
+        {
+          "name": "PA7",
+          "number": 7
+        }
+      ]
+    },
+    {
+      "name": "PB_Gpio.GpioPinMode",
+      "reservedNames": [],
+      "reservedNumbers": [],
+      "values": [
+        {
+          "name": "OUTPUT",
+          "number": 0
+        },
+        {
+          "name": "INPUT",
+          "number": 1
+        }
+      ]
+    },
+    {
+      "name": "PB_Gui.InputKey",
+      "reservedNames": [],
+      "reservedNumbers": [],
+      "values": [
+        {
+          "name": "UP",
+          "number": 0
+        },
+        {
+          "name": "DOWN",
+          "number": 1
+        },
+        {
+          "name": "RIGHT",
+          "number": 2
+        },
+        {
+          "name": "LEFT",
+          "number": 3
+        },
+        {
+          "name": "OK",
+          "number": 4
+        },
+        {
+          "name": "BACK",
+          "number": 5
+        }
+      ]
+    },
+    {
+      "name": "PB_Gui.InputType",
+      "reservedNames": [],
+      "reservedNumbers": [],
+      "values": [
+        {
+          "name": "PRESS",
+          "number": 0
+        },
+        {
+          "name": "RELEASE",
+          "number": 1
+        },
+        {
+          "name": "SHORT",
+          "number": 2
+        },
+        {
+          "name": "LONG",
+          "number": 3
+        },
+        {
+          "name": "REPEAT",
+          "number": 4
+        }
+      ]
+    },
+    {
+      "name": "PB_Gui.ScreenOrientation",
+      "reservedNames": [],
+      "reservedNumbers": [],
+      "values": [
+        {
+          "name": "HORIZONTAL",
+          "number": 0
+        },
+        {
+          "name": "HORIZONTAL_FLIP",
+          "number": 1
+        },
+        {
+          "name": "VERTICAL",
+          "number": 2
+        },
+        {
+          "name": "VERTICAL_FLIP",
+          "number": 3
+        }
+      ]
+    },
+    {
+      "name": "PB_Poison.AuditDecision",
+      "reservedNames": [],
+      "reservedNumbers": [],
+      "values": [
+        {
+          "name": "AUDIT_DENIED",
+          "number": 0
+        },
+        {
+          "name": "AUDIT_ALLOWED",
+          "number": 1
+        },
+        {
+          "name": "AUDIT_EXPIRED",
+          "number": 2
+        },
+        {
+          "name": "AUDIT_REVOKED",
+          "number": 3
+        }
+      ]
+    },
+    {
+      "name": "PB_Poison.ContentUpdateOperation",
+      "reservedNames": [],
+      "reservedNumbers": [],
+      "values": [
+        {
+          "name": "CONTENT_UPDATE_OPERATION_INSPECT",
+          "number": 0
+        },
+        {
+          "name": "CONTENT_UPDATE_OPERATION_IMPORT",
+          "number": 1
+        },
+        {
+          "name": "CONTENT_UPDATE_OPERATION_STAGE",
+          "number": 2
+        },
+        {
+          "name": "CONTENT_UPDATE_OPERATION_VERIFY",
+          "number": 3
+        },
+        {
+          "name": "CONTENT_UPDATE_OPERATION_ACTIVATE",
+          "number": 4
+        },
+        {
+          "name": "CONTENT_UPDATE_OPERATION_HEALTH",
+          "number": 5
+        },
+        {
+          "name": "CONTENT_UPDATE_OPERATION_CANCEL",
+          "number": 6
+        },
+        {
+          "name": "CONTENT_UPDATE_OPERATION_ROLLBACK",
+          "number": 7
+        },
+        {
+          "name": "CONTENT_UPDATE_OPERATION_QUARANTINE",
+          "number": 8
+        }
+      ]
+    },
+    {
+      "name": "PB_Poison.ContentUpdateState",
+      "reservedNames": [],
+      "reservedNumbers": [],
+      "values": [
+        {
+          "name": "CONTENT_UPDATE_STATE_DISCOVERED",
+          "number": 0
+        },
+        {
+          "name": "CONTENT_UPDATE_STATE_RECEIVING",
+          "number": 1
+        },
+        {
+          "name": "CONTENT_UPDATE_STATE_STAGED",
+          "number": 2
+        },
+        {
+          "name": "CONTENT_UPDATE_STATE_VERIFIED",
+          "number": 3
+        },
+        {
+          "name": "CONTENT_UPDATE_STATE_AWAITING_CONFIRMATION",
+          "number": 4
+        },
+        {
+          "name": "CONTENT_UPDATE_STATE_ACTIVATING",
+          "number": 5
+        },
+        {
+          "name": "CONTENT_UPDATE_STATE_HEALTHY",
+          "number": 6
+        },
+        {
+          "name": "CONTENT_UPDATE_STATE_ROLLED_BACK",
+          "number": 7
+        },
+        {
+          "name": "CONTENT_UPDATE_STATE_QUARANTINED",
+          "number": 8
+        }
+      ]
+    },
+    {
+      "name": "PB_Poison.ContentUpdateType",
+      "reservedNames": [],
+      "reservedNumbers": [],
+      "values": [
+        {
+          "name": "CONTENT_UPDATE_TYPE_APPLICATION",
+          "number": 0
+        },
+        {
+          "name": "CONTENT_UPDATE_TYPE_FIRMWARE",
+          "number": 1
+        },
+        {
+          "name": "CONTENT_UPDATE_TYPE_LESSON",
+          "number": 2
+        },
+        {
+          "name": "CONTENT_UPDATE_TYPE_TOOL_DATA",
+          "number": 3
+        },
+        {
+          "name": "CONTENT_UPDATE_TYPE_THEME",
+          "number": 4
+        },
+        {
+          "name": "CONTENT_UPDATE_TYPE_FONT_ICON",
+          "number": 5
+        },
+        {
+          "name": "CONTENT_UPDATE_TYPE_MENU",
+          "number": 6
+        },
+        {
+          "name": "CONTENT_UPDATE_TYPE_RESOURCE",
+          "number": 7
+        },
+        {
+          "name": "CONTENT_UPDATE_TYPE_UI_PACK",
+          "number": 8
+        }
+      ]
+    },
+    {
+      "name": "PB_Poison.JsBundleFrameKind",
+      "reservedNames": [],
+      "reservedNumbers": [],
+      "values": [
+        {
+          "name": "JS_BUNDLE_FRAME_UNSPECIFIED",
+          "number": 0
+        },
+        {
+          "name": "JS_BUNDLE_FRAME_CAPABILITY",
+          "number": 1
+        },
+        {
+          "name": "JS_BUNDLE_FRAME_ASSET",
+          "number": 2
+        },
+        {
+          "name": "JS_BUNDLE_FRAME_DATA",
+          "number": 3
+        }
+      ]
+    },
+    {
+      "name": "PB_Poison.JsBundleOperation",
+      "reservedNames": [],
+      "reservedNumbers": [],
+      "values": [
+        {
+          "name": "JS_BUNDLE_OPERATION_UNSPECIFIED",
+          "number": 0
+        },
+        {
+          "name": "JS_BUNDLE_OPERATION_DESCRIBE",
+          "number": 1
+        },
+        {
+          "name": "JS_BUNDLE_OPERATION_READ_ASSET",
+          "number": 2
+        }
+      ]
+    },
+    {
+      "name": "PB_Poison.PackageCatalogFreshness",
+      "reservedNames": [],
+      "reservedNumbers": [],
+      "values": [
+        {
+          "name": "PACKAGE_CATALOG_FRESHNESS_UNKNOWN",
+          "number": 0
+        },
+        {
+          "name": "PACKAGE_CATALOG_FRESHNESS_FRESH",
+          "number": 1
+        },
+        {
+          "name": "PACKAGE_CATALOG_FRESHNESS_STALE",
+          "number": 2
+        },
+        {
+          "name": "PACKAGE_CATALOG_FRESHNESS_MISSING",
+          "number": 3
+        }
+      ]
+    },
+    {
+      "name": "PB_Poison.PackageCatalogSource",
+      "reservedNames": [],
+      "reservedNumbers": [],
+      "values": [
+        {
+          "name": "PACKAGE_CATALOG_SOURCE_DEVICE_STORAGE",
+          "number": 0
+        },
+        {
+          "name": "PACKAGE_CATALOG_SOURCE_BUNDLED_RELEASE",
+          "number": 1
+        },
+        {
+          "name": "PACKAGE_CATALOG_SOURCE_IMPORTED_FILE",
+          "number": 2
+        },
+        {
+          "name": "PACKAGE_CATALOG_SOURCE_LOCAL_REPOSITORY",
+          "number": 3
+        }
+      ]
+    },
+    {
+      "name": "PB_Poison.PackageCatalogState",
+      "reservedNames": [],
+      "reservedNumbers": [],
+      "values": [
+        {
+          "name": "PACKAGE_CATALOG_STATE_INSTALLED",
+          "number": 0
+        },
+        {
+          "name": "PACKAGE_CATALOG_STATE_STAGED",
+          "number": 1
+        },
+        {
+          "name": "PACKAGE_CATALOG_STATE_AVAILABLE",
+          "number": 2
+        },
+        {
+          "name": "PACKAGE_CATALOG_STATE_INCOMPATIBLE",
+          "number": 3
+        },
+        {
+          "name": "PACKAGE_CATALOG_STATE_DISABLED",
+          "number": 4
+        },
+        {
+          "name": "PACKAGE_CATALOG_STATE_QUARANTINED",
+          "number": 5
+        },
+        {
+          "name": "PACKAGE_CATALOG_STATE_REVOKED",
+          "number": 6
+        },
+        {
+          "name": "PACKAGE_CATALOG_STATE_ROLLBACK_CANDIDATE",
+          "number": 7
+        }
+      ]
+    },
+    {
+      "name": "PB_Poison.PackageLifecycleState",
+      "reservedNames": [],
+      "reservedNumbers": [],
+      "values": [
+        {
+          "name": "PACKAGE_LIFECYCLE_STATE_INSTALLED",
+          "number": 0
+        },
+        {
+          "name": "PACKAGE_LIFECYCLE_STATE_STAGED",
+          "number": 1
+        },
+        {
+          "name": "PACKAGE_LIFECYCLE_STATE_VERIFIED",
+          "number": 2
+        },
+        {
+          "name": "PACKAGE_LIFECYCLE_STATE_ACTIVE",
+          "number": 3
+        },
+        {
+          "name": "PACKAGE_LIFECYCLE_STATE_DISABLED",
+          "number": 4
+        },
+        {
+          "name": "PACKAGE_LIFECYCLE_STATE_QUARANTINED",
+          "number": 5
+        },
+        {
+          "name": "PACKAGE_LIFECYCLE_STATE_REMOVED",
+          "number": 6
+        }
+      ]
+    },
+    {
+      "name": "PB_Poison.PackageOperation",
+      "reservedNames": [],
+      "reservedNumbers": [],
+      "values": [
+        {
+          "name": "PACKAGE_OPERATION_INSPECT",
+          "number": 0
+        },
+        {
+          "name": "PACKAGE_OPERATION_IMPORT",
+          "number": 1
+        },
+        {
+          "name": "PACKAGE_OPERATION_STAGE",
+          "number": 2
+        },
+        {
+          "name": "PACKAGE_OPERATION_VERIFY",
+          "number": 3
+        },
+        {
+          "name": "PACKAGE_OPERATION_ACTIVATE",
+          "number": 4
+        },
+        {
+          "name": "PACKAGE_OPERATION_HEALTH",
+          "number": 5
+        },
+        {
+          "name": "PACKAGE_OPERATION_DISABLE",
+          "number": 6
+        },
+        {
+          "name": "PACKAGE_OPERATION_ENABLE",
+          "number": 7
+        },
+        {
+          "name": "PACKAGE_OPERATION_REMOVE",
+          "number": 8
+        },
+        {
+          "name": "PACKAGE_OPERATION_ROLLBACK",
+          "number": 9
+        },
+        {
+          "name": "PACKAGE_OPERATION_QUARANTINE",
+          "number": 10
+        }
+      ]
+    },
+    {
+      "name": "PB_Poison.Role",
+      "reservedNames": [],
+      "reservedNumbers": [],
+      "values": [
+        {
+          "name": "ROLE_OWNER",
+          "number": 0
+        },
+        {
+          "name": "ROLE_OPERATOR",
+          "number": 1
+        },
+        {
+          "name": "ROLE_INSTRUCTOR",
+          "number": 2
+        },
+        {
+          "name": "ROLE_STUDENT",
+          "number": 3
+        },
+        {
+          "name": "ROLE_OBSERVER",
+          "number": 4
+        }
+      ]
+    },
+    {
+      "name": "PB_Poison.WorkloadArtifactState",
+      "reservedNames": [],
+      "reservedNumbers": [],
+      "values": [
+        {
+          "name": "WORKLOAD_ARTIFACT_UNSPECIFIED",
+          "number": 0
+        },
+        {
+          "name": "WORKLOAD_ARTIFACT_PARTIAL",
+          "number": 1
+        },
+        {
+          "name": "WORKLOAD_ARTIFACT_PROJECT",
+          "number": 2
+        },
+        {
+          "name": "WORKLOAD_ARTIFACT_EVIDENCE",
+          "number": 3
+        }
+      ]
+    },
+    {
+      "name": "PB_Poison.WorkloadConsoleType",
+      "reservedNames": [],
+      "reservedNumbers": [],
+      "values": [
+        {
+          "name": "WORKLOAD_CONSOLE_STDOUT",
+          "number": 0
+        },
+        {
+          "name": "WORKLOAD_CONSOLE_STDERR",
+          "number": 1
+        },
+        {
+          "name": "WORKLOAD_CONSOLE_LOG",
+          "number": 2
+        },
+        {
+          "name": "WORKLOAD_CONSOLE_EVENT",
+          "number": 3
+        },
+        {
+          "name": "WORKLOAD_CONSOLE_TRUNCATION",
+          "number": 4
+        }
+      ]
+    },
+    {
+      "name": "PB_Poison.WorkloadOperation",
+      "reservedNames": [],
+      "reservedNumbers": [],
+      "values": [
+        {
+          "name": "WORKLOAD_OPERATION_UNSPECIFIED",
+          "number": 0
+        },
+        {
+          "name": "WORKLOAD_OPERATION_CREATE",
+          "number": 1
+        },
+        {
+          "name": "WORKLOAD_OPERATION_RUN",
+          "number": 2
+        },
+        {
+          "name": "WORKLOAD_OPERATION_CANCEL",
+          "number": 3
+        },
+        {
+          "name": "WORKLOAD_OPERATION_INSPECT",
+          "number": 4
+        },
+        {
+          "name": "WORKLOAD_OPERATION_FINALIZE_ARTIFACT",
+          "number": 5
+        }
+      ]
+    },
+    {
+      "name": "PB_Poison.WorkloadRuntime",
+      "reservedNames": [],
+      "reservedNumbers": [],
+      "values": [
+        {
+          "name": "WORKLOAD_RUNTIME_UNSPECIFIED",
+          "number": 0
+        },
+        {
+          "name": "WORKLOAD_RUNTIME_JAVASCRIPT",
+          "number": 1
+        },
+        {
+          "name": "WORKLOAD_RUNTIME_NATIVE",
+          "number": 2
+        },
+        {
+          "name": "WORKLOAD_RUNTIME_WASM",
+          "number": 3
+        }
+      ]
+    },
+    {
+      "name": "PB_Poison.WorkloadState",
+      "reservedNames": [],
+      "reservedNumbers": [],
+      "values": [
+        {
+          "name": "WORKLOAD_STATE_UNSPECIFIED",
+          "number": 0
+        },
+        {
+          "name": "WORKLOAD_STATE_QUEUED",
+          "number": 1
+        },
+        {
+          "name": "WORKLOAD_STATE_RUNNING",
+          "number": 2
+        },
+        {
+          "name": "WORKLOAD_STATE_CANCELLING",
+          "number": 3
+        },
+        {
+          "name": "WORKLOAD_STATE_COMPLETED",
+          "number": 4
+        },
+        {
+          "name": "WORKLOAD_STATE_FAILED",
+          "number": 5
+        },
+        {
+          "name": "WORKLOAD_STATE_CANCELLED",
+          "number": 6
+        },
+        {
+          "name": "WORKLOAD_STATE_TIMED_OUT",
+          "number": 7
+        },
+        {
+          "name": "WORKLOAD_STATE_CRASHED",
+          "number": 8
+        },
+        {
+          "name": "WORKLOAD_STATE_DISCONNECTED",
+          "number": 9
+        }
+      ]
+    },
+    {
+      "name": "PB_Poison.WorkloadTerminalReason",
+      "reservedNames": [],
+      "reservedNumbers": [],
+      "values": [
+        {
+          "name": "WORKLOAD_TERMINAL_NONE",
+          "number": 0
+        },
+        {
+          "name": "WORKLOAD_TERMINAL_COMPLETED",
+          "number": 1
+        },
+        {
+          "name": "WORKLOAD_TERMINAL_CANCELLED",
+          "number": 2
+        },
+        {
+          "name": "WORKLOAD_TERMINAL_TIMEOUT",
+          "number": 3
+        },
+        {
+          "name": "WORKLOAD_TERMINAL_CRASH",
+          "number": 4
+        },
+        {
+          "name": "WORKLOAD_TERMINAL_DISCONNECT",
+          "number": 5
+        },
+        {
+          "name": "WORKLOAD_TERMINAL_HEAP_LIMIT",
+          "number": 6
+        },
+        {
+          "name": "WORKLOAD_TERMINAL_SOURCE_LIMIT",
+          "number": 7
+        },
+        {
+          "name": "WORKLOAD_TERMINAL_MODULE_LIMIT",
+          "number": 8
+        },
+        {
+          "name": "WORKLOAD_TERMINAL_PARSER_LIMIT",
+          "number": 9
+        },
+        {
+          "name": "WORKLOAD_TERMINAL_STACK_LIMIT",
+          "number": 10
+        },
+        {
+          "name": "WORKLOAD_TERMINAL_FUEL_LIMIT",
+          "number": 11
+        },
+        {
+          "name": "WORKLOAD_TERMINAL_CALLBACK_LIMIT",
+          "number": 12
+        },
+        {
+          "name": "WORKLOAD_TERMINAL_TIMER_LIMIT",
+          "number": 13
+        },
+        {
+          "name": "WORKLOAD_TERMINAL_HANDLE_LIMIT",
+          "number": 14
+        },
+        {
+          "name": "WORKLOAD_TERMINAL_LOG_LIMIT",
+          "number": 15
+        },
+        {
+          "name": "WORKLOAD_TERMINAL_ARTIFACT_LIMIT",
+          "number": 16
+        }
+      ]
+    },
+    {
+      "name": "PB_Storage.File.FileType",
+      "reservedNames": [],
+      "reservedNumbers": [],
+      "values": [
+        {
+          "name": "FILE",
+          "number": 0
+        },
+        {
+          "name": "DIR",
+          "number": 1
+        }
+      ]
+    },
+    {
+      "name": "PB_System.RebootRequest.RebootMode",
+      "reservedNames": [],
+      "reservedNumbers": [],
+      "values": [
+        {
+          "name": "OS",
+          "number": 0
+        },
+        {
+          "name": "DFU",
+          "number": 1
+        },
+        {
+          "name": "UPDATE",
+          "number": 2
+        }
+      ]
+    },
+    {
+      "name": "PB_System.UpdateResponse.UpdateResultCode",
+      "reservedNames": [],
+      "reservedNumbers": [],
+      "values": [
+        {
+          "name": "OK",
+          "number": 0
+        },
+        {
+          "name": "ManifestPathInvalid",
+          "number": 1
+        },
+        {
+          "name": "ManifestFolderNotFound",
+          "number": 2
+        },
+        {
+          "name": "ManifestInvalid",
+          "number": 3
+        },
+        {
+          "name": "StageMissing",
+          "number": 4
+        },
+        {
+          "name": "StageIntegrityError",
+          "number": 5
+        },
+        {
+          "name": "ManifestPointerError",
+          "number": 6
+        },
+        {
+          "name": "TargetMismatch",
+          "number": 7
+        },
+        {
+          "name": "OutdatedManifestVersion",
+          "number": 8
+        },
+        {
+          "name": "IntFull",
+          "number": 9
+        },
+        {
+          "name": "UnspecifiedError",
+          "number": 10
+        }
+      ]
+    }
+  ],
+  "files": [
+    "application.proto",
+    "desktop.proto",
+    "flipper.proto",
+    "gpio.proto",
+    "gui.proto",
+    "poison_app.proto",
+    "poison_audit.proto",
+    "poison_diagnostics.proto",
+    "poison_evidence.proto",
+    "poison_files.proto",
+    "poison_packages.proto",
+    "poison_policy.proto",
+    "poison_profiles.proto",
+    "poison_session.proto",
+    "poison_workload.proto",
+    "property.proto",
+    "storage.proto",
+    "system.proto"
+  ],
+  "messages": [
+    {
+      "fields": [],
+      "name": "PB.Empty",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "command_id",
+          "number": 1,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "command_status",
+          "number": 2,
+          "oneof": null,
+          "type": "enum",
+          "typeName": "PB.CommandStatus"
+        },
+        {
+          "cardinality": "optional",
+          "name": "has_next",
+          "number": 3,
+          "oneof": null,
+          "type": "bool",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "empty",
+          "number": 4,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB.Empty"
+        },
+        {
+          "cardinality": "optional",
+          "name": "system_ping_request",
+          "number": 5,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_System.PingRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "system_ping_response",
+          "number": 6,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_System.PingResponse"
+        },
+        {
+          "cardinality": "optional",
+          "name": "storage_list_request",
+          "number": 7,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Storage.ListRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "storage_list_response",
+          "number": 8,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Storage.ListResponse"
+        },
+        {
+          "cardinality": "optional",
+          "name": "storage_read_request",
+          "number": 9,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Storage.ReadRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "storage_read_response",
+          "number": 10,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Storage.ReadResponse"
+        },
+        {
+          "cardinality": "optional",
+          "name": "storage_write_request",
+          "number": 11,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Storage.WriteRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "storage_delete_request",
+          "number": 12,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Storage.DeleteRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "storage_mkdir_request",
+          "number": 13,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Storage.MkdirRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "storage_md5sum_request",
+          "number": 14,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Storage.Md5sumRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "storage_md5sum_response",
+          "number": 15,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Storage.Md5sumResponse"
+        },
+        {
+          "cardinality": "optional",
+          "name": "app_start_request",
+          "number": 16,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_App.StartRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "app_lock_status_request",
+          "number": 17,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_App.LockStatusRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "app_lock_status_response",
+          "number": 18,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_App.LockStatusResponse"
+        },
+        {
+          "cardinality": "optional",
+          "name": "stop_session",
+          "number": 19,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB.StopSession"
+        },
+        {
+          "cardinality": "optional",
+          "name": "gui_start_screen_stream_request",
+          "number": 20,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Gui.StartScreenStreamRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "gui_stop_screen_stream_request",
+          "number": 21,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Gui.StopScreenStreamRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "gui_screen_frame",
+          "number": 22,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Gui.ScreenFrame"
+        },
+        {
+          "cardinality": "optional",
+          "name": "gui_send_input_event_request",
+          "number": 23,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Gui.SendInputEventRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "storage_stat_request",
+          "number": 24,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Storage.StatRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "storage_stat_response",
+          "number": 25,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Storage.StatResponse"
+        },
+        {
+          "cardinality": "optional",
+          "name": "gui_start_virtual_display_request",
+          "number": 26,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Gui.StartVirtualDisplayRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "gui_stop_virtual_display_request",
+          "number": 27,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Gui.StopVirtualDisplayRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "storage_info_request",
+          "number": 28,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Storage.InfoRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "storage_info_response",
+          "number": 29,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Storage.InfoResponse"
+        },
+        {
+          "cardinality": "optional",
+          "name": "storage_rename_request",
+          "number": 30,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Storage.RenameRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "system_reboot_request",
+          "number": 31,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_System.RebootRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "system_device_info_request",
+          "number": 32,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_System.DeviceInfoRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "system_device_info_response",
+          "number": 33,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_System.DeviceInfoResponse"
+        },
+        {
+          "cardinality": "optional",
+          "name": "system_factory_reset_request",
+          "number": 34,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_System.FactoryResetRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "system_get_datetime_request",
+          "number": 35,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_System.GetDateTimeRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "system_get_datetime_response",
+          "number": 36,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_System.GetDateTimeResponse"
+        },
+        {
+          "cardinality": "optional",
+          "name": "system_set_datetime_request",
+          "number": 37,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_System.SetDateTimeRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "system_play_audiovisual_alert_request",
+          "number": 38,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_System.PlayAudiovisualAlertRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "system_protobuf_version_request",
+          "number": 39,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_System.ProtobufVersionRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "system_protobuf_version_response",
+          "number": 40,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_System.ProtobufVersionResponse"
+        },
+        {
+          "cardinality": "optional",
+          "name": "system_update_request",
+          "number": 41,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_System.UpdateRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "storage_backup_create_request",
+          "number": 42,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Storage.BackupCreateRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "storage_backup_restore_request",
+          "number": 43,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Storage.BackupRestoreRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "system_power_info_request",
+          "number": 44,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_System.PowerInfoRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "system_power_info_response",
+          "number": 45,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_System.PowerInfoResponse"
+        },
+        {
+          "cardinality": "optional",
+          "name": "system_update_response",
+          "number": 46,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_System.UpdateResponse"
+        },
+        {
+          "cardinality": "optional",
+          "name": "app_exit_request",
+          "number": 47,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_App.AppExitRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "app_load_file_request",
+          "number": 48,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_App.AppLoadFileRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "app_button_press_request",
+          "number": 49,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_App.AppButtonPressRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "app_button_release_request",
+          "number": 50,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_App.AppButtonReleaseRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "gpio_set_pin_mode",
+          "number": 51,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Gpio.SetPinMode"
+        },
+        {
+          "cardinality": "optional",
+          "name": "gpio_set_input_pull",
+          "number": 52,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Gpio.SetInputPull"
+        },
+        {
+          "cardinality": "optional",
+          "name": "gpio_get_pin_mode",
+          "number": 53,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Gpio.GetPinMode"
+        },
+        {
+          "cardinality": "optional",
+          "name": "gpio_get_pin_mode_response",
+          "number": 54,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Gpio.GetPinModeResponse"
+        },
+        {
+          "cardinality": "optional",
+          "name": "gpio_read_pin",
+          "number": 55,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Gpio.ReadPin"
+        },
+        {
+          "cardinality": "optional",
+          "name": "gpio_read_pin_response",
+          "number": 56,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Gpio.ReadPinResponse"
+        },
+        {
+          "cardinality": "optional",
+          "name": "gpio_write_pin",
+          "number": 57,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Gpio.WritePin"
+        },
+        {
+          "cardinality": "optional",
+          "name": "app_state_response",
+          "number": 58,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_App.AppStateResponse"
+        },
+        {
+          "cardinality": "optional",
+          "name": "storage_timestamp_request",
+          "number": 59,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Storage.TimestampRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "storage_timestamp_response",
+          "number": 60,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Storage.TimestampResponse"
+        },
+        {
+          "cardinality": "optional",
+          "name": "property_get_request",
+          "number": 61,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Property.GetRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "property_get_response",
+          "number": 62,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Property.GetResponse"
+        },
+        {
+          "cardinality": "optional",
+          "name": "app_get_error_request",
+          "number": 63,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_App.GetErrorRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "app_get_error_response",
+          "number": 64,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_App.GetErrorResponse"
+        },
+        {
+          "cardinality": "optional",
+          "name": "app_data_exchange_request",
+          "number": 65,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_App.DataExchangeRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "desktop_is_locked_request",
+          "number": 66,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Desktop.IsLockedRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "desktop_unlock_request",
+          "number": 67,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Desktop.UnlockRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "desktop_status_subscribe_request",
+          "number": 68,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Desktop.StatusSubscribeRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "desktop_status_unsubscribe_request",
+          "number": 69,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Desktop.StatusUnsubscribeRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "desktop_status",
+          "number": 70,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Desktop.Status"
+        },
+        {
+          "cardinality": "optional",
+          "name": "storage_tar_extract_request",
+          "number": 71,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Storage.TarExtractRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "gpio_get_otg_mode",
+          "number": 72,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Gpio.GetOtgMode"
+        },
+        {
+          "cardinality": "optional",
+          "name": "gpio_get_otg_mode_response",
+          "number": 73,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Gpio.GetOtgModeResponse"
+        },
+        {
+          "cardinality": "optional",
+          "name": "gpio_set_otg_mode",
+          "number": 74,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Gpio.SetOtgMode"
+        },
+        {
+          "cardinality": "optional",
+          "name": "app_button_press_release_request",
+          "number": 75,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_App.AppButtonPressReleaseRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "poison_session_envelope",
+          "number": 76,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Poison.SessionEnvelope"
+        },
+        {
+          "cardinality": "optional",
+          "name": "poison_policy_request",
+          "number": 77,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Poison.PolicyRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "poison_policy_decision",
+          "number": 78,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Poison.PolicyDecision"
+        },
+        {
+          "cardinality": "optional",
+          "name": "poison_diagnostic_counters",
+          "number": 79,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Poison.DiagnosticCounters"
+        },
+        {
+          "cardinality": "optional",
+          "name": "poison_diagnostic_event",
+          "number": 80,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Poison.DiagnosticEvent"
+        },
+        {
+          "cardinality": "optional",
+          "name": "poison_file_list_request",
+          "number": 81,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Poison.FileListRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "poison_file_list_response",
+          "number": 82,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Poison.FileListResponse"
+        },
+        {
+          "cardinality": "optional",
+          "name": "poison_file_transfer_begin",
+          "number": 83,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Poison.FileTransferBegin"
+        },
+        {
+          "cardinality": "optional",
+          "name": "poison_file_transfer_chunk",
+          "number": 84,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Poison.FileTransferChunk"
+        },
+        {
+          "cardinality": "optional",
+          "name": "poison_file_transfer_complete",
+          "number": 85,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Poison.FileTransferComplete"
+        },
+        {
+          "cardinality": "optional",
+          "name": "poison_evidence_record",
+          "number": 86,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Poison.EvidenceRecord"
+        },
+        {
+          "cardinality": "optional",
+          "name": "poison_case",
+          "number": 87,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Poison.Case"
+        },
+        {
+          "cardinality": "optional",
+          "name": "poison_tool_run",
+          "number": 88,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Poison.ToolRun"
+        },
+        {
+          "cardinality": "optional",
+          "name": "poison_annotation",
+          "number": 89,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Poison.Annotation"
+        },
+        {
+          "cardinality": "optional",
+          "name": "poison_export_manifest",
+          "number": 90,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Poison.ExportManifest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "poison_package_manifest",
+          "number": 91,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Poison.PackageManifest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "poison_app_command",
+          "number": 92,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Poison.AppCommand"
+        },
+        {
+          "cardinality": "optional",
+          "name": "poison_app_event",
+          "number": 93,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Poison.AppEvent"
+        },
+        {
+          "cardinality": "optional",
+          "name": "poison_profile",
+          "number": 94,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Poison.Profile"
+        },
+        {
+          "cardinality": "optional",
+          "name": "poison_profile_apply",
+          "number": 95,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Poison.ProfileApply"
+        },
+        {
+          "cardinality": "optional",
+          "name": "poison_profile_status",
+          "number": 96,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Poison.ProfileStatus"
+        },
+        {
+          "cardinality": "optional",
+          "name": "poison_content_update_request",
+          "number": 97,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Poison.ContentUpdateRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "poison_content_update_status",
+          "number": 98,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Poison.ContentUpdateStatus"
+        },
+        {
+          "cardinality": "optional",
+          "name": "poison_pairing_hello",
+          "number": 99,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Poison.PairingHello"
+        },
+        {
+          "cardinality": "optional",
+          "name": "poison_pairing_challenge",
+          "number": 100,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Poison.PairingChallenge"
+        },
+        {
+          "cardinality": "optional",
+          "name": "poison_pairing_confirm",
+          "number": 101,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Poison.PairingConfirm"
+        },
+        {
+          "cardinality": "optional",
+          "name": "poison_package_operation_request",
+          "number": 102,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Poison.PackageOperationRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "poison_package_operation_status",
+          "number": 103,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Poison.PackageOperationStatus"
+        },
+        {
+          "cardinality": "optional",
+          "name": "poison_diagnostic_snapshot_request",
+          "number": 104,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Poison.DiagnosticSnapshotRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "poison_audit_snapshot_request",
+          "number": 105,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Poison.AuditSnapshotRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "poison_audit_event",
+          "number": 106,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Poison.AuditEvent"
+        },
+        {
+          "cardinality": "optional",
+          "name": "poison_audit_snapshot_end",
+          "number": 107,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Poison.AuditSnapshotEnd"
+        },
+        {
+          "cardinality": "optional",
+          "name": "poison_channel_open",
+          "number": 108,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Poison.ChannelOpen"
+        },
+        {
+          "cardinality": "optional",
+          "name": "poison_channel_opened",
+          "number": 109,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Poison.ChannelOpened"
+        },
+        {
+          "cardinality": "optional",
+          "name": "poison_credit_update",
+          "number": 110,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Poison.CreditUpdate"
+        },
+        {
+          "cardinality": "optional",
+          "name": "poison_cancel_request",
+          "number": 111,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Poison.CancelRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "poison_cancelled",
+          "number": 112,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Poison.Cancelled"
+        },
+        {
+          "cardinality": "optional",
+          "name": "poison_resume_request",
+          "number": 113,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Poison.ResumeRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "poison_resume_response",
+          "number": 114,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Poison.ResumeResponse"
+        },
+        {
+          "cardinality": "optional",
+          "name": "poison_workload_request",
+          "number": 115,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Poison.WorkloadRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "poison_workload_status",
+          "number": 116,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Poison.WorkloadStatus"
+        },
+        {
+          "cardinality": "optional",
+          "name": "poison_workload_console",
+          "number": 117,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Poison.WorkloadConsoleFrame"
+        },
+        {
+          "cardinality": "optional",
+          "name": "poison_js_bundle_request",
+          "number": 118,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Poison.JsBundleRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "poison_js_bundle_frame",
+          "number": 119,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Poison.JsBundleFrame"
+        },
+        {
+          "cardinality": "optional",
+          "name": "poison_js_bundle_status",
+          "number": 120,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Poison.JsBundleStatus"
+        },
+        {
+          "cardinality": "optional",
+          "name": "poison_package_catalog_request",
+          "number": 121,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Poison.PackageCatalogRequest"
+        },
+        {
+          "cardinality": "optional",
+          "name": "poison_package_catalog_record",
+          "number": 122,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Poison.PackageCatalogRecord"
+        },
+        {
+          "cardinality": "optional",
+          "name": "poison_package_catalog_end",
+          "number": 123,
+          "oneof": "content",
+          "type": "message",
+          "typeName": "PB_Poison.PackageCatalogEnd"
+        }
+      ],
+      "name": "PB.Main",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "country_code",
+          "number": 1,
+          "oneof": null,
+          "type": "bytes",
+          "typeName": null
+        },
+        {
+          "cardinality": "repeated",
+          "name": "bands",
+          "number": 2,
+          "oneof": null,
+          "type": "message",
+          "typeName": "PB.Region.Band"
+        }
+      ],
+      "name": "PB.Region",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "start",
+          "number": 1,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "end",
+          "number": 2,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "power_limit",
+          "number": 3,
+          "oneof": null,
+          "type": "int32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "duty_cycle",
+          "number": 4,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        }
+      ],
+      "name": "PB.Region.Band",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [],
+      "name": "PB.StopSession",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "args",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "index",
+          "number": 2,
+          "oneof": null,
+          "type": "int32",
+          "typeName": null
+        }
+      ],
+      "name": "PB_App.AppButtonPressReleaseRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "args",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "index",
+          "number": 2,
+          "oneof": null,
+          "type": "int32",
+          "typeName": null
+        }
+      ],
+      "name": "PB_App.AppButtonPressRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [],
+      "name": "PB_App.AppButtonReleaseRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [],
+      "name": "PB_App.AppExitRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "path",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        }
+      ],
+      "name": "PB_App.AppLoadFileRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "state",
+          "number": 1,
+          "oneof": null,
+          "type": "enum",
+          "typeName": "PB_App.AppState"
+        }
+      ],
+      "name": "PB_App.AppStateResponse",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "data",
+          "number": 1,
+          "oneof": null,
+          "type": "bytes",
+          "typeName": null
+        }
+      ],
+      "name": "PB_App.DataExchangeRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [],
+      "name": "PB_App.GetErrorRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "code",
+          "number": 1,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "text",
+          "number": 2,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        }
+      ],
+      "name": "PB_App.GetErrorResponse",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [],
+      "name": "PB_App.LockStatusRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "locked",
+          "number": 1,
+          "oneof": null,
+          "type": "bool",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "active_application",
+          "number": 2,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        }
+      ],
+      "name": "PB_App.LockStatusResponse",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "name",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "args",
+          "number": 2,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        }
+      ],
+      "name": "PB_App.StartRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [],
+      "name": "PB_Desktop.IsLockedRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "locked",
+          "number": 1,
+          "oneof": null,
+          "type": "bool",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Desktop.Status",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [],
+      "name": "PB_Desktop.StatusSubscribeRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [],
+      "name": "PB_Desktop.StatusUnsubscribeRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [],
+      "name": "PB_Desktop.UnlockRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [],
+      "name": "PB_Gpio.GetOtgMode",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "mode",
+          "number": 1,
+          "oneof": null,
+          "type": "enum",
+          "typeName": "PB_Gpio.GpioOtgMode"
+        }
+      ],
+      "name": "PB_Gpio.GetOtgModeResponse",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "pin",
+          "number": 1,
+          "oneof": null,
+          "type": "enum",
+          "typeName": "PB_Gpio.GpioPin"
+        }
+      ],
+      "name": "PB_Gpio.GetPinMode",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "mode",
+          "number": 1,
+          "oneof": null,
+          "type": "enum",
+          "typeName": "PB_Gpio.GpioPinMode"
+        }
+      ],
+      "name": "PB_Gpio.GetPinModeResponse",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "pin",
+          "number": 1,
+          "oneof": null,
+          "type": "enum",
+          "typeName": "PB_Gpio.GpioPin"
+        }
+      ],
+      "name": "PB_Gpio.ReadPin",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "value",
+          "number": 2,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Gpio.ReadPinResponse",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "pin",
+          "number": 1,
+          "oneof": null,
+          "type": "enum",
+          "typeName": "PB_Gpio.GpioPin"
+        },
+        {
+          "cardinality": "optional",
+          "name": "pull_mode",
+          "number": 2,
+          "oneof": null,
+          "type": "enum",
+          "typeName": "PB_Gpio.GpioInputPull"
+        }
+      ],
+      "name": "PB_Gpio.SetInputPull",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "mode",
+          "number": 1,
+          "oneof": null,
+          "type": "enum",
+          "typeName": "PB_Gpio.GpioOtgMode"
+        }
+      ],
+      "name": "PB_Gpio.SetOtgMode",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "pin",
+          "number": 1,
+          "oneof": null,
+          "type": "enum",
+          "typeName": "PB_Gpio.GpioPin"
+        },
+        {
+          "cardinality": "optional",
+          "name": "mode",
+          "number": 2,
+          "oneof": null,
+          "type": "enum",
+          "typeName": "PB_Gpio.GpioPinMode"
+        }
+      ],
+      "name": "PB_Gpio.SetPinMode",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "pin",
+          "number": 1,
+          "oneof": null,
+          "type": "enum",
+          "typeName": "PB_Gpio.GpioPin"
+        },
+        {
+          "cardinality": "optional",
+          "name": "value",
+          "number": 2,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Gpio.WritePin",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "data",
+          "number": 1,
+          "oneof": null,
+          "type": "bytes",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "orientation",
+          "number": 2,
+          "oneof": null,
+          "type": "enum",
+          "typeName": "PB_Gui.ScreenOrientation"
+        }
+      ],
+      "name": "PB_Gui.ScreenFrame",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "key",
+          "number": 1,
+          "oneof": null,
+          "type": "enum",
+          "typeName": "PB_Gui.InputKey"
+        },
+        {
+          "cardinality": "optional",
+          "name": "type",
+          "number": 2,
+          "oneof": null,
+          "type": "enum",
+          "typeName": "PB_Gui.InputType"
+        }
+      ],
+      "name": "PB_Gui.SendInputEventRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [],
+      "name": "PB_Gui.StartScreenStreamRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "first_frame",
+          "number": 1,
+          "oneof": null,
+          "type": "message",
+          "typeName": "PB_Gui.ScreenFrame"
+        },
+        {
+          "cardinality": "optional",
+          "name": "send_input",
+          "number": 2,
+          "oneof": null,
+          "type": "bool",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Gui.StartVirtualDisplayRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [],
+      "name": "PB_Gui.StopScreenStreamRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [],
+      "name": "PB_Gui.StopVirtualDisplayRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "annotation_id",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "evidence_id",
+          "number": 2,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "author_id",
+          "number": 3,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "created_at_ms",
+          "number": 4,
+          "oneof": null,
+          "type": "uint64",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "text",
+          "number": 5,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "repeated",
+          "name": "tags",
+          "number": 6,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.Annotation",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "name",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "path",
+          "number": 2,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "sha256",
+          "number": 3,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "size",
+          "number": 4,
+          "oneof": null,
+          "type": "uint64",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.AppArtifact",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "app_id",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "command_id",
+          "number": 2,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "payload_json",
+          "number": 3,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "cancel",
+          "number": 4,
+          "oneof": null,
+          "type": "bool",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "run_id",
+          "number": 5,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "protocol_version",
+          "number": 6,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "chunk_index",
+          "number": 7,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "chunk_count",
+          "number": 8,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "payload_chunk",
+          "number": 9,
+          "oneof": null,
+          "type": "bytes",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.AppCommand",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "app_id",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "event_id",
+          "number": 2,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "sequence",
+          "number": 3,
+          "oneof": null,
+          "type": "uint64",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "log",
+          "number": 4,
+          "oneof": "kind",
+          "type": "message",
+          "typeName": "PB_Poison.AppLog"
+        },
+        {
+          "cardinality": "optional",
+          "name": "progress",
+          "number": 5,
+          "oneof": "kind",
+          "type": "message",
+          "typeName": "PB_Poison.AppProgress"
+        },
+        {
+          "cardinality": "optional",
+          "name": "form",
+          "number": 6,
+          "oneof": "kind",
+          "type": "message",
+          "typeName": "PB_Poison.AppForm"
+        },
+        {
+          "cardinality": "optional",
+          "name": "table",
+          "number": 7,
+          "oneof": "kind",
+          "type": "message",
+          "typeName": "PB_Poison.AppTable"
+        },
+        {
+          "cardinality": "optional",
+          "name": "artifact",
+          "number": 8,
+          "oneof": "kind",
+          "type": "message",
+          "typeName": "PB_Poison.AppArtifact"
+        },
+        {
+          "cardinality": "optional",
+          "name": "result",
+          "number": 9,
+          "oneof": "kind",
+          "type": "message",
+          "typeName": "PB_Poison.AppResult"
+        },
+        {
+          "cardinality": "optional",
+          "name": "run_id",
+          "number": 10,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "protocol_version",
+          "number": 11,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "chunk_index",
+          "number": 12,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "chunk_count",
+          "number": 13,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "message_chunk",
+          "number": 14,
+          "oneof": null,
+          "type": "bytes",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "schema_json_chunk",
+          "number": 15,
+          "oneof": null,
+          "type": "bytes",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "rows_json_chunk",
+          "number": 16,
+          "oneof": null,
+          "type": "bytes",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.AppEvent",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "schema_json",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.AppForm",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "level",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "message",
+          "number": 2,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.AppLog",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "percent",
+          "number": 1,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "label",
+          "number": 2,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.AppProgress",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "success",
+          "number": 1,
+          "oneof": null,
+          "type": "bool",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "message",
+          "number": 2,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.AppResult",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "schema_json",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "rows_json",
+          "number": 2,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.AppTable",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "event_id",
+          "number": 1,
+          "oneof": null,
+          "type": "uint64",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "prior_digest",
+          "number": 2,
+          "oneof": null,
+          "type": "bytes",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "actor_digest",
+          "number": 3,
+          "oneof": null,
+          "type": "bytes",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "action",
+          "number": 4,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "resource",
+          "number": 5,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "decision",
+          "number": 6,
+          "oneof": null,
+          "type": "enum",
+          "typeName": "PB_Poison.AuditDecision"
+        },
+        {
+          "cardinality": "optional",
+          "name": "timestamp_ms",
+          "number": 7,
+          "oneof": null,
+          "type": "uint64",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "correlation_id",
+          "number": 8,
+          "oneof": null,
+          "type": "bytes",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "safe_metadata",
+          "number": 9,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "digest",
+          "number": 10,
+          "oneof": null,
+          "type": "bytes",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.AuditEvent",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "next_event_id",
+          "number": 1,
+          "oneof": null,
+          "type": "uint64",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "last_digest",
+          "number": 2,
+          "oneof": null,
+          "type": "bytes",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "truncated",
+          "number": 3,
+          "oneof": null,
+          "type": "bool",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.AuditSnapshotEnd",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "after_event_id",
+          "number": 1,
+          "oneof": null,
+          "type": "uint64",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "max_events",
+          "number": 2,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.AuditSnapshotRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "command_id",
+          "number": 1,
+          "oneof": null,
+          "type": "uint64",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "reason",
+          "number": 2,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.CancelRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "command_id",
+          "number": 1,
+          "oneof": null,
+          "type": "uint64",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "accepted",
+          "number": 2,
+          "oneof": null,
+          "type": "bool",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.Cancelled",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "case_id",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "name",
+          "number": 2,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "purpose",
+          "number": 3,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "owner_id",
+          "number": 4,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "created_at_ms",
+          "number": 5,
+          "oneof": null,
+          "type": "uint64",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "retention_policy",
+          "number": 6,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.Case",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "channel",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "initial_credits",
+          "number": 2,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "resume_sequence",
+          "number": 3,
+          "oneof": null,
+          "type": "uint64",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.ChannelOpen",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "channel",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "granted_credits",
+          "number": 2,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "next_sequence",
+          "number": 3,
+          "oneof": null,
+          "type": "uint64",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.ChannelOpened",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "operation",
+          "number": 1,
+          "oneof": null,
+          "type": "enum",
+          "typeName": "PB_Poison.ContentUpdateOperation"
+        },
+        {
+          "cardinality": "optional",
+          "name": "update_id",
+          "number": 2,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "content_type",
+          "number": 3,
+          "oneof": null,
+          "type": "enum",
+          "typeName": "PB_Poison.ContentUpdateType"
+        },
+        {
+          "cardinality": "optional",
+          "name": "manifest_path",
+          "number": 4,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "candidate_digest",
+          "number": 5,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "received_bytes",
+          "number": 6,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "confirmation_token",
+          "number": 7,
+          "oneof": null,
+          "type": "bytes",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "healthy",
+          "number": 8,
+          "oneof": null,
+          "type": "bool",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "previous_digest",
+          "number": 9,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "release_sequence",
+          "number": 10,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "content_bytes",
+          "number": 11,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.ContentUpdateRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "update_id",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "state",
+          "number": 2,
+          "oneof": null,
+          "type": "enum",
+          "typeName": "PB_Poison.ContentUpdateState"
+        },
+        {
+          "cardinality": "optional",
+          "name": "content_type",
+          "number": 3,
+          "oneof": null,
+          "type": "enum",
+          "typeName": "PB_Poison.ContentUpdateType"
+        },
+        {
+          "cardinality": "optional",
+          "name": "candidate_digest",
+          "number": 4,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "previous_digest",
+          "number": 5,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "release_sequence",
+          "number": 6,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "received_bytes",
+          "number": 7,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "content_bytes",
+          "number": 8,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "confirmation_required",
+          "number": 9,
+          "oneof": null,
+          "type": "bool",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "result",
+          "number": 10,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "confirmation_token",
+          "number": 11,
+          "oneof": null,
+          "type": "bytes",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.ContentUpdateStatus",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "channel",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "credits",
+          "number": 2,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.CreditUpdate",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "session_established",
+          "number": 1,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "transport_errors",
+          "number": 2,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "dropped_frames",
+          "number": 3,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "retried_frames",
+          "number": 4,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "command_failures",
+          "number": 5,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "app_crashes",
+          "number": 6,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "policy_denials",
+          "number": 7,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "package_verifications",
+          "number": 8,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "package_revocations",
+          "number": 9,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "update_stages",
+          "number": 10,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "update_health",
+          "number": 11,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "update_rollbacks",
+          "number": 12,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "recoveries",
+          "number": 13,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "javascript_starts",
+          "number": 14,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "javascript_terminals",
+          "number": 15,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "javascript_crashes",
+          "number": 16,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "javascript_limits",
+          "number": 17,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "javascript_recoveries",
+          "number": 18,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.DiagnosticCounters",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "event_id",
+          "number": 1,
+          "oneof": null,
+          "type": "uint64",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "category",
+          "number": 2,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "summary",
+          "number": 3,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "timestamp_ms",
+          "number": 4,
+          "oneof": null,
+          "type": "uint64",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "correlation_digest",
+          "number": 5,
+          "oneof": null,
+          "type": "bytes",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.DiagnosticEvent",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "after_event_id",
+          "number": 1,
+          "oneof": null,
+          "type": "uint64",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "max_events",
+          "number": 2,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.DiagnosticSnapshotRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "key",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "value",
+          "number": 2,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.EvidenceLabel",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "evidence_id",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "case_id",
+          "number": 2,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "source_app_id",
+          "number": 3,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "captured_at_unix_ms",
+          "number": 4,
+          "oneof": null,
+          "type": "uint64",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "device_id",
+          "number": 5,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "firmware_version",
+          "number": 6,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "content_sha256",
+          "number": 7,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "content_length",
+          "number": 8,
+          "oneof": null,
+          "type": "uint64",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "media_type",
+          "number": 9,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "repeated",
+          "name": "labels",
+          "number": 10,
+          "oneof": null,
+          "type": "message",
+          "typeName": "PB_Poison.EvidenceLabel"
+        },
+        {
+          "cardinality": "optional",
+          "name": "previous_audit_sha256",
+          "number": 11,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "audit_sha256",
+          "number": 12,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "operator_id",
+          "number": 13,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "tool_id",
+          "number": 14,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "tool_version",
+          "number": 15,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "canonical_parameters",
+          "number": 16,
+          "oneof": null,
+          "type": "bytes",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "source_path",
+          "number": 17,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.EvidenceRecord",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "export_id",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "schema",
+          "number": 2,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "repeated",
+          "name": "evidence_ids",
+          "number": 3,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "manifest_sha256",
+          "number": 4,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "signature",
+          "number": 5,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "batch_index",
+          "number": 6,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "finalize",
+          "number": 7,
+          "oneof": null,
+          "type": "bool",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "accepted_evidence_ids",
+          "number": 8,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.ExportManifest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "path",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "existing_sha256",
+          "number": 2,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "incoming_sha256",
+          "number": 3,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.FileConflict",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "path",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "cursor",
+          "number": 2,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "page_size",
+          "number": 3,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.FileListRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "repeated",
+          "name": "entries",
+          "number": 1,
+          "oneof": null,
+          "type": "message",
+          "typeName": "PB_Poison.FileStat"
+        },
+        {
+          "cardinality": "optional",
+          "name": "next_cursor",
+          "number": 2,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.FileListResponse",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "path",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "size",
+          "number": 2,
+          "oneof": null,
+          "type": "uint64",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "modified_at_ms",
+          "number": 3,
+          "oneof": null,
+          "type": "uint64",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "directory",
+          "number": 4,
+          "oneof": null,
+          "type": "bool",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "sha256",
+          "number": 5,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.FileStat",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "operation_id",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "path",
+          "number": 2,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "size",
+          "number": 3,
+          "oneof": null,
+          "type": "uint64",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "sha256",
+          "number": 4,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.FileTransferBegin",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "operation_id",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "offset",
+          "number": 2,
+          "oneof": null,
+          "type": "uint64",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "data",
+          "number": 3,
+          "oneof": null,
+          "type": "bytes",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "sha256",
+          "number": 4,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.FileTransferChunk",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "operation_id",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "sha256",
+          "number": 2,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "size",
+          "number": 3,
+          "oneof": null,
+          "type": "uint64",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.FileTransferComplete",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "kind",
+          "number": 1,
+          "oneof": null,
+          "type": "enum",
+          "typeName": "PB_Poison.JsBundleFrameKind"
+        },
+        {
+          "cardinality": "optional",
+          "name": "capability",
+          "number": 2,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "asset_path",
+          "number": 3,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "asset_sha256",
+          "number": 4,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "asset_size",
+          "number": 5,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "offset",
+          "number": 6,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "data",
+          "number": 7,
+          "oneof": null,
+          "type": "bytes",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "eof",
+          "number": 8,
+          "oneof": null,
+          "type": "bool",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.JsBundleFrame",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "operation",
+          "number": 1,
+          "oneof": null,
+          "type": "enum",
+          "typeName": "PB_Poison.JsBundleOperation"
+        },
+        {
+          "cardinality": "optional",
+          "name": "bundle_id",
+          "number": 2,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "version",
+          "number": 3,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "content_sha256",
+          "number": 4,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "asset_path",
+          "number": 5,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "offset",
+          "number": 6,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "length",
+          "number": 7,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.JsBundleRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "accepted",
+          "number": 1,
+          "oneof": null,
+          "type": "bool",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "message",
+          "number": 2,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "bundle_id",
+          "number": 3,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "version",
+          "number": 4,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "api_version",
+          "number": 5,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "entrypoint",
+          "number": 6,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "content_sha256",
+          "number": 7,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "size",
+          "number": 8,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "capability_count",
+          "number": 9,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "asset_count",
+          "number": 10,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.JsBundleStatus",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "path",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.LogicalPath",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "returned_records",
+          "number": 1,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "total_records",
+          "number": 2,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "next_offset",
+          "number": 3,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "generation",
+          "number": 4,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.PackageCatalogEnd",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "id",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "version",
+          "number": 2,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "signer",
+          "number": 3,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "digest",
+          "number": 4,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "source",
+          "number": 5,
+          "oneof": null,
+          "type": "enum",
+          "typeName": "PB_Poison.PackageCatalogSource"
+        },
+        {
+          "cardinality": "optional",
+          "name": "source_path",
+          "number": 6,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "freshness",
+          "number": 7,
+          "oneof": null,
+          "type": "enum",
+          "typeName": "PB_Poison.PackageCatalogFreshness"
+        },
+        {
+          "cardinality": "optional",
+          "name": "state",
+          "number": 8,
+          "oneof": null,
+          "type": "enum",
+          "typeName": "PB_Poison.PackageCatalogState"
+        },
+        {
+          "cardinality": "optional",
+          "name": "verified",
+          "number": 9,
+          "oneof": null,
+          "type": "bool",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "signer_revoked",
+          "number": 10,
+          "oneof": null,
+          "type": "bool",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "conflicted",
+          "number": 11,
+          "oneof": null,
+          "type": "bool",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "ordinal",
+          "number": 12,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "generation",
+          "number": 13,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "compatible",
+          "number": 14,
+          "oneof": null,
+          "type": "bool",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "capability_mask",
+          "number": 15,
+          "oneof": null,
+          "type": "fixed64",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.PackageCatalogRecord",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "offset",
+          "number": 1,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "max_records",
+          "number": 2,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.PackageCatalogRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "package_format",
+          "number": 1,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "content_type",
+          "number": 2,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "id",
+          "number": 3,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "version",
+          "number": 4,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "firmware_api",
+          "number": 5,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "repeated",
+          "name": "payloads",
+          "number": 6,
+          "oneof": null,
+          "type": "message",
+          "typeName": "PB_Poison.PackagePayload"
+        },
+        {
+          "cardinality": "optional",
+          "name": "entrypoint",
+          "number": 7,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "repeated",
+          "name": "capabilities",
+          "number": 8,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "content_sha256",
+          "number": 9,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "signing_key_id",
+          "number": 10,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "signature",
+          "number": 11,
+          "oneof": null,
+          "type": "bytes",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "release_sequence",
+          "number": 12,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.PackageManifest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "operation",
+          "number": 1,
+          "oneof": null,
+          "type": "enum",
+          "typeName": "PB_Poison.PackageOperation"
+        },
+        {
+          "cardinality": "optional",
+          "name": "package_id",
+          "number": 2,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "version",
+          "number": 3,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "previous_version",
+          "number": 4,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "manifest_path",
+          "number": 5,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "candidate_digest",
+          "number": 6,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "previous_digest",
+          "number": 7,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "signing_key_id",
+          "number": 8,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "capability_mask",
+          "number": 9,
+          "oneof": null,
+          "type": "fixed64",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "release_sequence",
+          "number": 10,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "received_bytes",
+          "number": 11,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "content_bytes",
+          "number": 12,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "previous_state",
+          "number": 13,
+          "oneof": null,
+          "type": "enum",
+          "typeName": "PB_Poison.PackageLifecycleState"
+        },
+        {
+          "cardinality": "optional",
+          "name": "protected_package",
+          "number": 14,
+          "oneof": null,
+          "type": "bool",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "confirmation_required",
+          "number": 15,
+          "oneof": null,
+          "type": "bool",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "healthy",
+          "number": 16,
+          "oneof": null,
+          "type": "bool",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "confirmation_token",
+          "number": 17,
+          "oneof": null,
+          "type": "bytes",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.PackageOperationRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "package_id",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "version",
+          "number": 2,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "digest",
+          "number": 3,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "signing_key_id",
+          "number": 4,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "state",
+          "number": 5,
+          "oneof": null,
+          "type": "enum",
+          "typeName": "PB_Poison.PackageLifecycleState"
+        },
+        {
+          "cardinality": "optional",
+          "name": "capability_mask",
+          "number": 6,
+          "oneof": null,
+          "type": "fixed64",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "received_bytes",
+          "number": 7,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "content_bytes",
+          "number": 8,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "protected_package",
+          "number": 9,
+          "oneof": null,
+          "type": "bool",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "confirmation_required",
+          "number": 10,
+          "oneof": null,
+          "type": "bool",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "confirmation_token",
+          "number": 11,
+          "oneof": null,
+          "type": "bytes",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "result",
+          "number": 12,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.PackageOperationStatus",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "path",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "sha256",
+          "number": 2,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "size",
+          "number": 3,
+          "oneof": null,
+          "type": "uint64",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.PackagePayload",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "protocol_version",
+          "number": 1,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "device_ephemeral_public_key",
+          "number": 2,
+          "oneof": null,
+          "type": "bytes",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "device_nonce",
+          "number": 3,
+          "oneof": null,
+          "type": "bytes",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "confirmation_code",
+          "number": 4,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "transcript_digest",
+          "number": 5,
+          "oneof": null,
+          "type": "bytes",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "expires_at_ms",
+          "number": 6,
+          "oneof": null,
+          "type": "uint64",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "session_id",
+          "number": 7,
+          "oneof": null,
+          "type": "fixed64",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "identity_trusted",
+          "number": 8,
+          "oneof": null,
+          "type": "bool",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.PairingChallenge",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "transcript_digest",
+          "number": 1,
+          "oneof": null,
+          "type": "bytes",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "confirmation_code",
+          "number": 2,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "physical_confirmation",
+          "number": 3,
+          "oneof": null,
+          "type": "bool",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "client_identity_signature",
+          "number": 4,
+          "oneof": null,
+          "type": "bytes",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.PairingConfirm",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "protocol_version",
+          "number": 1,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "client_ephemeral_public_key",
+          "number": 2,
+          "oneof": null,
+          "type": "bytes",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "client_name",
+          "number": 3,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "requested_role",
+          "number": 4,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "requested_capabilities",
+          "number": 5,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "client_nonce",
+          "number": 6,
+          "oneof": null,
+          "type": "bytes",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "client_identity_public_key",
+          "number": 7,
+          "oneof": null,
+          "type": "bytes",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.PairingHello",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "granted_capabilities",
+          "number": 1,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "allowed",
+          "number": 2,
+          "oneof": null,
+          "type": "bool",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "policy_version",
+          "number": 3,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "denial_reason",
+          "number": 4,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.PolicyDecision",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "role",
+          "number": 1,
+          "oneof": null,
+          "type": "enum",
+          "typeName": "PB_Poison.Role"
+        },
+        {
+          "cardinality": "optional",
+          "name": "requested_capabilities",
+          "number": 2,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "device_locked",
+          "number": 3,
+          "oneof": null,
+          "type": "bool",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "physical_confirmation",
+          "number": 4,
+          "oneof": null,
+          "type": "bool",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "policy_version",
+          "number": 5,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.PolicyRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "format",
+          "number": 1,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "id",
+          "number": 2,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "version",
+          "number": 3,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "role",
+          "number": 4,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "repeated",
+          "name": "enabled_tools",
+          "number": 5,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "repeated",
+          "name": "favorites",
+          "number": 6,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "theme_id",
+          "number": 7,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "font_pack_id",
+          "number": 8,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "icon_pack_id",
+          "number": 9,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "menu_id",
+          "number": 10,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "dashboard_layout",
+          "number": 11,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "contrast_ratio_x10",
+          "number": 12,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "capability_mask",
+          "number": 13,
+          "oneof": null,
+          "type": "uint64",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "classroom_restricted",
+          "number": 14,
+          "oneof": null,
+          "type": "bool",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "policy_id",
+          "number": 15,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "repeated",
+          "name": "hidden_tools",
+          "number": 16,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "repeated",
+          "name": "shortcuts",
+          "number": 17,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "home_presentation",
+          "number": 18,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "status_presentation",
+          "number": 19,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "lock_behavior",
+          "number": 20,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "notifications_enabled",
+          "number": 21,
+          "oneof": null,
+          "type": "bool",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "haptics_enabled",
+          "number": 22,
+          "oneof": null,
+          "type": "bool",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "tool_defaults_json",
+          "number": 23,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "transport_policy",
+          "number": 24,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "logging_policy",
+          "number": 25,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "evidence_policy",
+          "number": 26,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "radio_region",
+          "number": 27,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "peripheral_safety",
+          "number": 28,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "classroom_policy",
+          "number": 29,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.Profile",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "profile_id",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "confirmation_token",
+          "number": 2,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "confirmation_token_bytes",
+          "number": 3,
+          "oneof": null,
+          "type": "bytes",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.ProfileApply",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "profile_id",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "version",
+          "number": 2,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "known_good",
+          "number": 3,
+          "oneof": null,
+          "type": "bool",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "confirmation_token",
+          "number": 4,
+          "oneof": null,
+          "type": "bytes",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "preview",
+          "number": 5,
+          "oneof": null,
+          "type": "bool",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.ProfileStatus",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "session_id",
+          "number": 1,
+          "oneof": null,
+          "type": "fixed64",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "resume_token",
+          "number": 2,
+          "oneof": null,
+          "type": "bytes",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "last_received_sequence",
+          "number": 3,
+          "oneof": null,
+          "type": "uint64",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.ResumeRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "accepted",
+          "number": 1,
+          "oneof": null,
+          "type": "bool",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "resume_token",
+          "number": 2,
+          "oneof": null,
+          "type": "bytes",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "next_sequence",
+          "number": 3,
+          "oneof": null,
+          "type": "uint64",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "error",
+          "number": 4,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.ResumeResponse",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "protocol_version",
+          "number": 1,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "session_id",
+          "number": 2,
+          "oneof": null,
+          "type": "fixed64",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "sequence",
+          "number": 3,
+          "oneof": null,
+          "type": "fixed64",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "acknowledgement",
+          "number": 4,
+          "oneof": null,
+          "type": "fixed64",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "channel",
+          "number": 5,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "payload",
+          "number": 6,
+          "oneof": null,
+          "type": "bytes",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "authentication_tag",
+          "number": 7,
+          "oneof": null,
+          "type": "bytes",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.SessionEnvelope",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "run_id",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "case_id",
+          "number": 2,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "tool_id",
+          "number": 3,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "tool_version",
+          "number": 4,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "started_at_ms",
+          "number": 5,
+          "oneof": null,
+          "type": "uint64",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "finished_at_ms",
+          "number": 6,
+          "oneof": null,
+          "type": "uint64",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "state",
+          "number": 7,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.ToolRun",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "artifact_id",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "path",
+          "number": 2,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "size",
+          "number": 3,
+          "oneof": null,
+          "type": "uint64",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "sha256",
+          "number": 4,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "state",
+          "number": 5,
+          "oneof": null,
+          "type": "enum",
+          "typeName": "PB_Poison.WorkloadArtifactState"
+        },
+        {
+          "cardinality": "optional",
+          "name": "evidence_id",
+          "number": 6,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.WorkloadArtifact",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "workload_id",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "sequence",
+          "number": 2,
+          "oneof": null,
+          "type": "uint64",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "type",
+          "number": 3,
+          "oneof": null,
+          "type": "enum",
+          "typeName": "PB_Poison.WorkloadConsoleType"
+        },
+        {
+          "cardinality": "optional",
+          "name": "text",
+          "number": 4,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.WorkloadConsoleFrame",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "heap_bytes",
+          "number": 1,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "source_bytes",
+          "number": 2,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "modules",
+          "number": 3,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "parser_depth",
+          "number": 4,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "stack_depth",
+          "number": 5,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "fuel",
+          "number": 6,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "callbacks",
+          "number": 7,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "timers",
+          "number": 8,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "open_handles",
+          "number": 9,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "logs",
+          "number": 10,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "artifacts",
+          "number": 11,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "wall_ms",
+          "number": 12,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "artifact_bytes",
+          "number": 13,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.WorkloadLimits",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "operation",
+          "number": 1,
+          "oneof": null,
+          "type": "enum",
+          "typeName": "PB_Poison.WorkloadOperation"
+        },
+        {
+          "cardinality": "optional",
+          "name": "workload_id",
+          "number": 2,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "runtime",
+          "number": 3,
+          "oneof": null,
+          "type": "enum",
+          "typeName": "PB_Poison.WorkloadRuntime"
+        },
+        {
+          "cardinality": "optional",
+          "name": "project_digest",
+          "number": 4,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "capabilities_digest",
+          "number": 5,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "entrypoint",
+          "number": 6,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "limits",
+          "number": 7,
+          "oneof": null,
+          "type": "message",
+          "typeName": "PB_Poison.WorkloadLimits"
+        },
+        {
+          "cardinality": "optional",
+          "name": "from_sequence",
+          "number": 8,
+          "oneof": null,
+          "type": "uint64",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "evidence_requested",
+          "number": 9,
+          "oneof": null,
+          "type": "bool",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "artifact_id",
+          "number": 10,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "artifact_path",
+          "number": 11,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "artifact_size",
+          "number": 12,
+          "oneof": null,
+          "type": "uint64",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "artifact_sha256",
+          "number": 13,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "evidence_id",
+          "number": 14,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "case_id",
+          "number": 15,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "capability_mask",
+          "number": 16,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.WorkloadRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "workload_id",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "runtime",
+          "number": 2,
+          "oneof": null,
+          "type": "enum",
+          "typeName": "PB_Poison.WorkloadRuntime"
+        },
+        {
+          "cardinality": "optional",
+          "name": "state",
+          "number": 3,
+          "oneof": null,
+          "type": "enum",
+          "typeName": "PB_Poison.WorkloadState"
+        },
+        {
+          "cardinality": "optional",
+          "name": "terminal_reason",
+          "number": 4,
+          "oneof": null,
+          "type": "enum",
+          "typeName": "PB_Poison.WorkloadTerminalReason"
+        },
+        {
+          "cardinality": "optional",
+          "name": "usage",
+          "number": 5,
+          "oneof": null,
+          "type": "message",
+          "typeName": "PB_Poison.WorkloadUsage"
+        },
+        {
+          "cardinality": "optional",
+          "name": "next_sequence",
+          "number": 6,
+          "oneof": null,
+          "type": "uint64",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "artifact_count",
+          "number": 7,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "accepted",
+          "number": 8,
+          "oneof": null,
+          "type": "bool",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "message",
+          "number": 9,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "artifact",
+          "number": 10,
+          "oneof": null,
+          "type": "message",
+          "typeName": "PB_Poison.WorkloadArtifact"
+        },
+        {
+          "cardinality": "optional",
+          "name": "effective_capability_mask",
+          "number": 11,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.WorkloadStatus",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "heap_bytes",
+          "number": 1,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "source_bytes",
+          "number": 2,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "modules",
+          "number": 3,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "parser_depth",
+          "number": 4,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "stack_depth",
+          "number": 5,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "fuel",
+          "number": 6,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "callbacks",
+          "number": 7,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "timers",
+          "number": 8,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "open_handles",
+          "number": 9,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "logs",
+          "number": 10,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "artifacts",
+          "number": 11,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "wall_ms",
+          "number": 12,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "artifact_bytes",
+          "number": 13,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Poison.WorkloadUsage",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "key",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Property.GetRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "key",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "value",
+          "number": 2,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Property.GetResponse",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "archive_path",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Storage.BackupCreateRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "archive_path",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Storage.BackupRestoreRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "path",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "recursive",
+          "number": 2,
+          "oneof": null,
+          "type": "bool",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Storage.DeleteRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "type",
+          "number": 1,
+          "oneof": null,
+          "type": "enum",
+          "typeName": "PB_Storage.File.FileType"
+        },
+        {
+          "cardinality": "optional",
+          "name": "name",
+          "number": 2,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "size",
+          "number": 3,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "data",
+          "number": 4,
+          "oneof": null,
+          "type": "bytes",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "md5sum",
+          "number": 5,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Storage.File",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "path",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Storage.InfoRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "total_space",
+          "number": 1,
+          "oneof": null,
+          "type": "uint64",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "free_space",
+          "number": 2,
+          "oneof": null,
+          "type": "uint64",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Storage.InfoResponse",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "path",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "include_md5",
+          "number": 2,
+          "oneof": null,
+          "type": "bool",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "filter_max_size",
+          "number": 3,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Storage.ListRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "repeated",
+          "name": "file",
+          "number": 1,
+          "oneof": null,
+          "type": "message",
+          "typeName": "PB_Storage.File"
+        }
+      ],
+      "name": "PB_Storage.ListResponse",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "path",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Storage.Md5sumRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "md5sum",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Storage.Md5sumResponse",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "path",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Storage.MkdirRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "path",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Storage.ReadRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "file",
+          "number": 1,
+          "oneof": null,
+          "type": "message",
+          "typeName": "PB_Storage.File"
+        }
+      ],
+      "name": "PB_Storage.ReadResponse",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "old_path",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "new_path",
+          "number": 2,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Storage.RenameRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "path",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Storage.StatRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "file",
+          "number": 1,
+          "oneof": null,
+          "type": "message",
+          "typeName": "PB_Storage.File"
+        }
+      ],
+      "name": "PB_Storage.StatResponse",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "tar_path",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "out_path",
+          "number": 2,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Storage.TarExtractRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "path",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Storage.TimestampRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "timestamp",
+          "number": 1,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        }
+      ],
+      "name": "PB_Storage.TimestampResponse",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "path",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "file",
+          "number": 2,
+          "oneof": null,
+          "type": "message",
+          "typeName": "PB_Storage.File"
+        }
+      ],
+      "name": "PB_Storage.WriteRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "hour",
+          "number": 1,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "minute",
+          "number": 2,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "second",
+          "number": 3,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "day",
+          "number": 4,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "month",
+          "number": 5,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "year",
+          "number": 6,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "weekday",
+          "number": 7,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        }
+      ],
+      "name": "PB_System.DateTime",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [],
+      "name": "PB_System.DeviceInfoRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "key",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "value",
+          "number": 2,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        }
+      ],
+      "name": "PB_System.DeviceInfoResponse",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [],
+      "name": "PB_System.FactoryResetRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [],
+      "name": "PB_System.GetDateTimeRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "datetime",
+          "number": 1,
+          "oneof": null,
+          "type": "message",
+          "typeName": "PB_System.DateTime"
+        }
+      ],
+      "name": "PB_System.GetDateTimeResponse",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "data",
+          "number": 1,
+          "oneof": null,
+          "type": "bytes",
+          "typeName": null
+        }
+      ],
+      "name": "PB_System.PingRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "data",
+          "number": 1,
+          "oneof": null,
+          "type": "bytes",
+          "typeName": null
+        }
+      ],
+      "name": "PB_System.PingResponse",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [],
+      "name": "PB_System.PlayAudiovisualAlertRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [],
+      "name": "PB_System.PowerInfoRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "key",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "value",
+          "number": 2,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        }
+      ],
+      "name": "PB_System.PowerInfoResponse",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [],
+      "name": "PB_System.ProtobufVersionRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "major",
+          "number": 1,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        },
+        {
+          "cardinality": "optional",
+          "name": "minor",
+          "number": 2,
+          "oneof": null,
+          "type": "uint32",
+          "typeName": null
+        }
+      ],
+      "name": "PB_System.ProtobufVersionResponse",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "mode",
+          "number": 1,
+          "oneof": null,
+          "type": "enum",
+          "typeName": "PB_System.RebootRequest.RebootMode"
+        }
+      ],
+      "name": "PB_System.RebootRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "datetime",
+          "number": 1,
+          "oneof": null,
+          "type": "message",
+          "typeName": "PB_System.DateTime"
+        }
+      ],
+      "name": "PB_System.SetDateTimeRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "update_manifest",
+          "number": 1,
+          "oneof": null,
+          "type": "string",
+          "typeName": null
+        }
+      ],
+      "name": "PB_System.UpdateRequest",
+      "reservedNames": [],
+      "reservedNumbers": []
+    },
+    {
+      "fields": [
+        {
+          "cardinality": "optional",
+          "name": "code",
+          "number": 1,
+          "oneof": null,
+          "type": "enum",
+          "typeName": "PB_System.UpdateResponse.UpdateResultCode"
+        }
+      ],
+      "name": "PB_System.UpdateResponse",
+      "reservedNames": [],
+      "reservedNumbers": []
+    }
+  ],
+  "schema": "poison.protocol.snapshot/v1"
+}

@@ -1,0 +1,13 @@
+{
+  "schema": "poison.supported-platforms/v1",
+  "source": "config/supported-clients.json",
+  "rows": [
+    {"id": "macos-chrome", "routes": ["web-runtime"], "status": "planned"},
+    {"id": "macos-safari", "routes": ["web-runtime"], "status": "planned"},
+    {"id": "windows-chrome", "routes": ["web-runtime"], "status": "planned"},
+    {"id": "ubuntu-chrome", "routes": ["web-runtime"], "status": "planned"},
+    {"id": "android-chrome", "routes": ["web-runtime"], "status": "planned"},
+    {"id": "ios-safari", "routes": ["web-runtime"], "status": "planned"},
+    {"id": "firefox-desktop", "routes": ["web-runtime"], "status": "planned"}
+  ]
+}

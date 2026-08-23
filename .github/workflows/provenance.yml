@@ -1,0 +1,34 @@
+name: Provenance and Documentation
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  governance:
+    runs-on: [self-hosted, macOS, ARM64]
+    timeout-minutes: 30
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Verify locked baseline and documentation
+        run: |
+          python3 tools/verify_baseline.py
+          python3 tools/verify_blackmagic.py
+          python3 tools/verify_docs.py
+      - name: Verify SBOM and licensing manifests
+        run: python3 tools/generate_sbom.py --check
+      - name: Verify pinned toolchain manifest
+        run: |
+          ./fbt -h >/dev/null
+          python3 tools/verify_toolchain.py
+      - name: Install locked protocol generators
+        run: |
+          pnpm install --dir tools/protocol --frozen-lockfile
+          cargo fetch --locked --manifest-path tools/protocol/Cargo.toml
+      - name: Verify generated protocol bindings and compatibility
+        run: ./fbt proto

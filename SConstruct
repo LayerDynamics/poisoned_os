@@ -54,6 +54,22 @@ firmware_env = distenv.AddFwProject(
     fw_type="firmware",
     fw_env_key="FW_ENV",
 )
+dist_dir_name = distenv.GetProjetDirName()
+external_apps_artifacts = firmware_env["FW_EXTAPPS"]
+external_app_list = external_apps_artifacts.application_map.values()
+poison_esp_flasher_fap = external_apps_artifacts.application_map[
+    "poison_esp_flasher"
+].compact
+marauder_prepare = distenv.PhonyTarget(
+    "marauder_prepare",
+    [
+        [
+            "${PYTHON3}",
+            "${FBT_SCRIPT_DIR}/marauder.py",
+            "prepare",
+        ]
+    ],
+)
 
 # If enabled, initialize updater-related targets
 if GetOption("fullenv") or any(
@@ -128,27 +144,50 @@ if GetOption("fullenv") or any(
         GDBREMOTE="${BLACKMAGIC_ADDR}",
     )
 
-    # Installation over USB & CLI
+    # A flash target must prove the exact device and protobuf transport before
+    # SCons starts any firmware or resource build action.
+    if not GetOption("no_exec") and any(
+        target in {"flash_usb", "flash_usb_full", "flash_usb_min"}
+        for target in BUILD_TARGETS
+    ):
+        distenv.UsbPreflight()
+
+    # Resolve and verify the pinned Marauder assets before the installer writes
+    # either device. The on-device flasher FAP is also a hard dependency.
+    # Installation over USB protobuf RPC
     usb_update_package = distenv.AddUsbFlashTarget(
-        "#build/usbinstall.flag",
-        (firmware_env["FW_RESOURCES_MANIFEST"], selfupdate_dist),
+        f"#build/{dist_dir_name}-usbinstall.flag",
+        (
+            firmware_env["FW_RESOURCES_MANIFEST"],
+            selfupdate_dist,
+            poison_esp_flasher_fap,
+            marauder_prepare,
+        ),
+        POST_INSTALL_ARGS=[
+            "--marauder-fap",
+            poison_esp_flasher_fap.abspath,
+            "--marauder-target",
+            "flipper-zero-wifi-dev-board",
+        ],
     )
+    # The normal install must carry the branded animation/resource pack and
+    # post-update slideshow. Keep the minimal firmware-only bundle explicit.
+    distenv.Alias("flash_usb", usb_update_package)
     distenv.Alias("flash_usb_full", usb_update_package)
 
     usb_minupdate_package = distenv.AddUsbFlashTarget(
-        "#build/minusbinstall.flag", (selfupdate_min_dist,)
+        f"#build/{dist_dir_name}-minusbinstall.flag",
+        (selfupdate_min_dist,),
+        POST_INSTALL_ARGS=["--skip-marauder"],
     )
-    distenv.Alias("flash_usb", usb_minupdate_package)
+    distenv.Alias("flash_usb_min", usb_minupdate_package)
 
 
 # Target for copying & renaming binaries to dist folder
 basic_dist = distenv.DistCommand("fw_dist", distenv["DIST_DEPENDS"])
 distenv.Default(basic_dist)
 
-dist_dir_name = distenv.GetProjetDirName()
 dist_dir = distenv.Dir(f"#/dist/{dist_dir_name}")
-external_apps_artifacts = firmware_env["FW_EXTAPPS"]
-external_app_list = external_apps_artifacts.application_map.values()
 
 fap_dist = [
     distenv.Install(
@@ -437,6 +476,21 @@ distenv.PhonyTarget(
             "${ARGS}",
         ]
     ],
+)
+
+distenv.PhonyTarget(
+    "marauder_flash",
+    [
+        [
+            "${PYTHON3}",
+            "${FBT_SCRIPT_DIR}/marauder.py",
+            "flash",
+            "--fap",
+            "${SOURCE}",
+            "${ARGS}",
+        ]
+    ],
+    source=poison_esp_flasher_fap,
 )
 
 

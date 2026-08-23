@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package PB_Poison;
+
+message DiagnosticSnapshotRequest {
+    uint64 after_event_id = 1;
+    uint32 max_events = 2;
+}
+
+message DiagnosticCounters {
+    uint32 session_established = 1;
+    uint32 transport_errors = 2;
+    uint32 dropped_frames = 3;
+    uint32 retried_frames = 4;
+    uint32 command_failures = 5;
+    uint32 app_crashes = 6;
+    uint32 policy_denials = 7;
+    uint32 package_verifications = 8;
+    uint32 package_revocations = 9;
+    uint32 update_stages = 10;
+    uint32 update_health = 11;
+    uint32 update_rollbacks = 12;
+    uint32 recoveries = 13;
+    uint32 javascript_starts = 14;
+    uint32 javascript_terminals = 15;
+    uint32 javascript_crashes = 16;
+    uint32 javascript_limits = 17;
+    uint32 javascript_recoveries = 18;
+}
+
+message DiagnosticEvent {
+    uint64 event_id = 1;
+    string category = 2;
+    string summary = 3;
+    uint64 timestamp_ms = 4;
+    bytes correlation_digest = 5;
+}

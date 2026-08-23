@@ -27,6 +27,7 @@ static void rpc_system_app_send_state_response(
     PB_App_AppState state,
     const char* name) {
     PB_Main* response = malloc(sizeof(PB_Main));
+    *response = (PB_Main)PB_Main_init_zero;
 
     response->which_content = PB_Main_app_state_response_tag;
     response->content.app_state_response.state = state;
@@ -122,12 +123,22 @@ static void rpc_system_app_lock_status_process(const PB_Main* request, void* con
     FURI_LOG_D(TAG, "LockStatus");
 
     PB_Main* response = malloc(sizeof(PB_Main));
+    *response = (PB_Main)PB_Main_init_zero;
 
     response->command_id = request->command_id;
     response->which_content = PB_Main_app_lock_status_response_tag;
 
     Loader* loader = furi_record_open(RECORD_LOADER);
-    response->content.app_lock_status_response.locked = loader_is_locked(loader);
+    PB_App_LockStatusResponse* lock_status = &response->content.app_lock_status_response;
+    lock_status->locked = loader_is_locked(loader);
+    FuriString* application_name = furi_string_alloc();
+    if(loader_get_application_name(loader, application_name)) {
+        strlcpy(
+            lock_status->active_application,
+            furi_string_get_cstr(application_name),
+            sizeof(lock_status->active_application));
+    }
+    furi_string_free(application_name);
     furi_record_close(RECORD_LOADER);
 
     FURI_LOG_D(TAG, "LockStatus: response");
@@ -301,6 +312,7 @@ static void rpc_system_app_get_error_process(const PB_Main* request, void* conte
     furi_assert(rpc_app);
 
     PB_Main* response = malloc(sizeof(PB_Main));
+    *response = (PB_Main)PB_Main_init_zero;
 
     response->command_id = request->command_id;
     response->which_content = PB_Main_app_get_error_response_tag;
@@ -421,6 +433,7 @@ void rpc_system_app_exchange_data(RpcAppSystem* rpc_app, const uint8_t* data, si
     furi_check(rpc_app);
 
     PB_Main* request = malloc(sizeof(PB_Main));
+    *request = (PB_Main)PB_Main_init_zero;
 
     request->which_content = PB_Main_app_data_exchange_request_tag;
     PB_App_DataExchangeRequest* content = &request->content.app_data_exchange_request;
@@ -442,6 +455,7 @@ void* rpc_system_app_alloc(RpcSession* session) {
     furi_assert(session);
 
     RpcAppSystem* rpc_app = malloc(sizeof(RpcAppSystem));
+    memset(rpc_app, 0, sizeof(*rpc_app));
     rpc_app->session = session;
 
     RpcHandler rpc_handler = {
@@ -502,5 +516,7 @@ void rpc_system_app_free(void* context) {
         furi_delay_tick(1);
     }
 
+    if(rpc_app->error_text) free(rpc_app->error_text);
+    memset(rpc_app, 0, sizeof(*rpc_app));
     free(rpc_app);
 }

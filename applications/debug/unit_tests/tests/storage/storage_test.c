@@ -6,6 +6,9 @@
 // This is a hack to access internal storage functions and definitions
 #include <storage/storage_i.h>
 
+void poison_file_contract_run_tests(void);
+void poison_vfs_path_run_tests(void);
+
 #define UNIT_TESTS_RESOURCES_PATH(path) EXT_PATH("unit_tests/" path)
 #define UNIT_TESTS_PATH(path)           EXT_PATH(".tmp/unit_tests/" path)
 
@@ -754,6 +757,8 @@ int run_minunit_test_storage(void) {
     MU_RUN_SUITE(test_data_path);
     MU_RUN_SUITE(test_storage_common);
     MU_RUN_SUITE(test_md5_calc_suite);
+    poison_file_contract_run_tests();
+    poison_vfs_path_run_tests();
     return MU_EXIT_CODE;
 }
 

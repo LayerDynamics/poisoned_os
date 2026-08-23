@@ -65,9 +65,39 @@ static void desktop_view_locked_doors_draw(Canvas* canvas, DesktopViewLockedMode
     int32_t offset = model->door_offset;
     int32_t door_left_x = DOOR_L_FINAL_POS + offset;
     int32_t door_right_x = DOOR_R_FINAL_POS - offset;
-    size_t height = icon_get_height(&I_DoorLeft_70x55);
-    canvas_draw_icon(canvas, door_left_x, canvas_height(canvas) - height, &I_DoorLeft_70x55);
-    canvas_draw_icon(canvas, door_right_x, canvas_height(canvas) - height, &I_DoorRight_70x55);
+
+    canvas_set_color(canvas, ColorBlack);
+    canvas_draw_box(canvas, door_left_x, STATUS_BAR_Y_SHIFT, 68, 64 - STATUS_BAR_Y_SHIFT);
+    canvas_draw_box(canvas, door_right_x, STATUS_BAR_Y_SHIFT, 68, 64 - STATUS_BAR_Y_SHIFT);
+    canvas_set_color(canvas, ColorWhite);
+    for(uint8_t y = STATUS_BAR_Y_SHIFT + 5; y < 62; y += 9) {
+        canvas_draw_line(canvas, door_left_x + 4, y, door_left_x + 62, y);
+        canvas_draw_line(canvas, door_right_x + 4, y, door_right_x + 62, y);
+    }
+}
+
+static void desktop_view_locked_draw_secure(
+    Canvas* canvas,
+    const DesktopViewLockedModel* model,
+    bool show_release_hint) {
+    canvas_clear(canvas);
+    canvas_set_color(canvas, ColorBlack);
+    canvas_draw_box(canvas, 0, STATUS_BAR_Y_SHIFT, 15, 64 - STATUS_BAR_Y_SHIFT);
+    canvas_draw_line(canvas, 19, 34, 123, 34);
+    canvas_draw_icon(canvas, 4, STATUS_BAR_Y_SHIFT + 5, &I_Lock_7x8);
+
+    canvas_set_font(canvas, FontSecondary);
+    canvas_draw_str(canvas, 20, 23, "POISONED / SECURE");
+    canvas_set_font(canvas, FontPrimary);
+    canvas_draw_str(canvas, 20, 32, "SECURE");
+    canvas_set_font(canvas, FontSecondary);
+    if(show_release_hint) {
+        canvas_draw_str(canvas, 20, 47, "3x BACK TO RELEASE");
+    } else {
+        canvas_draw_str(canvas, 20, 47, model->pin_locked ? "PIN REQUIRED" : "INPUT LOCKED");
+    }
+    canvas_draw_line(canvas, 20, 54, 123, 54);
+    canvas_draw_str(canvas, 20, 63, "LOCAL CONTROL HELD");
 }
 
 static bool desktop_view_locked_doors_move(DesktopViewLockedModel* model) {
@@ -118,21 +148,21 @@ static void desktop_view_locked_draw(Canvas* canvas, void* model) {
     canvas_set_color(canvas, ColorBlack);
 
     if(view_state == DesktopViewLockedStateDoorsClosing) {
+        canvas_clear(canvas);
         desktop_view_locked_doors_draw(canvas, m);
-        canvas_set_font(canvas, FontPrimary);
-        elements_multiline_text_framed(canvas, 42, 30 + STATUS_BAR_Y_SHIFT, "Locked");
+    } else if(view_state == DesktopViewLockedStateLocked) {
+        desktop_view_locked_draw_secure(canvas, m, false);
     } else if(view_state == DesktopViewLockedStateLockedHintShown) {
-        canvas_set_font(canvas, FontSecondary);
-        elements_bold_rounded_frame(canvas, 14, 2 + STATUS_BAR_Y_SHIFT, 99, 48);
-        elements_multiline_text(canvas, 65, 20 + STATUS_BAR_Y_SHIFT, "To unlock\npress:");
-        canvas_draw_icon(canvas, 65, 36 + STATUS_BAR_Y_SHIFT, &I_Pin_back_arrow_10x8);
-        canvas_draw_icon(canvas, 80, 36 + STATUS_BAR_Y_SHIFT, &I_Pin_back_arrow_10x8);
-        canvas_draw_icon(canvas, 95, 36 + STATUS_BAR_Y_SHIFT, &I_Pin_back_arrow_10x8);
-        canvas_draw_icon(canvas, 16, 7 + STATUS_BAR_Y_SHIFT, &I_WarningDolphin_45x42);
-        canvas_draw_dot(canvas, 17, 61);
+        desktop_view_locked_draw_secure(canvas, m, true);
     } else if(view_state == DesktopViewLockedStateUnlockedHintShown) {
+        canvas_clear(canvas);
+        canvas_draw_box(canvas, 0, STATUS_BAR_Y_SHIFT, 128, 64 - STATUS_BAR_Y_SHIFT);
+        canvas_set_color(canvas, ColorWhite);
         canvas_set_font(canvas, FontPrimary);
-        elements_multiline_text_framed(canvas, 42, 30 + STATUS_BAR_Y_SHIFT, "Unlocked");
+        canvas_draw_str_aligned(canvas, 64, 36, AlignCenter, AlignBottom, "RELEASED");
+        canvas_set_font(canvas, FontSecondary);
+        canvas_draw_str_aligned(
+            canvas, 64, 49, AlignCenter, AlignBottom, "LOCAL CONTROL RESTORED");
     }
 }
 

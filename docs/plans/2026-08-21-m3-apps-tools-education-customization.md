@@ -15,16 +15,24 @@
 
 | Achievement | Status before implementation | Required closing evidence |
 |---|---|---|
-| A3.1 Signed application packages | Not started | Deterministic build/sign/verify/catalog plus transactional lifecycle and rollback pass. |
-| A3.2 Signed firmware and content updates | Not started | Existing updater integration survives every interruption and failed-health boundary. |
-| A3.3 Structured application control | Not started | Typed and legacy modes pass together with malformed-event isolation. |
-| A3.4 Profiles and safe customization | Not started | Field/classroom profile preview, atomic apply, export/reset/import, and accessibility pass. |
-| A3.5 Curated professional tools | Not started | ADR-0008 and independent proof for all ten hardware families pass. |
-| A3.6 Student and educator workflows | Not started | Device-only lesson plus offline author/assign/collect/review workflow passes. |
-| A3.7 Confirmation and recovery | Not started | Destructive-caller coverage and dashboard-independent firmware/profile/index recovery pass. |
+| A3.1 Signed application packages | In progress: bounded package contract, deterministic host builder/signer, firmware verifier/transaction, and deterministic local-catalog foundations are implemented; device RPC/catalog wiring, lifecycle fault vectors, and full signature vectors remain. | Deterministic build/sign/verify/catalog plus transactional lifecycle and rollback pass. |
+| A3.2 Signed firmware and content updates | In progress: shared bounded content-update state/rollback coordinator and firmware regression coverage are implemented; updater integration, signature vectors, health signaling, and fault injection remain. | Existing updater integration survives every interruption and failed-health boundary. |
+| A3.3 Structured application control | In progress: bounded structured-app protocol, firmware sequence validator/SDK, RPC input gate, and dashboard structured/legacy view foundations are implemented; full authenticated RPC dispatch and physical dual-mode E2E remain. | Typed and legacy modes pass together with malformed-event isolation. |
+| A3.4 Profiles and safe customization | In progress: versioned profile protocol, immutable built-in recovery profile, role-capability/contrast validation, atomic preview/apply/reset, asset identifier checks, and dashboard editor foundations are implemented; signed asset transactions, import/export, full settings UI, and physical recovery remain. | Field/classroom profile preview, atomic apply, export/reset/import, and accessibility pass. |
+| A3.5 Curated professional tools | In progress: ADR-0008 boundary, capability contract, ten-family catalog schema/data, host validator, firmware execution gate, and dashboard catalog/run foundations are implemented; family adapters, signed inventory reconciliation, and physical proof remain. | ADR-0008 and independent proof for all ten hardware families pass. |
+| A3.6 Student and educator workflows | In progress: signed lesson schema/introductory pack, firmware progress/reset state machine, digest-only evidence checkpoints, and dashboard lesson/classroom authoring, assignment, and review foundations are implemented with regression coverage; offline synchronization and physical classroom evidence remain. | Device-only lesson plus offline author/assign/collect/review workflow passes. |
+| A3.7 Confirmation and recovery | In progress: the 12-caller destructive-operation inventory, recovery state machine, device-only scene entrypoints, last-known-good gating, cancellation, and user-data preservation regression coverage are implemented; caller dispatch integration, updater boot integration, and physical recovery remain. | Destructive-caller coverage and dashboard-independent firmware/profile/index recovery pass. |
 | A3.8 Field and classroom E2E | Not started | Complete real-hardware package/update/tool/profile/lesson/recovery protocol passes. |
 
-**Canonical task commands:** firmware tasks run `./fbt FIRMWARE_APP_SET=unit_tests` and `python3 tools/hil/run_suite.py --suite firmware-units`; Python package/catalog tools run `python3 -m unittest discover tools`; dashboard tasks run `pnpm --dir dashboard verify`; bridge tasks run `cargo test --workspace --manifest-path bridge/Cargo.toml`; physical workflows run the exact HIL and Playwright commands named below. Record command, versions, signer/fixture/device IDs, exit code, and evidence digest before changing a ledger row.
+**Canonical task commands:** firmware tasks run `./fbt FIRMWARE_APP_SET=unit_tests` and `python3 tools/hil/run_suite.py --suite firmware-units`; Python package/catalog tools run `python3 -m unittest discover tools`; dashboard tasks run `pnpm --dir dashboard verify`; bridge tasks use `python3 tools/rust/cargo.py`; physical workflows run the exact HIL and Playwright commands named below. Record command, versions, signer/fixture/device IDs, exit code, and evidence digest before changing a ledger row.
+
+**Implementation evidence (Task 4 foundation):** `poison_content_update.h/.c` defines the shared `Discovered → Receiving → Staged → Verified → AwaitingConfirmation → Activating → Healthy/RolledBack/Quarantined` transition contract, validates bounded identifiers/digests, and preserves a previous digest for rollback. `poison_content_update_test.c` covers ordered activation, invalid inputs, rollback, and terminal-state rejection; the unit firmware image passed on 2026-08-21. Existing updater wiring, signed manifest verification, boot-health persistence, and interruption fault vectors remain open.
+
+**Implementation evidence (Tasks 19–20 foundation):** `data/poison/lessons/lesson.schema.json` and `getting-started.json` define signed bounded lesson packs; `poison_lessons.c/.h` enforces ordered signed steps, digest-only checkpoints, per-learner progress, completion, and reset; `poison_assignments.c/.h` adds bounded workspace-scoped assignment creation, instructor-only binding/reset, role-checked collection, and listing; `dashboard/src/education/` provides lesson execution, classroom assignment, authoring validation/versioning, digest-only progress review, and deterministic offline assignment queue/merge helpers with regression tests. Firmware unit build and dashboard verification pass; signed synchronization transport/export and physical device-only evidence remain open.
+
+**Implementation evidence (Task 22 foundation):** `applications/system/poison_recovery/` provides a dashboard-independent recovery state machine with menu, firmware/profile/index operations, last-known-good gating, cancellation, and mandatory user-data preservation; `poison_recovery_test.c` covers successful restore, unsafe metadata denial, and terminal cancellation. Updater boot-time fallback, signed artifact discovery, and physical recovery evidence remain open.
+
+**Implementation evidence (Task 21 foundation):** `poison_confirmation.h/.c` now enumerates storage, evidence, migration, package, update, radio-policy, identity, native-code, application, profile, lesson, and recovery callers; the firmware regression test requires a confirmation policy row for every enumerated caller. Generic RPC caller dispatch and changed-argument mutation coverage remain open.
 
 ## Achievement A3.1: Signed Application Packages
 
@@ -68,6 +76,8 @@
 4. Run firmware and Python package tests twice from clean outputs → Expected: identical package digests and complete rejection coverage.
 5. Stage diffs and request approval for proposed `feat(packages): add signed deterministic application bundles`.
 
+**Implementation evidence (Task 1 foundation):** `schemas/poison/package-manifest.schema.json`, generated `poison_packages.proto` bindings, `tools/packages/build_package.py`, `tools/packages/sign_package.py`, and `poison_package_verify.c` establish bounded package types, path-safe payload validation, deterministic ZIP member ordering/timestamps, lowercase SHA-256 checks, signer revocation/downgrade rejection, and the M0 OpenSSL signing primitive. Reproducibility tests and the firmware unit image passed on 2026-08-21; complete signature/key vectors, device archive verification, and transactional lifecycle remain open.
+
 ### Task 2: Implement install, update, rollback, and removal
 
 **Files:**
@@ -105,6 +115,8 @@
 3. Cache signed catalog metadata for offline browsing, retain source and freshness state, and reject rollback/downgrade/revocation conflicts before download or transfer.
 4. Test duplicate sources, stale metadata, source disappearance, conflicting package IDs, revoked metadata keys, offline restart, and catalog/package inventory reconciliation.
 5. Run firmware, bridge, and dashboard catalog tests → Expected: every displayed availability state is derived from current signed metadata and local verified inventory.
+
+**Implementation evidence (Task 3):** `poison_package_catalog.c/.h`, `bridge/src/packages.rs`, `PackageSources.tsx`, and their tests provide bounded records for device, bundled-release, imported-file, and local-repository sources; deterministic ordering; duplicate-source and conflicting-digest rejection; stale/missing-source quarantine; revoked/unverified metadata exclusion; and JSON cache restore for offline browsing. `rpc_poison_package_catalog_list_authenticated` validates the M1 session and fixed `package-catalog` channel before returning the ordered bounded device catalog, with firmware regression coverage for valid and wrong-channel requests. `PackageCatalog::reconcile_source_paths` now reconciles a fresh inventory and quarantines disappeared records, with bridge regression coverage. Remote catalog transport remains disabled; signed catalog-key vectors and complete downgrade/revocation fixtures remain open.
 
 ## Achievement A3.2: Signed Firmware and Content Updates
 
@@ -161,7 +173,18 @@
 3. Select structured rendering when advertised and preserve existing framebuffer/input behavior for legacy FAPs.
 4. Run firmware and dashboard tests → Expected: both modes work and a malformed structured app cannot crash or control the dashboard shell.
 
+**Implementation evidence (Task 5 foundation):** `poison_app.proto/.options` (union tags 92–93), generated C/TypeScript/Rust bindings, `poison_app.c/.h`, `poison_app_sdk.h`, `rpc_poison_app.c`, `StructuredAppView.tsx`, and `LegacyFramebufferView.tsx` provide bounded typed event payloads, contiguous sequence enforcement, terminal cancellation, command-size validation, and a structured/legacy rendering split. Firmware unit and dashboard tests pass; authenticated command dispatch, complete typed form/table/artifact handling, and physical dual-mode E2E remain open.
+
 ## Achievement A3.4: Profiles and Safe Customization
+
+**Current implementation status (2026-08-21):** In progress. The firmware now contains an
+immutable built-in PoisonedOS field-console presentation across the desktop home, app and
+settings navigation, lock/control/PIN-delay surfaces, status rail, diagnostics, updater, and
+power lifecycle. The source regression suite is `tools/tests/test_poison_ui.py`; the current
+firmware build passes with API 88.3. Transactional user profiles, signed appearance packs,
+device/dashboard preview, atomic activation, rollback, import/export, accessibility validation,
+and device-only known-good profile recovery in Task 6 remain unimplemented and are not implied
+by this built-in visual foundation.
 
 ### Task 6: Implement transactional profiles and appearance settings
 
@@ -195,6 +218,9 @@
 
 **Achievement check:** An owner can configure a field profile and an instructor can configure a constrained classroom profile, export either, reset the device, and restore it exactly.
 
+**Implementation evidence (Task 6 foundation):** `poison_profiles.proto/.options` (union tags 94–96), generated bindings, `poison_profiles.c/.h`, `poison_profile_assets.c/.h`, `rpc_poison_profiles.c`, `ProfileEditor.tsx`, `ThemeEditor.tsx`, and tests implement versioned profile fields, immutable `poisonedos.field-console` recovery initialization, role capability intersection, minimum contrast validation, preview-before-apply, atomic apply/reset, bounded asset identifiers, and dashboard change summaries. Signed asset verification, persistent storage transactions, import/export, complete settings scenes, and device-only recovery E2E remain open.
+`ProfileEditor.tsx` now also provides canonical format-1 JSON export/import with capability-mask preservation and validation-backed rejection of malformed or inaccessible profiles; dashboard verification passes. Firmware-signed asset transactions, persistent storage transactions, complete settings scenes, and device-only recovery E2E remain open.
+
 ## Achievement A3.5: Curated Professional Tool Catalog
 
 ### Task 7: Decide the supported tool sources and contribution boundary
@@ -211,6 +237,8 @@
 3. Define the adapter boundary between existing applications and PoisonedOS structured commands/results so tool integration does not duplicate radio/protocol engines.
 4. Define capability, regional-policy, classroom-policy, destructive-action, raw-capture, and evidence-redaction rules per family.
 5. Review ADR-0008 before implementing catalog adapters; unresolved ownership or licensing blocks the affected family, not the accuracy of the catalog.
+
+**Implementation evidence (Task 7 foundation):** `ADR-0008-v1-tool-catalog.md`, `tool-capability-policy.md`, and `tool-adapter-contract.md` establish the local-only source boundary, ten hardware families, provenance/ownership fields, separate observe/mutation capabilities, current-device authorization, resource release, and evidence rules. They use domain ownership and authorization terms rather than milestone labels.
 
 ### Task 8: Define and validate the curated tool catalog
 
@@ -234,6 +262,8 @@
 3. Validate unique IDs, schema versions, package references, capability declarations, bounded parameters, output schemas, and applicable radio-region policy in CI; profiles and tool defaults cannot weaken regulatory enforcement without an explicit authorized developer policy.
 4. Route execution through structured app sessions and save selected results through the M2 evidence service.
 5. Run catalog, structured-app, policy, and dashboard tests → Expected: catalog and installed package inventory agree exactly.
+
+**Implementation evidence (Task 8 foundation):** `data/poison/catalog/tool.schema.json`, `tools.json`, `tools/catalog/validate_catalog.py`, `poison_tools.c/.h`, `rpc_poison_tools.c`, `ToolCatalog.tsx`, `ToolRunView.tsx`, and tests enforce unique bounded records for all ten families and expose foundation entries as non-runnable until a verified adapter is present. The catalog validator and firmware/dashboard checks pass; family-specific adapters, signed inventory reconciliation, and physical evidence remain open.
 
 The ten tasks below share this completion protocol: first preserve current device-only behavior and file-format fixtures in compatibility tests; then define bounded typed commands, sequence/credit-controlled events, cancellation, hardware ownership, capabilities, and raw/derived evidence schemas; enforce policy in firmware; preserve a device UI and stop/recovery path; finally run allowed, denied, cancel, disconnect/reconnect, contention, and evidence-verification scenarios on physical hardware through `python3 tools/hil/run_suite.py --suite tool-families`.
 
@@ -271,6 +301,13 @@ The ten tasks below share this completion protocol: first preserve current devic
 
 ### Task 11: Integrate iButton and 1-Wire workflows
 
+**Current implementation status (2026-08-21):** The shared iButton adapter now allocates and tears
+down the upstream protocol/key objects, performs physical reads through `ibutton_protocols_read`,
+returns the detected protocol and bounded rendered data, and exposes explicit write-ID and emulate
+start/stop lifecycle calls. The adapter is linked against the firmware iButton library and exported
+through the Poison tool service ABI. Physical read/write/emulation evidence still requires a connected
+1-Wire accessory; the adapter does not claim that hardware evidence from build tests.
+
 **Files:**
 - Modify: `applications/main/ibutton/application.fam`
 - Modify: `applications/main/onewire/application.fam`
@@ -287,6 +324,12 @@ The ten tasks below share this completion protocol: first preserve current devic
 
 ### Task 12: Integrate infrared workflows
 
+**Current implementation status (2026-08-21):** The shared infrared adapter now uses the existing
+`InfraredWorker` and HAL for decoded/raw receive, bounded receive timeouts, signal metadata, steady
+transmit, contention checks, and deterministic stop/cleanup. It is linked against the firmware
+infrared library and exported through the Poison tool service ABI. Physical capture/transmit evidence
+still requires an attached IR source/receiver and is not inferred from the build.
+
 **Files:**
 - Modify: `applications/main/infrared/application.fam`
 - Create: `applications/services/poison_tools/adapters/poison_tool_infrared.c`
@@ -301,6 +344,13 @@ The ten tasks below share this completion protocol: first preserve current devic
 3. Test malformed and oversized signals, cancel, receiver/transmitter contention, denied replay, disconnect, and evidence fidelity.
 
 ### Task 13: Integrate Sub-GHz workflows and regulatory enforcement
+
+**Current implementation status (2026-08-21):** The shared Sub-GHz adapter now initializes the
+existing protocol registry, CC1101 device registry, receiver, and worker; validates frequencies
+against the selected hardware; performs bounded decoded receive with RSSI/LQI metadata; supports
+bounded raw LevelDuration transmit; and tears down the radio and worker deterministically. It is
+linked through the Poison tool service ABI. Physical RF evidence and the full policy recheck path
+still require connected-hardware verification.
 
 **Files:**
 - Modify: `applications/main/subghz/application.fam`
@@ -317,13 +367,46 @@ The ten tasks below share this completion protocol: first preserve current devic
 
 ### Task 14: Integrate GPIO workflows
 
+**Current implementation status (2026-08-21):** In progress. The shared GPIO adapter now executes
+validated external-pin configuration, reads, writes, bounded sampling, and analog-safe release through
+the Flipper HAL (`applications/services/poison_tools/poison_gpio_adapter.c`), with firmware unit tests.
+The ESP target adapter now covers every bundled board image: the WiFi dev board, Marauder S2/S3,
+FlipperHTTP S2, and Wardriver WROOM/S3. `Poison ESP Flasher` now ports
+Momentum's device-resident Espressif serial-flasher architecture: the Flipper controls
+DTR/RTS/SWCLK and OTG, enters the attached ESP bootloader, writes bootloader at `0x1000`,
+partition table at `0x8000`, boot_app0 at `0xE000`, and firmware at `0x10000`, and performs
+target-side MD5 verification after every segment. The normal `marauder_flash` host command only
+verifies and stages the pinned v1.15.0 assets and FAP, then launches the on-device board menu or
+the explicit `marauder_flipper` auto path; it never calls host esptool. The previous GPIO bridge
+is retained as the explicit `bridge-flash` diagnostic path and always tears down through the
+reserved 1200-baud signal. Requested serial ports must present the Flipper `0483:5740`
+descriptor, so the DisplayLink `17e9:6000` device is rejected. The first-party `Poison Marauder`
+FAP provides device information, passive AP scan, result listing, stop, bounded UART output,
+and overrun markers; it deliberately exposes no transmit/attack shortcut before M1 policy and
+exact-confirmation integration. The focused host suite has 18 passing tests and the on-device
+flasher builds at API 88.3. The first verified board write and post-flash companion validation
+remain required before this task is complete.
+
 **Files:**
 - Modify: `applications/main/gpio/application.fam`
+- Modify: `applications/main/gpio/gpio_app.c`
+- Modify: `applications/main/gpio/gpio_app_i.h`
+- Modify: `applications/main/gpio/scenes/gpio_scene_start.c`
+- Modify: `applications/main/gpio/scenes/gpio_scene_usb_uart.c`
 - Modify: `applications/services/rpc/rpc_gpio.c`
+- Create: `applications/external/application.fam`
+- Create: `applications/external/poison_marauder/application.fam`
+- Create: `applications/external/poison_marauder/poison_marauder.c`
+- Create: `applications/external/poison_esp_flasher/application.fam`
+- Create: `applications/external/poison_esp_flasher/esp_flasher_app.c`
+- Create: `applications/external/poison_esp_flasher/esp_flasher_worker.c`
+- Create: `provenance/marauder.lock.json`
+- Create: `scripts/marauder.py`
 - Create: `applications/services/poison_tools/adapters/poison_tool_gpio.c`
 - Create: `dashboard/src/tools/families/GpioTool.tsx`
 - Test: `applications/debug/unit_tests/tests/tools/poison_tool_gpio_test.c`
 - Test: `dashboard/src/tools/families/GpioTool.test.tsx`
+- Test: `tools/tests/test_marauder.py`
 
 **Steps:**
 
@@ -332,6 +415,11 @@ The ten tasks below share this completion protocol: first preserve current devic
 3. Test safe input, approved output, conflict, cancel, disconnect fail-safe state, overrun reporting, and evidence export.
 
 ### Task 15: Integrate USB and HID workflows
+
+**Current implementation status (2026-08-21):** The shared USB/HID adapter now switches to the
+real Flipper USB HID interface, exposes connection state plus keyboard/mouse operations, releases
+all held inputs, and restores the prior USB interface on teardown. It is exported through the Poison
+tool service ABI; host detach and physical HID evidence remain hardware verification requirements.
 
 **Files:**
 - Modify: `applications/main/bad_usb/application.fam`
@@ -348,6 +436,12 @@ The ten tasks below share this completion protocol: first preserve current devic
 3. Test detach, host rejection, cancellation, lock transition, script error, descriptor conflict with control transport, and recovery to the prior USB mode.
 
 ### Task 16: Integrate BLE and Bluetooth HID workflows
+
+**Current implementation status (2026-08-21):** The shared BLE adapter now starts the existing
+Bluetooth HID profile, uses the Flipper Bluetooth HAL for active-state inspection and advertising,
+exposes keyboard and mouse reports through the real HID profile, releases all held reports, and
+restores the default profile during teardown. Physical pairing/input evidence remains a hardware
+verification requirement.
 
 **Files:**
 - Modify: `applications/services/bt/application.fam`
@@ -378,6 +472,10 @@ The ten tasks below share this completion protocol: first preserve current devic
 1. Configure only supported UART parameters, arbitrate pins with GPIO/expansion, stream sequence-numbered bounded RX/TX logs, and save selected bytes as evidence.
 2. Gate transmit independently from observe; reject unsupported baud/frame settings, reserved pins, unbounded buffers, and output after stop/disconnect.
 3. Test overrun/truncation markers, binary data, cancellation, cable loss, pin contention, denied transmit, and reconnect without duplicate writes.
+4. Provision curated ESP coprocessor firmware only from an authoritative pinned manifest:
+   identify the existing hardware name when possible, detect chip family and flash size,
+   reject ambiguous board profiles, verify every input segment, use declared offsets, verify
+   flash readback, and skip a repeated write when the exact curated version is already running.
 
 ### Task 18: Integrate storage and archive workflows
 
@@ -511,7 +609,7 @@ The ten tasks below share this completion protocol: first preserve current devic
 python3 tools/hil/run_suite.py --suite firmware-units
 python3 tools/catalog/validate_catalog.py
 pnpm --dir dashboard verify
-cargo test --workspace --manifest-path bridge/Cargo.toml
+python3 tools/rust/cargo.py test --workspace --manifest-path bridge/Cargo.toml
 python3 tools/hil/run_suite.py --suite apps-tools-education
 python3 tools/hil/run_suite.py --suite tool-families
 python3 tools/hil/run_suite.py --suite device-recovery

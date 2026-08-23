@@ -1,0 +1,202 @@
+syntax = "proto3";
+
+package PB_Poison;
+
+message PackagePayload {
+    string path = 1;
+    string sha256 = 2;
+    uint64 size = 3;
+}
+
+message PackageManifest {
+    uint32 package_format = 1;
+    string content_type = 2;
+    string id = 3;
+    string version = 4;
+    string firmware_api = 5;
+    repeated PackagePayload payloads = 6;
+    string entrypoint = 7;
+    repeated string capabilities = 8;
+    string content_sha256 = 9;
+    string signing_key_id = 10;
+    bytes signature = 11;
+    uint32 release_sequence = 12;
+}
+
+enum ContentUpdateOperation {
+    CONTENT_UPDATE_OPERATION_INSPECT = 0;
+    CONTENT_UPDATE_OPERATION_IMPORT = 1;
+    CONTENT_UPDATE_OPERATION_STAGE = 2;
+    CONTENT_UPDATE_OPERATION_VERIFY = 3;
+    CONTENT_UPDATE_OPERATION_ACTIVATE = 4;
+    CONTENT_UPDATE_OPERATION_HEALTH = 5;
+    CONTENT_UPDATE_OPERATION_CANCEL = 6;
+    CONTENT_UPDATE_OPERATION_ROLLBACK = 7;
+    CONTENT_UPDATE_OPERATION_QUARANTINE = 8;
+}
+
+enum ContentUpdateState {
+    CONTENT_UPDATE_STATE_DISCOVERED = 0;
+    CONTENT_UPDATE_STATE_RECEIVING = 1;
+    CONTENT_UPDATE_STATE_STAGED = 2;
+    CONTENT_UPDATE_STATE_VERIFIED = 3;
+    CONTENT_UPDATE_STATE_AWAITING_CONFIRMATION = 4;
+    CONTENT_UPDATE_STATE_ACTIVATING = 5;
+    CONTENT_UPDATE_STATE_HEALTHY = 6;
+    CONTENT_UPDATE_STATE_ROLLED_BACK = 7;
+    CONTENT_UPDATE_STATE_QUARANTINED = 8;
+}
+
+enum ContentUpdateType {
+    CONTENT_UPDATE_TYPE_APPLICATION = 0;
+    CONTENT_UPDATE_TYPE_FIRMWARE = 1;
+    CONTENT_UPDATE_TYPE_LESSON = 2;
+    CONTENT_UPDATE_TYPE_TOOL_DATA = 3;
+    CONTENT_UPDATE_TYPE_THEME = 4;
+    CONTENT_UPDATE_TYPE_FONT_ICON = 5;
+    CONTENT_UPDATE_TYPE_MENU = 6;
+    CONTENT_UPDATE_TYPE_RESOURCE = 7;
+    CONTENT_UPDATE_TYPE_UI_PACK = 8;
+}
+
+message ContentUpdateRequest {
+    ContentUpdateOperation operation = 1;
+    string update_id = 2;
+    ContentUpdateType content_type = 3;
+    string manifest_path = 4;
+    string candidate_digest = 5;
+    uint32 received_bytes = 6;
+    bytes confirmation_token = 7;
+    bool healthy = 8;
+    string previous_digest = 9;
+    uint32 release_sequence = 10;
+    uint32 content_bytes = 11;
+}
+
+message ContentUpdateStatus {
+    string update_id = 1;
+    ContentUpdateState state = 2;
+    ContentUpdateType content_type = 3;
+    string candidate_digest = 4;
+    string previous_digest = 5;
+    uint32 release_sequence = 6;
+    uint32 received_bytes = 7;
+    uint32 content_bytes = 8;
+    bool confirmation_required = 9;
+    string result = 10;
+    bytes confirmation_token = 11;
+}
+
+enum PackageOperation {
+    PACKAGE_OPERATION_INSPECT = 0;
+    PACKAGE_OPERATION_IMPORT = 1;
+    PACKAGE_OPERATION_STAGE = 2;
+    PACKAGE_OPERATION_VERIFY = 3;
+    PACKAGE_OPERATION_ACTIVATE = 4;
+    PACKAGE_OPERATION_HEALTH = 5;
+    PACKAGE_OPERATION_DISABLE = 6;
+    PACKAGE_OPERATION_ENABLE = 7;
+    PACKAGE_OPERATION_REMOVE = 8;
+    PACKAGE_OPERATION_ROLLBACK = 9;
+    PACKAGE_OPERATION_QUARANTINE = 10;
+}
+
+enum PackageLifecycleState {
+    PACKAGE_LIFECYCLE_STATE_INSTALLED = 0;
+    PACKAGE_LIFECYCLE_STATE_STAGED = 1;
+    PACKAGE_LIFECYCLE_STATE_VERIFIED = 2;
+    PACKAGE_LIFECYCLE_STATE_ACTIVE = 3;
+    PACKAGE_LIFECYCLE_STATE_DISABLED = 4;
+    PACKAGE_LIFECYCLE_STATE_QUARANTINED = 5;
+    PACKAGE_LIFECYCLE_STATE_REMOVED = 6;
+}
+
+message PackageOperationRequest {
+    PackageOperation operation = 1;
+    string package_id = 2;
+    string version = 3;
+    string previous_version = 4;
+    string manifest_path = 5;
+    string candidate_digest = 6;
+    string previous_digest = 7;
+    string signing_key_id = 8;
+    fixed64 capability_mask = 9;
+    uint32 release_sequence = 10;
+    uint32 received_bytes = 11;
+    uint32 content_bytes = 12;
+    PackageLifecycleState previous_state = 13;
+    bool protected_package = 14;
+    bool confirmation_required = 15;
+    bool healthy = 16;
+    bytes confirmation_token = 17;
+}
+
+message PackageOperationStatus {
+    string package_id = 1;
+    string version = 2;
+    string digest = 3;
+    string signing_key_id = 4;
+    PackageLifecycleState state = 5;
+    fixed64 capability_mask = 6;
+    uint32 received_bytes = 7;
+    uint32 content_bytes = 8;
+    bool protected_package = 9;
+    bool confirmation_required = 10;
+    bytes confirmation_token = 11;
+    string result = 12;
+}
+
+enum PackageCatalogSource {
+    PACKAGE_CATALOG_SOURCE_DEVICE_STORAGE = 0;
+    PACKAGE_CATALOG_SOURCE_BUNDLED_RELEASE = 1;
+    PACKAGE_CATALOG_SOURCE_IMPORTED_FILE = 2;
+    PACKAGE_CATALOG_SOURCE_LOCAL_REPOSITORY = 3;
+}
+
+enum PackageCatalogFreshness {
+    PACKAGE_CATALOG_FRESHNESS_UNKNOWN = 0;
+    PACKAGE_CATALOG_FRESHNESS_FRESH = 1;
+    PACKAGE_CATALOG_FRESHNESS_STALE = 2;
+    PACKAGE_CATALOG_FRESHNESS_MISSING = 3;
+}
+
+enum PackageCatalogState {
+    PACKAGE_CATALOG_STATE_INSTALLED = 0;
+    PACKAGE_CATALOG_STATE_STAGED = 1;
+    PACKAGE_CATALOG_STATE_AVAILABLE = 2;
+    PACKAGE_CATALOG_STATE_INCOMPATIBLE = 3;
+    PACKAGE_CATALOG_STATE_DISABLED = 4;
+    PACKAGE_CATALOG_STATE_QUARANTINED = 5;
+    PACKAGE_CATALOG_STATE_REVOKED = 6;
+    PACKAGE_CATALOG_STATE_ROLLBACK_CANDIDATE = 7;
+}
+
+message PackageCatalogRequest {
+    uint32 offset = 1;
+    uint32 max_records = 2;
+}
+
+message PackageCatalogRecord {
+    string id = 1;
+    string version = 2;
+    string signer = 3;
+    string digest = 4;
+    PackageCatalogSource source = 5;
+    string source_path = 6;
+    PackageCatalogFreshness freshness = 7;
+    PackageCatalogState state = 8;
+    bool verified = 9;
+    bool signer_revoked = 10;
+    bool conflicted = 11;
+    uint32 ordinal = 12;
+    uint32 generation = 13;
+    bool compatible = 14;
+    fixed64 capability_mask = 15;
+}
+
+message PackageCatalogEnd {
+    uint32 returned_records = 1;
+    uint32 total_records = 2;
+    uint32 next_offset = 3;
+    uint32 generation = 4;
+}

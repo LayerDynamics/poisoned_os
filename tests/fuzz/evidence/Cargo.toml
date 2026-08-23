@@ -1,0 +1,8 @@
+[package]
+name = "poison-fuzz-evidence"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "evidence_manifest"
+path = "fuzz_targets/evidence_manifest.rs"

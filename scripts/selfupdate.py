@@ -3,10 +3,35 @@
 import logging
 import os
 import pathlib
+import time
 
 from flipper.app import App
 from flipper.storage import FlipperStorage, FlipperStorageOperations
 from flipper.utils.cdc import resolve_port
+
+
+APP_CLOSE_ATTEMPTS = 10
+APP_POST_CLOSE_DELAY_SEC = 0.5
+
+
+def close_running_apps(storage, logger):
+    logger.info("Closing current app, if any")
+    for _ in range(APP_CLOSE_ATTEMPTS):
+        storage.send_and_wait_eol("loader close\r")
+        result = storage.read.until(storage.CLI_EOL)
+        if b"was closed" in result:
+            logger.info("App closed")
+            storage.read.until(storage.CLI_EOL)
+            time.sleep(APP_POST_CLOSE_DELAY_SEC)
+        elif result.startswith(b"No application"):
+            storage.read.until(storage.CLI_EOL)
+            return True
+        else:
+            logger.error(f"Unable to close current app: {result.decode('ascii')}")
+            return False
+
+    logger.error("Unable to reach an idle loader after closing queued apps")
+    return False
 
 
 class Main(App):
@@ -41,6 +66,9 @@ class Main(App):
 
         try:
             with FlipperStorage(port) as storage:
+                if not close_running_apps(storage, self.logger):
+                    return 6
+
                 storage_ops = FlipperStorageOperations(storage)
                 storage_ops.mkpath(update_root)
                 storage_ops.mkpath(flipper_update_path)

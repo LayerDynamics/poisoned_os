@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stdbool.h>
 #include <stdint.h>
 #include "js_thread_i.h"
 #include "js_value.h"
@@ -17,6 +18,8 @@ extern "C" {
 #define JS_SDK_VENDOR "flipperdevices"
 #define JS_SDK_MAJOR  1
 #define JS_SDK_MINOR  0
+
+#define JS_PROJECT_PATH_MAX (256u)
 
 /**
  * @brief Returns the foreign pointer in `obj["_"]`
@@ -104,11 +107,22 @@ typedef struct {
     const ElfApiInterface* api_interface;
 } JsModuleDescriptor;
 
-JsModules* js_modules_create(struct mjs* mjs, CompositeApiResolver* resolver);
+JsModules* js_modules_create(
+    struct mjs* mjs,
+    CompositeApiResolver* resolver,
+    uint32_t granted_capabilities,
+    bool enforce_capabilities,
+    const char* script_path);
 
 void js_modules_destroy(JsModules* modules);
 
 mjs_val_t js_module_require(JsModules* modules, const char* name, size_t name_len);
+mjs_val_t js_module_require_from(
+    JsModules* modules,
+    const char* name,
+    size_t name_len,
+    const char* base,
+    size_t base_len);
 
 /**
  * @brief Gets a module instance by its name
@@ -117,6 +131,48 @@ mjs_val_t js_module_require(JsModules* modules, const char* name, size_t name_le
  * @returns Pointer to module context, NULL if the module is not instantiated
  */
 void* js_module_get(JsModules* modules, const char* name);
+
+/** Run the already-loaded event-loop module for managed asynchronous built-ins. */
+mjs_err_t js_modules_run_event_loop(JsModules* modules);
+
+/** Resolve a managed workload's virtual path beneath its immutable project revision. */
+bool js_modules_resolve_project_path(
+    const JsModules* modules,
+    const char* path,
+    char output[JS_PROJECT_PATH_MAX]);
+
+/** Return the managed project root, or NULL for an unmanaged runner. */
+const char* js_modules_project_root(const JsModules* modules);
+
+bool js_modules_is_managed(const JsModules* modules);
+
+/** Verify the immutable project manifest and every member before RPC accepts execution. */
+bool js_modules_verify_managed_project(
+    const char* script_path,
+    const char* project_digest,
+    uint32_t source_bytes,
+    uint16_t module_count);
+
+#ifdef FW_CFG_unit_tests
+bool js_modules_test_resolve_project_path(
+    const char* script_path,
+    const char* path,
+    char output[JS_PROJECT_PATH_MAX]);
+bool js_modules_test_resolve_source_path(
+    const char* script_path,
+    const char* base,
+    const char* request,
+    char output[JS_PROJECT_PATH_MAX]);
+bool js_modules_test_resolve_bare_source_path(
+    const char* script_path,
+    const char* lock_source,
+    const char* request,
+    char output[JS_PROJECT_PATH_MAX]);
+bool js_modules_test_resolve_builtin_source_path(
+    const char* script_path,
+    const char* request,
+    char output[JS_PROJECT_PATH_MAX]);
+#endif
 
 /**
  * @brief `sdkCompatibilityStatus` function

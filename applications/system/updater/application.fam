@@ -6,6 +6,7 @@ App(
     requires=[
         "gui",
         "storage",
+        "poison_packages",
     ],
     conflicts=["desktop"],
     entry_point="updater_srv",
@@ -22,6 +23,7 @@ App(
         "gui",
         "storage",
         "bt",
+        "poison_packages",
     ],
     conflicts=["updater"],
     provides=["updater_start"],

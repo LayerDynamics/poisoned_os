@@ -64,24 +64,25 @@ typedef uint64_t mjs_val_t;
  */
 #define MAKE_TAG(s, t) ((uint64_t)(s) << 63 | (uint64_t)0x7ff0 << 48 | (uint64_t)(t) << 48)
 
-#define MJS_TAG_OBJECT MAKE_TAG(1, 1)
-#define MJS_TAG_FOREIGN MAKE_TAG(1, 2)
-#define MJS_TAG_UNDEFINED MAKE_TAG(1, 3)
-#define MJS_TAG_BOOLEAN MAKE_TAG(1, 4)
-#define MJS_TAG_NAN MAKE_TAG(1, 5)
-#define MJS_TAG_STRING_I MAKE_TAG(1, 6) /* Inlined string len < 5 */
-#define MJS_TAG_STRING_5 MAKE_TAG(1, 7) /* Inlined string len 5 */
-#define MJS_TAG_STRING_O MAKE_TAG(1, 8) /* Owned string */
-#define MJS_TAG_STRING_F MAKE_TAG(1, 9) /* Foreign string */
-#define MJS_TAG_STRING_C MAKE_TAG(1, 10) /* String chunk */
-#define MJS_TAG_STRING_D MAKE_TAG(1, 11) /* Dictionary string  */
-#define MJS_TAG_ARRAY MAKE_TAG(1, 12)
-#define MJS_TAG_FUNCTION MAKE_TAG(1, 13)
+#define MJS_TAG_OBJECT       MAKE_TAG(1, 1)
+#define MJS_TAG_FOREIGN      MAKE_TAG(1, 2)
+#define MJS_TAG_UNDEFINED    MAKE_TAG(1, 3)
+#define MJS_TAG_BOOLEAN      MAKE_TAG(1, 4)
+#define MJS_TAG_NAN          MAKE_TAG(1, 5)
+#define MJS_TAG_STRING_I     MAKE_TAG(1, 6) /* Inlined string len < 5 */
+#define MJS_TAG_STRING_5     MAKE_TAG(1, 7) /* Inlined string len 5 */
+#define MJS_TAG_STRING_O     MAKE_TAG(1, 8) /* Owned string */
+#define MJS_TAG_STRING_F     MAKE_TAG(1, 9) /* Foreign string */
+#define MJS_TAG_STRING_C     MAKE_TAG(1, 10) /* String chunk */
+#define MJS_TAG_STRING_D     MAKE_TAG(1, 11) /* Dictionary string  */
+#define MJS_TAG_ARRAY        MAKE_TAG(1, 12)
+#define MJS_TAG_FUNCTION     MAKE_TAG(1, 13)
 #define MJS_TAG_FUNCTION_FFI MAKE_TAG(1, 14)
-#define MJS_TAG_NULL MAKE_TAG(1, 15)
+#define MJS_TAG_NULL         MAKE_TAG(1, 15)
 
-#define MJS_TAG_ARRAY_BUF MAKE_TAG(0, 1) /* ArrayBuffer */
-#define MJS_TAG_ARRAY_BUF_VIEW MAKE_TAG(0, 2) /* DataView */
+#define MJS_TAG_ARRAY_BUF        MAKE_TAG(0, 1) /* ArrayBuffer */
+#define MJS_TAG_ARRAY_BUF_VIEW   MAKE_TAG(0, 2) /* DataView */
+#define MJS_TAG_FUNCTION_CLOSURE MAKE_TAG(0, 3) /* Function with captured lexical scopes */
 
 #define MJS_TAG_MASK MAKE_TAG(1, 15)
 
@@ -135,10 +136,25 @@ typedef enum mjs_err {
 
 typedef void (*mjs_flags_poller_t)(struct mjs* mjs);
 
+typedef enum {
+    MJS_DEBUG_EVENT_LINE,
+    MJS_DEBUG_EVENT_STATEMENT,
+} mjs_debug_event_t;
+
+typedef void (*mjs_debug_hook_t)(
+    struct mjs* mjs,
+    mjs_debug_event_t event,
+    const char* filename,
+    int line,
+    void* context);
+
 struct mjs;
 
 /* Create MJS instance */
 struct mjs* mjs_create(void* context);
+
+/* Return the bytes currently reserved by the interpreter and its arenas. */
+size_t mjs_memory_usage(const struct mjs* mjs);
 
 /* Destroy MJS instance */
 void mjs_destroy(struct mjs* mjs);

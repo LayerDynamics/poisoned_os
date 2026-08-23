@@ -20,6 +20,7 @@ enum mjs_call_stack_frame_item {
     CALL_STACK_FRAME_ITEM_RETVAL_STACK_IDX, /* TOS */
     CALL_STACK_FRAME_ITEM_LOOP_ADDR_IDX,
     CALL_STACK_FRAME_ITEM_SCOPE_IDX,
+    CALL_STACK_FRAME_ITEM_SCOPE_BASE,
     CALL_STACK_FRAME_ITEM_RETURN_ADDR,
     CALL_STACK_FRAME_ITEM_THIS,
 
@@ -57,7 +58,7 @@ struct mjs_bcode_part {
     mjs_err_t exec_res : 4;
 
     /* If set, bcode data does not need to be freed */
-    unsigned in_rom : 1;
+    unsigned in_rom    : 1;
 };
 
 struct mjs {
@@ -68,6 +69,8 @@ struct mjs {
     struct mbuf call_stack;
     struct mbuf arg_stack;
     struct mbuf scopes; /* Scope objects */
+    size_t scope_base; /* First non-global scope visible to the current function */
+    size_t closure_scope_bytes;
     struct mbuf loop_addresses; /* Addresses for breaks & continues */
     struct mbuf owned_strings; /* Sequence of (varint len, char data[]) */
     struct mbuf foreign_strings; /* Sequence of (varint len, char *data) */
@@ -83,14 +86,23 @@ struct mjs {
     ffi_cb_args_t* ffi_cb_args; /* List of FFI args descriptors */
     size_t cur_bcode_offset;
     mjs_flags_poller_t exec_flags_poller;
+    mjs_debug_hook_t debug_hook;
+    void* debug_hook_context;
+    size_t debug_last_bcode_offset;
+    size_t debug_last_bcode_start;
+    int debug_last_line;
+    unsigned debug_hook_suppressed : 1;
     void* context;
+    size_t max_parser_depth;
+    size_t parser_depth;
 
     struct gc_arena object_arena;
     struct gc_arena property_arena;
     struct gc_arena ffi_sig_arena;
+    struct gc_arena closure_arena;
 
-    unsigned inhibit_gc : 1;
-    unsigned need_gc : 1;
+    unsigned inhibit_gc   : 1;
+    unsigned need_gc      : 1;
     unsigned generate_jsc : 1;
 };
 
@@ -120,6 +132,17 @@ MJS_PRIVATE enum mjs_type mjs_get_type(mjs_val_t v);
  * (if any) will be fetched from the call_stack.
  */
 MJS_PRIVATE void mjs_gen_stack_trace(struct mjs* mjs, size_t offset);
+
+/** Install or clear the source-level execution hook used by debuggers. */
+MJS_PRIVATE void mjs_set_debug_hook(struct mjs* mjs, mjs_debug_hook_t hook, void* context);
+
+/** Return a visible lexical scope, where zero is the innermost scope. */
+MJS_PRIVATE mjs_val_t mjs_debug_get_scope(struct mjs* mjs, size_t depth);
+
+/** Internal resource accounting helpers used by the managed JS runner. */
+MJS_PRIVATE size_t mjs_call_depth(const struct mjs* mjs);
+MJS_PRIVATE size_t mjs_parser_depth(const struct mjs* mjs);
+MJS_PRIVATE void mjs_set_parser_depth_limit(struct mjs* mjs, size_t maximum_depth);
 
 MJS_PRIVATE mjs_val_t vtop(struct mbuf* m);
 MJS_PRIVATE size_t mjs_stack_size(const struct mbuf* m);

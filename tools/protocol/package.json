@@ -1,0 +1,15 @@
+{
+  "name": "@poisonedos/protocol-toolchain",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@10.32.1",
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@bufbuild/protobuf": "2.14.0"
+  },
+  "devDependencies": {
+    "@bufbuild/protoc-gen-es": "2.14.0"
+  }
+}

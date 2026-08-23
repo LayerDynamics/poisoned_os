@@ -1,0 +1,10 @@
+App(
+    appid="poison_security_settings",
+    name="Device Security",
+    apptype=FlipperAppType.SETTINGS,
+    entry_point="poison_security_settings_app",
+    requires=["gui", "rpc_start"],
+    stack_size=3 * 1024,
+    order=15,
+    sources=["*.c"],
+)

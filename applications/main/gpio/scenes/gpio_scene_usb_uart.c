@@ -6,6 +6,8 @@ typedef struct {
     UsbUartState state;
 } SceneUsbUartBridge;
 
+#define MARAUDER_BRIDGE_EXIT_BAUD 1200U
+
 static SceneUsbUartBridge* scene_usb_uart = NULL;
 
 void gpio_scene_usb_uart_callback(GpioCustomEvent event, void* context) {
@@ -35,6 +37,11 @@ void gpio_scene_usb_uart_on_enter(void* context) {
         scene_usb_uart->cfg.flow_pins = 0;
         scene_usb_uart->cfg.baudrate_mode = 0;
         scene_usb_uart->cfg.baudrate = 0;
+        scene_usb_uart->cfg.software_de_re = 0;
+        if(app->marauder_bridge) {
+            scene_usb_uart->cfg.flow_pins = 2;
+            power_enable_otg(app->power, true);
+        }
         app->usb_uart_bridge = usb_uart_enable(&scene_usb_uart->cfg);
     }
 
@@ -64,6 +71,16 @@ bool gpio_scene_usb_uart_on_event(void* context, SceneManagerEvent event) {
         uint32_t tx_cnt_last = scene_usb_uart->state.tx_cnt;
         uint32_t rx_cnt_last = scene_usb_uart->state.rx_cnt;
         usb_uart_get_state(app->usb_uart_bridge, &scene_usb_uart->state);
+        if(app->marauder_bridge &&
+           scene_usb_uart->state.baudrate_cur == MARAUDER_BRIDGE_EXIT_BAUD) {
+            usb_uart_disable(app->usb_uart_bridge);
+            app->usb_uart_bridge = NULL;
+            free(scene_usb_uart);
+            scene_usb_uart = NULL;
+            scene_manager_stop(app->scene_manager);
+            view_dispatcher_stop(app->view_dispatcher);
+            return true;
+        }
         gpio_usb_uart_update_state(
             app->gpio_usb_uart, &scene_usb_uart->cfg, &scene_usb_uart->state);
         if(tx_cnt_last != scene_usb_uart->state.tx_cnt)

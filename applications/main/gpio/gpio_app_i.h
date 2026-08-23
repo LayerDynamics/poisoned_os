@@ -37,6 +37,7 @@ struct GpioApp {
     GPIOItems* gpio_items;
     UsbUartBridge* usb_uart_bridge;
     UsbUartConfig* usb_uart_cfg;
+    bool marauder_bridge;
 };
 
 typedef enum {

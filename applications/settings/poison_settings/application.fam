@@ -1,0 +1,9 @@
+App(
+    appid="poison_settings",
+    name="Profiles & Appearance",
+    apptype=FlipperAppType.SETTINGS,
+    entry_point="poison_settings_app",
+    requires=["dialogs", "gui", "poison_profiles"],
+    stack_size=3 * 1024,
+    order=45,
+)

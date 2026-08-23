@@ -20,6 +20,10 @@
 #include <pb_decode.h>
 #include <storage.pb.h>
 #include <flipper.pb.h>
+#include <applications/services/poison_diagnostics/poison_diagnostics.h>
+#include <applications/services/poison_app/poison_app.h>
+#include <applications/services/poison_audit/poison_audit.h>
+#include <applications/services/poison_tools/poison_tools.h>
 
 LIST_DEF(MsgList, PB_Main, M_POD_OPLIST)
 #define M_OPL_MsgList_t() LIST_OPLIST(MsgList)
@@ -58,6 +62,39 @@ static RpcSessionContext rpc_session[TEST_RPC_SESSIONS];
 
 #define DEBUG_PRINT 0
 
+void poison_session_run_tests(void);
+void poison_channel_run_tests(void);
+void poison_crypto_run_tests(void);
+void poison_session_state_run_tests(void);
+void poison_policy_run_tests(void);
+void poison_confirmation_run_tests(void);
+void poison_diagnostics_run_tests(void);
+void test_poison_pairing_ui(void);
+void poison_file_contract_run_tests(void);
+void poison_vfs_path_run_tests(void);
+void poison_vfs_journal_run_tests(void);
+void poison_migration_run_tests(void);
+void poison_safe_sample_run_tests(void);
+void poison_js_developer_policy_run_tests(void);
+void poison_evidence_run_tests(void);
+void poison_evidence_rpc_run_tests(void);
+void poison_workspace_run_tests(void);
+void poison_package_verify_run_tests(void);
+void poison_package_transaction_run_tests(void);
+void poison_package_catalog_run_tests(void);
+void poison_app_protocol_run_tests(void);
+void poison_profiles_run_tests(void);
+void poison_tools_catalog_run_tests(void);
+void poison_tool_gpio_run_tests(void);
+void poison_rust_api_run_tests(void);
+void poison_js_capabilities_run_tests(void);
+void poison_js_limits_run_tests(void);
+void poison_content_update_run_tests(void);
+void poison_workload_run_tests(void);
+void poison_lessons_run_tests(void);
+void poison_assignments_run_tests(void);
+void poison_wasm_run_tests(void);
+
 #define BYTES(x) (x), sizeof(x)
 
 #define DISABLE_TEST(code)  \
@@ -79,13 +116,13 @@ static void test_rpc_free_msg_list(MsgList_t msg_list);
 static void test_rpc_session_close_callback(void* context);
 static void test_rpc_session_terminated_callback(void* context);
 
-static void test_rpc_setup(void) {
+static void test_rpc_setup_owner(RpcOwner owner) {
     furi_check(!rpc);
     furi_check(!(rpc_session[0].session));
 
     rpc = furi_record_open(RECORD_RPC);
     for(int i = 0; !(rpc_session[0].session) && (i < 10000); ++i) {
-        rpc_session[0].session = rpc_session_open(rpc, RpcOwnerUnknown);
+        rpc_session[0].session = rpc_session_open(rpc, owner);
         furi_delay_tick(1);
     }
     furi_check(rpc_session[0].session);
@@ -98,6 +135,10 @@ static void test_rpc_setup(void) {
     rpc_session_set_terminated_callback(
         rpc_session[0].session, test_rpc_session_terminated_callback);
     rpc_session_set_context(rpc_session[0].session, &rpc_session[0]);
+}
+
+static void test_rpc_setup(void) {
+    test_rpc_setup_owner(RpcOwnerUnknown);
 }
 
 static void test_rpc_setup_second_session(void) {
@@ -473,6 +514,9 @@ static void test_rpc_compare_messages(PB_Main* result, PB_Main* expected) {
         bool result_locked = result->content.app_lock_status_response.locked;
         bool expected_locked = expected->content.app_lock_status_response.locked;
         mu_check(result_locked == expected_locked);
+        mu_assert_string_eq(
+            expected->content.app_lock_status_response.active_application,
+            result->content.app_lock_status_response.active_application);
         break;
     }
     case PB_Main_storage_info_response_tag: {
@@ -1567,6 +1611,10 @@ static void test_app_get_status_lock_run(bool locked_expected, uint32_t command_
     response->which_content = PB_Main_app_lock_status_response_tag;
     response->has_next = false;
     response->content.app_lock_status_response.locked = locked_expected;
+    strlcpy(
+        response->content.app_lock_status_response.active_application,
+        locked_expected ? "Delay Test" : "",
+        sizeof(response->content.app_lock_status_response.active_application));
 
     test_rpc_encode_and_feed_one(&request, 0);
     test_rpc_decode_and_compare(expected_msg_list, 0);
@@ -1823,9 +1871,1087 @@ MU_TEST(test_rpc_multisession_storage) {
     test_rpc_storage_teardown();
 }
 
+typedef struct {
+    bool called;
+    bool approve;
+    bool request_valid;
+} TestRpcPairingApproval;
+
+typedef struct {
+    bool called;
+} TestRpcStructuredApp;
+
+typedef struct {
+    bool called;
+} TestRpcProfileApproval;
+
+typedef struct {
+    const char* const* values;
+    size_t count;
+} TestRpcStringList;
+
+static bool
+    test_rpc_encode_strings(pb_ostream_t* stream, const pb_field_t* field, void* const* argument) {
+    const TestRpcStringList* strings = *argument;
+    for(size_t index = 0u; index < strings->count; ++index) {
+        if(!pb_encode_tag_for_field(stream, field) ||
+           !pb_encode_string(
+               stream, (const uint8_t*)strings->values[index], strlen(strings->values[index]))) {
+            return false;
+        }
+    }
+    return true;
+}
+
+static bool test_rpc_structured_app_command(const PoisonAppCommand* command, void* context) {
+    TestRpcStructuredApp* app = context;
+    app->called = command->protocol_version == POISON_APP_PROTOCOL_VERSION &&
+                  strcmp(command->app_id, "org.poison.rpc-test") == 0 &&
+                  strcmp(command->run_id, "run-1") == 0 &&
+                  strcmp(command->command_id, "inspect") == 0 &&
+                  strlen(command->payload_json) == 400u && !command->cancel;
+    for(size_t index = 0u; app->called && index < 400u; index++) {
+        app->called = command->payload_json[index] == 'a';
+    }
+    return app->called;
+}
+
+static bool test_rpc_profile_confirmation(
+    void* context,
+    const char* profile_id,
+    const char* version,
+    uint64_t capability_mask) {
+    TestRpcProfileApproval* approval = context;
+    approval->called = strcmp(profile_id, "rpc.field") == 0 && strcmp(version, "1.0.0") == 0 &&
+                       capability_mask == POISON_CAPABILITY_STATUS;
+    return approval->called;
+}
+
+static bool test_rpc_pairing_confirmation(
+    void* context,
+    const char* confirmation_code,
+    const char* fingerprint,
+    const char* client_name,
+    uint32_t requested_role,
+    uint32_t requested_capabilities) {
+    TestRpcPairingApproval* approval = context;
+    if(!approval) return false;
+
+    approval->called = true;
+    approval->request_valid =
+        confirmation_code && strlen(confirmation_code) == 6u && fingerprint &&
+        strlen(fingerprint) == 16u && client_name && strcmp(client_name, "field-console") == 0 &&
+        requested_role == PoisonRoleOperator &&
+        requested_capabilities == (POISON_CAPABILITY_STATUS | POISON_CAPABILITY_CONTROL |
+                                   POISON_CAPABILITY_FILES | POISON_CAPABILITY_DESTRUCTIVE);
+    return approval->approve;
+}
+
+static bool test_rpc_decode_one(PB_Main* message, uint8_t session) {
+    rpc_session[session].timeout = furi_get_tick() + MAX_RECEIVE_OUTPUT_TIMEOUT;
+    pb_istream_t stream = {
+        .callback = test_rpc_pb_stream_read,
+        .state = &rpc_session[session],
+        .errmsg = NULL,
+        .bytes_left = 0x7FFFFFFF,
+    };
+    memset(message, 0, sizeof(*message));
+    return pb_decode_ex(&stream, &PB_Main_msg, message, PB_DECODE_DELIMITED);
+}
+
+static bool test_rpc_secure_round_trip(
+    PoisonSession* client_session,
+    uint64_t session_id,
+    PB_Main* inner_request,
+    PB_Main* inner_response) {
+    uint8_t plaintext[768u];
+    pb_ostream_t inner_output = pb_ostream_from_buffer(plaintext, sizeof(plaintext));
+    if(!pb_encode(&inner_output, &PB_Main_msg, inner_request)) return false;
+
+    PB_Main envelope_message = PB_Main_init_zero;
+    envelope_message.command_id = inner_request->command_id;
+    envelope_message.which_content = PB_Main_poison_session_envelope_tag;
+    PB_Poison_SessionEnvelope* envelope = &envelope_message.content.poison_session_envelope;
+    envelope->protocol_version = 2u;
+    envelope->session_id = session_id;
+    strcpy(envelope->channel, "rpc");
+    envelope->payload.size = inner_output.bytes_written;
+    envelope->authentication_tag.size = POISON_SESSION_AUTH_TAG_BYTES;
+    if(poison_session_encrypt_tx(
+           client_session,
+           0u,
+           envelope->channel,
+           plaintext,
+           inner_output.bytes_written,
+           &envelope->sequence,
+           envelope->payload.bytes,
+           envelope->authentication_tag.bytes) != PoisonSessionResultOk) {
+        return false;
+    }
+    test_rpc_encode_and_feed_one(&envelope_message, 0);
+
+    PB_Main encrypted_response;
+    if(!test_rpc_decode_one(&encrypted_response, 0) ||
+       encrypted_response.which_content != PB_Main_poison_session_envelope_tag) {
+        return false;
+    }
+    const PB_Poison_SessionEnvelope* response_envelope =
+        &encrypted_response.content.poison_session_envelope;
+    uint8_t response_plaintext[768u];
+    const bool decrypted = poison_session_decrypt_rx(
+                               client_session,
+                               response_envelope->sequence,
+                               response_envelope->acknowledgement,
+                               response_envelope->channel,
+                               response_envelope->payload.bytes,
+                               response_envelope->payload.size,
+                               response_envelope->authentication_tag.bytes,
+                               response_plaintext) == PoisonSessionResultOk;
+    if(decrypted) {
+        *inner_response = (PB_Main)PB_Main_init_zero;
+        pb_istream_t input =
+            pb_istream_from_buffer(response_plaintext, response_envelope->payload.size);
+        if(!pb_decode(&input, &PB_Main_msg, inner_response)) {
+            pb_release(&PB_Main_msg, &encrypted_response);
+            return false;
+        }
+    }
+    pb_release(&PB_Main_msg, &encrypted_response);
+    return decrypted;
+}
+
+MU_TEST(test_rpc_poison_pairing_and_encrypted_ping_use_real_dispatcher) {
+    test_rpc_setup_owner(RpcOwnerUart);
+    TestRpcPairingApproval approval = {
+        .called = false,
+        .approve = true,
+        .request_valid = false,
+    };
+    rpc_session_set_pairing_confirmation_callback(
+        rpc_session[0].session, test_rpc_pairing_confirmation, &approval);
+    TestRpcProfileApproval profile_approval = {0};
+    rpc_session_set_profile_confirmation_callback(
+        rpc_session[0].session, test_rpc_profile_confirmation, &profile_approval);
+
+    PB_Main pre_pair_plaintext_ping = PB_Main_init_zero;
+    pre_pair_plaintext_ping.command_id = ++command_id;
+    pre_pair_plaintext_ping.which_content = PB_Main_system_ping_request_tag;
+    test_rpc_encode_and_feed_one(&pre_pair_plaintext_ping, 0u);
+    PB_Main pre_pair_plaintext_response = PB_Main_init_zero;
+    mu_check(test_rpc_decode_one(&pre_pair_plaintext_response, 0u));
+    mu_check(pre_pair_plaintext_response.command_id == pre_pair_plaintext_ping.command_id);
+    mu_check(
+        pre_pair_plaintext_response.command_status == PB_CommandStatus_ERROR_INVALID_PARAMETERS);
+    mu_check(pre_pair_plaintext_response.which_content == PB_Main_empty_tag);
+    pb_release(&PB_Main_msg, &pre_pair_plaintext_response);
+
+    uint8_t client_private[POISON_CRYPTO_P256_PRIVATE_BYTES];
+    uint8_t client_public[POISON_CRYPTO_P256_PUBLIC_BYTES];
+    uint8_t identity_private[POISON_CRYPTO_P256_PRIVATE_BYTES];
+    uint8_t identity_public[POISON_CRYPTO_P256_PUBLIC_BYTES];
+    mu_check(
+        poison_crypto_generate_p256_keypair(client_private, client_public) ==
+        PoisonCryptoResultOk);
+    mu_check(
+        poison_crypto_generate_p256_keypair(identity_private, identity_public) ==
+        PoisonCryptoResultOk);
+    PB_Main hello = PB_Main_init_zero;
+    hello.command_id = ++command_id;
+    hello.which_content = PB_Main_poison_pairing_hello_tag;
+    PB_Poison_PairingHello* pairing_hello = &hello.content.poison_pairing_hello;
+    pairing_hello->protocol_version = 2u;
+    pairing_hello->client_ephemeral_public_key.size = sizeof(client_public);
+    memcpy(pairing_hello->client_ephemeral_public_key.bytes, client_public, sizeof(client_public));
+    pairing_hello->client_identity_public_key.size = sizeof(identity_public);
+    memcpy(
+        pairing_hello->client_identity_public_key.bytes, identity_public, sizeof(identity_public));
+    strcpy(pairing_hello->client_name, "field-console");
+    pairing_hello->requested_role = PoisonRoleOperator;
+    pairing_hello->requested_capabilities = POISON_CAPABILITY_STATUS | POISON_CAPABILITY_CONTROL |
+                                            POISON_CAPABILITY_FILES |
+                                            POISON_CAPABILITY_DESTRUCTIVE;
+    pairing_hello->client_nonce.size = 32u;
+    for(size_t index = 0; index < pairing_hello->client_nonce.size; ++index)
+        pairing_hello->client_nonce.bytes[index] = (uint8_t)(index + 1u);
+    uint8_t client_nonce[32u];
+    memcpy(client_nonce, pairing_hello->client_nonce.bytes, sizeof(client_nonce));
+    test_rpc_encode_and_feed_one(&hello, 0);
+
+    PB_Main challenge_message;
+    mu_check(test_rpc_decode_one(&challenge_message, 0));
+    mu_check(challenge_message.command_status == PB_CommandStatus_OK);
+    mu_check(challenge_message.which_content == PB_Main_poison_pairing_challenge_tag);
+    PB_Poison_PairingChallenge* challenge = &challenge_message.content.poison_pairing_challenge;
+
+    uint8_t shared_secret[POISON_CRYPTO_SHARED_SECRET_BYTES];
+    uint8_t salt[64u];
+    uint8_t info[45u];
+    uint8_t directional_keys[POISON_SESSION_KEY_BYTES * 2u];
+    mu_check(
+        poison_crypto_p256_shared_secret(
+            client_private, challenge->device_ephemeral_public_key.bytes, shared_secret) ==
+        PoisonCryptoResultOk);
+    memcpy(salt, client_nonce, sizeof(client_nonce));
+    memcpy(salt + sizeof(client_nonce), challenge->device_nonce.bytes, 32u);
+    memcpy(info, "poison-rpc-v2", 13u);
+    memcpy(info + 13u, challenge->transcript_digest.bytes, 32u);
+    mu_check(
+        poison_crypto_hkdf_sha256(
+            salt,
+            sizeof(salt),
+            shared_secret,
+            sizeof(shared_secret),
+            info,
+            sizeof(info),
+            directional_keys,
+            sizeof(directional_keys)) == PoisonCryptoResultOk);
+
+    PB_Main confirm = PB_Main_init_zero;
+    confirm.command_id = ++command_id;
+    confirm.which_content = PB_Main_poison_pairing_confirm_tag;
+    confirm.content.poison_pairing_confirm.transcript_digest.size = 32u;
+    memcpy(
+        confirm.content.poison_pairing_confirm.transcript_digest.bytes,
+        challenge->transcript_digest.bytes,
+        32u);
+    strcpy(confirm.content.poison_pairing_confirm.confirmation_code, challenge->confirmation_code);
+    confirm.content.poison_pairing_confirm.physical_confirmation = true;
+    size_t identity_signature_size = 0u;
+    mu_check(
+        poison_crypto_sign_p256_sha256(
+            identity_private,
+            challenge->transcript_digest.bytes,
+            confirm.content.poison_pairing_confirm.client_identity_signature.bytes,
+            &identity_signature_size) == PoisonCryptoResultOk);
+    confirm.content.poison_pairing_confirm.client_identity_signature.size =
+        identity_signature_size;
+    const uint64_t session_id = challenge->session_id;
+    test_rpc_encode_and_feed_one(&confirm, 0);
+    pb_release(&PB_Main_msg, &challenge_message);
+
+    PB_Main confirm_response;
+    mu_check(test_rpc_decode_one(&confirm_response, 0));
+    mu_check(confirm_response.which_content == PB_Main_empty_tag);
+    mu_check(confirm_response.command_status == PB_CommandStatus_OK);
+    mu_check(approval.called);
+    mu_check(approval.request_valid);
+    pb_release(&PB_Main_msg, &confirm_response);
+    const PoisonAuditChain* pairing_audit = poison_audit_get();
+    mu_check(pairing_audit->event_count > 0u);
+    const size_t pairing_event_index =
+        (pairing_audit->write_index + POISON_AUDIT_RING_SIZE - 1u) % POISON_AUDIT_RING_SIZE;
+    mu_check(
+        strcmp(pairing_audit->events[pairing_event_index].action, "pairing.authenticate") == 0);
+    mu_check(pairing_audit->events[pairing_event_index].decision == PoisonAuditDecisionAllowed);
+
+    PoisonSession client_session;
+    poison_session_init(&client_session);
+    mu_check(poison_session_begin_negotiation(&client_session, 2u) == PoisonSessionResultOk);
+    mu_check(
+        poison_session_begin_confirmation(&client_session, session_id) == PoisonSessionResultOk);
+    mu_check(
+        poison_session_set_directional_keys(
+            &client_session, directional_keys + POISON_SESSION_KEY_BYTES, directional_keys) ==
+        PoisonSessionResultOk);
+    mu_check(poison_session_confirm(&client_session, true) == PoisonSessionResultOk);
+    mu_check(poison_session_activate(&client_session) == PoisonSessionResultOk);
+
+    PB_Main unopened_ping = PB_Main_init_zero;
+    unopened_ping.command_id = ++command_id;
+    unopened_ping.which_content = PB_Main_system_ping_request_tag;
+    unopened_ping.content.system_ping_request.data->size = 1u;
+    unopened_ping.content.system_ping_request.data->bytes[0] = 0x42u;
+    PB_Main unopened_ping_response;
+    mu_check(test_rpc_secure_round_trip(
+        &client_session, session_id, &unopened_ping, &unopened_ping_response));
+    mu_check(unopened_ping_response.command_status == PB_CommandStatus_ERROR_INVALID_PARAMETERS);
+    mu_check(unopened_ping_response.which_content == PB_Main_empty_tag);
+    pb_release(&PB_Main_msg, &unopened_ping_response);
+
+    PB_Main channel_open = PB_Main_init_zero;
+    channel_open.command_id = ++command_id;
+    channel_open.which_content = PB_Main_poison_channel_open_tag;
+    strcpy(channel_open.content.poison_channel_open.channel, "rpc");
+    channel_open.content.poison_channel_open.initial_credits = 2u;
+    channel_open.content.poison_channel_open.resume_sequence = 0u;
+    PB_Main channel_open_response;
+    mu_check(test_rpc_secure_round_trip(
+        &client_session, session_id, &channel_open, &channel_open_response));
+    mu_check(channel_open_response.command_status == PB_CommandStatus_OK);
+    mu_check(channel_open_response.which_content == PB_Main_poison_channel_opened_tag);
+    mu_check(strcmp(channel_open_response.content.poison_channel_opened.channel, "rpc") == 0);
+    mu_check(channel_open_response.content.poison_channel_opened.granted_credits == 2u);
+    mu_check(channel_open_response.content.poison_channel_opened.next_sequence == 0u);
+    pb_release(&PB_Main_msg, &channel_open_response);
+
+    PB_Main credit_update = PB_Main_init_zero;
+    credit_update.command_id = ++command_id;
+    credit_update.which_content = PB_Main_poison_credit_update_tag;
+    strcpy(credit_update.content.poison_credit_update.channel, "rpc");
+    credit_update.content.poison_credit_update.credits = 2u;
+    PB_Main credit_response;
+    mu_check(
+        test_rpc_secure_round_trip(&client_session, session_id, &credit_update, &credit_response));
+    mu_check(credit_response.command_status == PB_CommandStatus_OK);
+    mu_check(credit_response.which_content == PB_Main_empty_tag);
+    pb_release(&PB_Main_msg, &credit_response);
+
+    PB_Main frame_notification = PB_Main_init_zero;
+    frame_notification.which_content = PB_Main_gui_screen_frame_tag;
+    frame_notification.content.gui_screen_frame.data = malloc(PB_BYTES_ARRAY_T_ALLOCSIZE(1024u));
+    frame_notification.content.gui_screen_frame.data->size = 1024u;
+    memset(frame_notification.content.gui_screen_frame.data->bytes, 0xA5, 1024u);
+    rpc_send(rpc_session[0].session, &frame_notification);
+    pb_release(&PB_Main_msg, &frame_notification);
+
+    PB_Main encrypted_frame;
+    mu_check(test_rpc_decode_one(&encrypted_frame, 0));
+    mu_check(encrypted_frame.which_content == PB_Main_poison_session_envelope_tag);
+    const PB_Poison_SessionEnvelope* frame_envelope =
+        &encrypted_frame.content.poison_session_envelope;
+    mu_check(frame_envelope->payload.size > 1024u);
+    uint8_t frame_plaintext[1280u];
+    mu_check(
+        poison_session_decrypt_rx(
+            &client_session,
+            frame_envelope->sequence,
+            frame_envelope->acknowledgement,
+            frame_envelope->channel,
+            frame_envelope->payload.bytes,
+            frame_envelope->payload.size,
+            frame_envelope->authentication_tag.bytes,
+            frame_plaintext) == PoisonSessionResultOk);
+    PB_Main decoded_frame = PB_Main_init_zero;
+    pb_istream_t frame_input =
+        pb_istream_from_buffer(frame_plaintext, frame_envelope->payload.size);
+    mu_check(pb_decode(&frame_input, &PB_Main_msg, &decoded_frame));
+    mu_check(decoded_frame.command_id == 0u);
+    mu_check(decoded_frame.command_status == PB_CommandStatus_OK);
+    mu_check(decoded_frame.which_content == PB_Main_gui_screen_frame_tag);
+    mu_check(decoded_frame.content.gui_screen_frame.data->size == 1024u);
+    mu_check(decoded_frame.content.gui_screen_frame.data->bytes[1023u] == 0xA5u);
+    pb_release(&PB_Main_msg, &decoded_frame);
+    pb_release(&PB_Main_msg, &encrypted_frame);
+    memset(frame_plaintext, 0, sizeof(frame_plaintext));
+
+    PB_Main policy_request = PB_Main_init_zero;
+    policy_request.command_id = ++command_id;
+    policy_request.which_content = PB_Main_poison_policy_request_tag;
+    policy_request.content.poison_policy_request.role = PB_Poison_Role_ROLE_OPERATOR;
+    policy_request.content.poison_policy_request.requested_capabilities =
+        POISON_CAPABILITY_STATUS | POISON_CAPABILITY_CONTROL;
+    policy_request.content.poison_policy_request.policy_version = 1u;
+    PB_Main policy_response;
+    mu_check(test_rpc_secure_round_trip(
+        &client_session, session_id, &policy_request, &policy_response));
+    mu_check(policy_response.command_status == PB_CommandStatus_OK);
+    mu_check(policy_response.which_content == PB_Main_poison_policy_decision_tag);
+    mu_check(policy_response.content.poison_policy_decision.allowed);
+    mu_check(
+        policy_response.content.poison_policy_decision.granted_capabilities ==
+        (POISON_CAPABILITY_STATUS | POISON_CAPABILITY_CONTROL));
+    pb_release(&PB_Main_msg, &policy_response);
+
+    policy_request.command_id = ++command_id;
+    policy_request.content.poison_policy_request.role = PB_Poison_Role_ROLE_OWNER;
+    mu_check(test_rpc_secure_round_trip(
+        &client_session, session_id, &policy_request, &policy_response));
+    mu_check(policy_response.command_status == PB_CommandStatus_ERROR_INVALID_PARAMETERS);
+    mu_check(policy_response.which_content == PB_Main_empty_tag);
+    pb_release(&PB_Main_msg, &policy_response);
+
+    PB_Main tool_start = PB_Main_init_zero;
+    tool_start.command_id = ++command_id;
+    tool_start.which_content = PB_Main_poison_tool_run_tag;
+    strcpy(tool_start.content.poison_tool_run.tool_id, "usb-hid.inspect");
+    strcpy(tool_start.content.poison_tool_run.run_id, "rpc-cancel-run");
+    strcpy(tool_start.content.poison_tool_run.case_id, "local");
+    strcpy(tool_start.content.poison_tool_run.tool_version, "builtin");
+    strcpy(tool_start.content.poison_tool_run.state, "start");
+    PB_Main tool_start_response;
+    mu_check(test_rpc_secure_round_trip(
+        &client_session, session_id, &tool_start, &tool_start_response));
+    mu_check(tool_start_response.command_status == PB_CommandStatus_OK);
+    mu_check(poison_tools_run_is_active("rpc-cancel-run"));
+    pb_release(&PB_Main_msg, &tool_start_response);
+
+    PB_Main tool_cancel = PB_Main_init_zero;
+    tool_cancel.command_id = ++command_id;
+    tool_cancel.which_content = PB_Main_poison_cancel_request_tag;
+    tool_cancel.content.poison_cancel_request.command_id = tool_start.command_id;
+    strcpy(tool_cancel.content.poison_cancel_request.reason, "unit-test");
+    PB_Main tool_cancel_response;
+    mu_check(test_rpc_secure_round_trip(
+        &client_session, session_id, &tool_cancel, &tool_cancel_response));
+    mu_check(tool_cancel_response.command_status == PB_CommandStatus_OK);
+    mu_check(tool_cancel_response.which_content == PB_Main_poison_cancelled_tag);
+    mu_check(tool_cancel_response.content.poison_cancelled.command_id == tool_start.command_id);
+    mu_check(tool_cancel_response.content.poison_cancelled.accepted);
+    mu_check(!poison_tools_run_is_active("rpc-cancel-run"));
+    pb_release(&PB_Main_msg, &tool_cancel_response);
+
+    TestRpcStructuredApp structured_app = {0};
+    mu_check(poison_app_endpoint_register(
+        "org.poison.rpc-test", "run-1", test_rpc_structured_app_command, &structured_app));
+
+    PB_Main app_command = PB_Main_init_zero;
+    app_command.command_id = ++command_id;
+    app_command.which_content = PB_Main_poison_app_command_tag;
+    strcpy(app_command.content.poison_app_command.app_id, "org.poison.rpc-test");
+    strcpy(app_command.content.poison_app_command.run_id, "run-1");
+    strcpy(app_command.content.poison_app_command.command_id, "inspect");
+    app_command.content.poison_app_command.protocol_version = POISON_APP_PROTOCOL_VERSION;
+    app_command.content.poison_app_command.chunk_count = 2u;
+    app_command.content.poison_app_command.payload_chunk.size = 384u;
+    memset(app_command.content.poison_app_command.payload_chunk.bytes, 'a', 384u);
+    PB_Main app_response;
+    mu_check(test_rpc_secure_round_trip(&client_session, session_id, &app_command, &app_response));
+    mu_check(app_response.command_status == PB_CommandStatus_OK);
+    mu_check(app_response.which_content == PB_Main_empty_tag);
+    mu_check(!structured_app.called);
+    pb_release(&PB_Main_msg, &app_response);
+
+    app_command.command_id = ++command_id;
+    app_command.content.poison_app_command.chunk_index = 1u;
+    app_command.content.poison_app_command.payload_chunk.size = 16u;
+    memset(app_command.content.poison_app_command.payload_chunk.bytes, 'a', 16u);
+    mu_check(test_rpc_secure_round_trip(&client_session, session_id, &app_command, &app_response));
+    mu_check(app_response.command_status == PB_CommandStatus_OK);
+    mu_check(app_response.which_content == PB_Main_empty_tag);
+    mu_check(structured_app.called);
+    pb_release(&PB_Main_msg, &app_response);
+    poison_app_endpoint_unregister(&structured_app);
+
+    PB_Main profile_preview = PB_Main_init_zero;
+    profile_preview.command_id = ++command_id;
+    profile_preview.which_content = PB_Main_poison_profile_tag;
+    PB_Poison_Profile* profile = &profile_preview.content.poison_profile;
+    profile->format = 1u;
+    strcpy(profile->id, "rpc.field");
+    strcpy(profile->version, "1.0.0");
+    strcpy(profile->role, "field");
+    strcpy(profile->policy_id, "builtin.field");
+    strcpy(profile->theme_id, "builtin.field-console");
+    strcpy(profile->font_pack_id, "builtin.default");
+    strcpy(profile->icon_pack_id, "builtin.default");
+    strcpy(profile->menu_id, "builtin.field-console");
+    strcpy(profile->dashboard_layout, "field-console");
+    strcpy(profile->home_presentation, "builtin.field-console");
+    strcpy(profile->status_presentation, "builtin.field-console");
+    strcpy(profile->lock_behavior, "pin");
+    strcpy(profile->tool_defaults_json, "{}");
+    strcpy(profile->transport_policy, "local-only");
+    strcpy(profile->logging_policy, "metadata");
+    strcpy(profile->evidence_policy, "digest-only");
+    strcpy(profile->radio_region, "device");
+    strcpy(profile->peripheral_safety, "guarded");
+    strcpy(profile->classroom_policy, "none");
+    profile->notifications_enabled = true;
+    profile->haptics_enabled = true;
+    profile->contrast_ratio_x10 = 45u;
+    profile->capability_mask = POISON_CAPABILITY_STATUS;
+    PB_Main profile_response;
+    mu_check(test_rpc_secure_round_trip(
+        &client_session, session_id, &profile_preview, &profile_response));
+    mu_check(profile_response.command_status == PB_CommandStatus_OK);
+    mu_check(profile_response.which_content == PB_Main_poison_profile_status_tag);
+    mu_check(profile_response.content.poison_profile_status.preview);
+    mu_check(
+        profile_response.content.poison_profile_status.confirmation_token.size ==
+        POISON_CONFIRMATION_TOKEN_BYTES);
+
+    PB_Main profile_apply = PB_Main_init_zero;
+    profile_apply.command_id = ++command_id;
+    profile_apply.which_content = PB_Main_poison_profile_apply_tag;
+    strcpy(profile_apply.content.poison_profile_apply.profile_id, "rpc.field");
+    profile_apply.content.poison_profile_apply.confirmation_token_bytes.size =
+        POISON_CONFIRMATION_TOKEN_BYTES;
+    memcpy(
+        profile_apply.content.poison_profile_apply.confirmation_token_bytes.bytes,
+        profile_response.content.poison_profile_status.confirmation_token.bytes,
+        POISON_CONFIRMATION_TOKEN_BYTES);
+    pb_release(&PB_Main_msg, &profile_response);
+    mu_check(test_rpc_secure_round_trip(
+        &client_session, session_id, &profile_apply, &profile_response));
+    mu_check(profile_response.command_status == PB_CommandStatus_OK);
+    mu_check(profile_response.which_content == PB_Main_poison_profile_status_tag);
+    mu_check(!profile_response.content.poison_profile_status.preview);
+    mu_check(profile_approval.called);
+    pb_release(&PB_Main_msg, &profile_response);
+
+    profile_preview.command_id = ++command_id;
+    strcpy(profile->id, "rpc.untrusted-assets");
+    strcpy(profile->theme_id, "org.poison.theme.missing");
+    mu_check(test_rpc_secure_round_trip(
+        &client_session, session_id, &profile_preview, &profile_response));
+    mu_check(profile_response.command_status == PB_CommandStatus_ERROR_INVALID_PARAMETERS);
+    pb_release(&PB_Main_msg, &profile_response);
+
+    PB_Main forbidden_plaintext_ping = PB_Main_init_zero;
+    forbidden_plaintext_ping.command_id = ++command_id;
+    forbidden_plaintext_ping.which_content = PB_Main_system_ping_request_tag;
+    test_rpc_encode_and_feed_one(&forbidden_plaintext_ping, 0);
+    PB_Main forbidden_response;
+    mu_check(test_rpc_decode_one(&forbidden_response, 0));
+    mu_check(forbidden_response.which_content == PB_Main_poison_session_envelope_tag);
+    const PB_Poison_SessionEnvelope* forbidden_envelope =
+        &forbidden_response.content.poison_session_envelope;
+    uint8_t forbidden_plaintext[768u];
+    mu_check(
+        poison_session_decrypt_rx(
+            &client_session,
+            forbidden_envelope->sequence,
+            forbidden_envelope->acknowledgement,
+            forbidden_envelope->channel,
+            forbidden_envelope->payload.bytes,
+            forbidden_envelope->payload.size,
+            forbidden_envelope->authentication_tag.bytes,
+            forbidden_plaintext) == PoisonSessionResultOk);
+    PB_Main forbidden_inner = PB_Main_init_zero;
+    pb_istream_t forbidden_input =
+        pb_istream_from_buffer(forbidden_plaintext, forbidden_envelope->payload.size);
+    mu_check(pb_decode(&forbidden_input, &PB_Main_msg, &forbidden_inner));
+    mu_check(forbidden_inner.command_id == forbidden_plaintext_ping.command_id);
+    mu_check(forbidden_inner.command_status == PB_CommandStatus_ERROR_INVALID_PARAMETERS);
+    pb_release(&PB_Main_msg, &forbidden_inner);
+    pb_release(&PB_Main_msg, &forbidden_response);
+
+    PB_Main inner_ping = PB_Main_init_zero;
+    inner_ping.command_id = ++command_id;
+    inner_ping.which_content = PB_Main_system_ping_request_tag;
+    uint8_t plaintext[768u];
+    pb_ostream_t inner_output = pb_ostream_from_buffer(plaintext, sizeof(plaintext));
+    mu_check(pb_encode(&inner_output, &PB_Main_msg, &inner_ping));
+
+    PB_Main envelope_message = PB_Main_init_zero;
+    envelope_message.command_id = inner_ping.command_id;
+    envelope_message.which_content = PB_Main_poison_session_envelope_tag;
+    PB_Poison_SessionEnvelope* envelope = &envelope_message.content.poison_session_envelope;
+    envelope->protocol_version = 2u;
+    envelope->session_id = session_id;
+    envelope->acknowledgement = 0u;
+    strcpy(envelope->channel, "rpc");
+    envelope->payload.size = inner_output.bytes_written;
+    envelope->authentication_tag.size = POISON_SESSION_AUTH_TAG_BYTES;
+    mu_check(
+        poison_session_encrypt_tx(
+            &client_session,
+            envelope->acknowledgement,
+            envelope->channel,
+            plaintext,
+            inner_output.bytes_written,
+            &envelope->sequence,
+            envelope->payload.bytes,
+            envelope->authentication_tag.bytes) == PoisonSessionResultOk);
+    test_rpc_encode_and_feed_one(&envelope_message, 0);
+
+    PB_Main encrypted_response;
+    mu_check(test_rpc_decode_one(&encrypted_response, 0));
+    mu_check(encrypted_response.which_content == PB_Main_poison_session_envelope_tag);
+    const PB_Poison_SessionEnvelope* response_envelope =
+        &encrypted_response.content.poison_session_envelope;
+    mu_check(response_envelope->session_id == session_id);
+    mu_check(response_envelope->acknowledgement == 0u);
+    uint8_t response_plaintext[768u];
+    mu_check(
+        poison_session_decrypt_rx(
+            &client_session,
+            response_envelope->sequence,
+            response_envelope->acknowledgement,
+            response_envelope->channel,
+            response_envelope->payload.bytes,
+            response_envelope->payload.size,
+            response_envelope->authentication_tag.bytes,
+            response_plaintext) == PoisonSessionResultOk);
+    PB_Main inner_response = PB_Main_init_zero;
+    pb_istream_t inner_input =
+        pb_istream_from_buffer(response_plaintext, response_envelope->payload.size);
+    mu_check(pb_decode(&inner_input, &PB_Main_msg, &inner_response));
+    mu_check(inner_response.which_content == PB_Main_system_ping_response_tag);
+    mu_check(inner_response.command_id == inner_ping.command_id);
+    mu_check(
+        memcmp(
+            response_envelope->payload.bytes,
+            response_plaintext,
+            response_envelope->payload.size) != 0);
+
+    PB_Main update_import = PB_Main_init_zero;
+    update_import.command_id = ++command_id;
+    update_import.which_content = PB_Main_poison_content_update_request_tag;
+    PB_Poison_ContentUpdateRequest* update = &update_import.content.poison_content_update_request;
+    update->operation = PB_Poison_ContentUpdateOperation_CONTENT_UPDATE_OPERATION_IMPORT;
+    strcpy(update->update_id, "firmware-2");
+    strcpy(update->manifest_path, "/ext/update/poison/update.poison");
+    update->content_type = PB_Poison_ContentUpdateType_CONTENT_UPDATE_TYPE_FIRMWARE;
+    strcpy(
+        update->candidate_digest,
+        "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef");
+    strcpy(
+        update->previous_digest,
+        "abcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcd");
+    update->release_sequence = 2u;
+    update->content_bytes = 8192u;
+    PB_Main update_response;
+    mu_check(
+        test_rpc_secure_round_trip(&client_session, session_id, &update_import, &update_response));
+    mu_check(update_response.command_status == PB_CommandStatus_ERROR_INVALID_PARAMETERS);
+    mu_check(update_response.which_content == 0u);
+
+    PB_Main package_inspect = PB_Main_init_zero;
+    package_inspect.command_id = ++command_id;
+    package_inspect.which_content = PB_Main_poison_package_operation_request_tag;
+    package_inspect.content.poison_package_operation_request.operation =
+        PB_Poison_PackageOperation_PACKAGE_OPERATION_INSPECT;
+    strcpy(
+        package_inspect.content.poison_package_operation_request.package_id,
+        "org.poison.dispatch-test");
+    PB_Main package_response;
+    mu_check(test_rpc_secure_round_trip(
+        &client_session, session_id, &package_inspect, &package_response));
+    mu_check(package_response.command_status == PB_CommandStatus_OK);
+    mu_check(package_response.which_content == PB_Main_poison_package_operation_status_tag);
+    mu_check(
+        strcmp(package_response.content.poison_package_operation_status.result, "not-found") == 0);
+
+    static const char* const transfer_digest =
+        "7cb2062b7be22ae0c9f9add987d054a6d9b18bd97d60eb26e07bf7d9485a51e2";
+    static const char* const transfer_root = "/int/config/.rpc-workload";
+    static const char* const transfer_version = "/int/config/.rpc-workload/versions/v1";
+    static const char* const transfer_path = "/int/config/.rpc-workload/versions/v1/main.js";
+    static const char* const transfer_temporary_path =
+        "/int/config/.rpc-workload/versions/v1/main.js.poison-upload";
+    Storage* transfer_storage = furi_record_open(RECORD_STORAGE);
+    (void)storage_common_remove(transfer_storage, transfer_path);
+    (void)storage_common_remove(transfer_storage, transfer_temporary_path);
+    (void)storage_common_remove(transfer_storage, transfer_version);
+    (void)storage_common_remove(transfer_storage, "/int/config/.rpc-workload/versions");
+    (void)storage_common_remove(transfer_storage, transfer_root);
+
+    PB_Main transfer_begin = PB_Main_init_zero;
+    transfer_begin.command_id = ++command_id;
+    transfer_begin.which_content = PB_Main_poison_file_transfer_begin_tag;
+    strcpy(transfer_begin.content.poison_file_transfer_begin.operation_id, "rpc-transfer-1");
+    strcpy(
+        transfer_begin.content.poison_file_transfer_begin.path,
+        "/config/.rpc-workload/versions/v1/main.js");
+    transfer_begin.content.poison_file_transfer_begin.size = sizeof("rpc-transfer") - 1u;
+    strcpy(transfer_begin.content.poison_file_transfer_begin.sha256, transfer_digest);
+    PB_Main transfer_response;
+    mu_check(test_rpc_secure_round_trip(
+        &client_session, session_id, &transfer_begin, &transfer_response));
+    mu_check(transfer_response.command_status == PB_CommandStatus_OK);
+    mu_check(transfer_response.which_content == PB_Main_empty_tag);
+    pb_release(&PB_Main_msg, &transfer_response);
+
+    PB_Main transfer_chunk = PB_Main_init_zero;
+    transfer_chunk.command_id = ++command_id;
+    transfer_chunk.which_content = PB_Main_poison_file_transfer_chunk_tag;
+    strcpy(transfer_chunk.content.poison_file_transfer_chunk.operation_id, "rpc-transfer-1");
+    transfer_chunk.content.poison_file_transfer_chunk.offset = 0u;
+    transfer_chunk.content.poison_file_transfer_chunk.data.size = sizeof("rpc-transfer") - 1u;
+    memcpy(
+        transfer_chunk.content.poison_file_transfer_chunk.data.bytes,
+        "rpc-transfer",
+        sizeof("rpc-transfer") - 1u);
+    strcpy(transfer_chunk.content.poison_file_transfer_chunk.sha256, transfer_digest);
+    mu_check(test_rpc_secure_round_trip(
+        &client_session, session_id, &transfer_chunk, &transfer_response));
+    mu_check(transfer_response.command_status == PB_CommandStatus_OK);
+    pb_release(&PB_Main_msg, &transfer_response);
+
+    PB_Main transfer_complete = PB_Main_init_zero;
+    transfer_complete.command_id = ++command_id;
+    transfer_complete.which_content = PB_Main_poison_file_transfer_complete_tag;
+    strcpy(transfer_complete.content.poison_file_transfer_complete.operation_id, "rpc-transfer-1");
+    strcpy(transfer_complete.content.poison_file_transfer_complete.sha256, transfer_digest);
+    transfer_complete.content.poison_file_transfer_complete.size = sizeof("rpc-transfer") - 1u;
+    mu_check(test_rpc_secure_round_trip(
+        &client_session, session_id, &transfer_complete, &transfer_response));
+    mu_check(transfer_response.command_status == PB_CommandStatus_OK);
+    mu_check(storage_file_exists(transfer_storage, transfer_path));
+    mu_check(!storage_file_exists(transfer_storage, transfer_temporary_path));
+    pb_release(&PB_Main_msg, &transfer_response);
+
+    transfer_begin.command_id = ++command_id;
+    mu_check(test_rpc_secure_round_trip(
+        &client_session, session_id, &transfer_begin, &transfer_response));
+    mu_check(transfer_response.command_status == PB_CommandStatus_OK);
+    pb_release(&PB_Main_msg, &transfer_response);
+    transfer_chunk.command_id = ++command_id;
+    mu_check(test_rpc_secure_round_trip(
+        &client_session, session_id, &transfer_chunk, &transfer_response));
+    mu_check(transfer_response.command_status == PB_CommandStatus_OK);
+    pb_release(&PB_Main_msg, &transfer_response);
+    transfer_complete.command_id = ++command_id;
+    mu_check(test_rpc_secure_round_trip(
+        &client_session, session_id, &transfer_complete, &transfer_response));
+    mu_check(transfer_response.command_status == PB_CommandStatus_OK);
+    mu_check(storage_file_exists(transfer_storage, transfer_path));
+    pb_release(&PB_Main_msg, &transfer_response);
+
+    if(storage_sd_status(transfer_storage) == FSE_OK) {
+        const char* evidence_object_path =
+            "/ext/evidence/objects/7cb2062b7be22ae0c9f9add987d054a6d9b18bd97d60eb26e07bf7d9485a51e2.bin";
+        const bool evidence_object_preexisting =
+            storage_file_exists(transfer_storage, evidence_object_path);
+        char case_id[65u];
+        char evidence_id[65u];
+        snprintf(case_id, sizeof(case_id), "rpc-case-%lu", (unsigned long)furi_get_tick());
+        snprintf(
+            evidence_id, sizeof(evidence_id), "rpc-evidence-%lu", (unsigned long)furi_get_tick());
+
+        PB_Main invalid_case_request = PB_Main_init_zero;
+        invalid_case_request.command_id = ++command_id;
+        invalid_case_request.which_content = PB_Main_poison_case_tag;
+        strcpy(invalid_case_request.content.poison_case.case_id, "../rpc-case");
+        strcpy(invalid_case_request.content.poison_case.name, "Invalid case");
+        strcpy(invalid_case_request.content.poison_case.purpose, "Traversal regression");
+        strcpy(invalid_case_request.content.poison_case.retention_policy, "manual");
+        PB_Main case_response;
+        mu_check(test_rpc_secure_round_trip(
+            &client_session, session_id, &invalid_case_request, &case_response));
+        mu_check(case_response.command_status == PB_CommandStatus_ERROR_INVALID_PARAMETERS);
+        pb_release(&PB_Main_msg, &case_response);
+
+        PB_Main case_request = PB_Main_init_zero;
+        case_request.command_id = ++command_id;
+        case_request.which_content = PB_Main_poison_case_tag;
+        strcpy(case_request.content.poison_case.case_id, case_id);
+        strcpy(case_request.content.poison_case.name, "RPC evidence case");
+        strcpy(case_request.content.poison_case.purpose, "Encrypted dispatcher regression");
+        strcpy(case_request.content.poison_case.retention_policy, "manual");
+        mu_check(test_rpc_secure_round_trip(
+            &client_session, session_id, &case_request, &case_response));
+        mu_check(case_response.command_status == PB_CommandStatus_OK);
+        mu_check(case_response.which_content == PB_Main_poison_case_tag);
+        mu_check(strcmp(case_response.content.poison_case.case_id, case_id) == 0);
+        mu_check(strncmp(case_response.content.poison_case.owner_id, "session-", 8u) == 0);
+        mu_check(case_response.content.poison_case.created_at_ms > 0u);
+        const uint64_t case_created_at_ms = case_response.content.poison_case.created_at_ms;
+        pb_release(&PB_Main_msg, &case_response);
+        case_request.command_id = ++command_id;
+        mu_check(test_rpc_secure_round_trip(
+            &client_session, session_id, &case_request, &case_response));
+        mu_check(case_response.command_status == PB_CommandStatus_OK);
+        mu_check(case_response.content.poison_case.created_at_ms == case_created_at_ms);
+        pb_release(&PB_Main_msg, &case_response);
+
+        PB_Main evidence_request = PB_Main_init_zero;
+        evidence_request.command_id = ++command_id;
+        evidence_request.which_content = PB_Main_poison_evidence_record_tag;
+        strcpy(evidence_request.content.poison_evidence_record.evidence_id, evidence_id);
+        strcpy(evidence_request.content.poison_evidence_record.case_id, case_id);
+        strcpy(evidence_request.content.poison_evidence_record.source_app_id, "rpc-test");
+        strcpy(evidence_request.content.poison_evidence_record.content_sha256, transfer_digest);
+        evidence_request.content.poison_evidence_record.content_length =
+            sizeof("rpc-transfer") - 1u;
+        strcpy(
+            evidence_request.content.poison_evidence_record.media_type,
+            "application/octet-stream");
+        strcpy(
+            evidence_request.content.poison_evidence_record.source_path,
+            "/config/.rpc-transfer-test");
+        PB_Main evidence_response;
+        mu_check(test_rpc_secure_round_trip(
+            &client_session, session_id, &evidence_request, &evidence_response));
+        mu_check(evidence_response.command_status == PB_CommandStatus_OK);
+        mu_check(evidence_response.which_content == PB_Main_poison_evidence_record_tag);
+        mu_check(
+            strcmp(evidence_response.content.poison_evidence_record.evidence_id, evidence_id) ==
+            0);
+        mu_check(
+            strcmp(
+                evidence_response.content.poison_evidence_record.content_sha256,
+                transfer_digest) == 0);
+        mu_check(strlen(evidence_response.content.poison_evidence_record.audit_sha256) == 64u);
+        pb_release(&PB_Main_msg, &evidence_response);
+
+        char evidence_record_path[192u];
+        snprintf(
+            evidence_record_path,
+            sizeof(evidence_record_path),
+            "/ext/evidence/records/%s.pev",
+            evidence_id);
+        mu_check(storage_file_exists(transfer_storage, evidence_record_path));
+        mu_check(storage_file_exists(transfer_storage, evidence_object_path));
+
+        char annotation_id[65u];
+        snprintf(
+            annotation_id,
+            sizeof(annotation_id),
+            "rpc-annotation-%lu",
+            (unsigned long)furi_get_tick());
+        PB_Main annotation_request = PB_Main_init_zero;
+        annotation_request.command_id = ++command_id;
+        annotation_request.which_content = PB_Main_poison_annotation_tag;
+        strcpy(annotation_request.content.poison_annotation.annotation_id, annotation_id);
+        strcpy(annotation_request.content.poison_annotation.evidence_id, evidence_id);
+        strcpy(annotation_request.content.poison_annotation.text, "Verified RPC capture");
+        annotation_request.content.poison_annotation.tags_count = 2u;
+        strcpy(annotation_request.content.poison_annotation.tags[0], "rpc");
+        strcpy(annotation_request.content.poison_annotation.tags[1], "verified");
+        PB_Main annotation_response;
+        mu_check(test_rpc_secure_round_trip(
+            &client_session, session_id, &annotation_request, &annotation_response));
+        mu_check(annotation_response.command_status == PB_CommandStatus_OK);
+        mu_check(annotation_response.which_content == PB_Main_poison_annotation_tag);
+        mu_check(
+            strcmp(annotation_response.content.poison_annotation.annotation_id, annotation_id) ==
+            0);
+        mu_check(annotation_response.content.poison_annotation.tags_count == 2u);
+        mu_check(
+            strncmp(annotation_response.content.poison_annotation.author_id, "session-", 8u) == 0);
+        pb_release(&PB_Main_msg, &annotation_response);
+
+        char export_id[65u];
+        snprintf(export_id, sizeof(export_id), "rpc-export-%lu", (unsigned long)furi_get_tick());
+        const char* export_values[] = {evidence_id};
+        TestRpcStringList export_list = {
+            .values = export_values,
+            .count = COUNT_OF(export_values),
+        };
+        PB_Main export_request = PB_Main_init_zero;
+        export_request.command_id = ++command_id;
+        export_request.which_content = PB_Main_poison_export_manifest_tag;
+        strcpy(export_request.content.poison_export_manifest.export_id, export_id);
+        strcpy(
+            export_request.content.poison_export_manifest.schema, "poison.evidence-manifest/v1");
+        export_request.content.poison_export_manifest.evidence_ids.funcs.encode =
+            test_rpc_encode_strings;
+        export_request.content.poison_export_manifest.evidence_ids.arg = &export_list;
+        export_request.content.poison_export_manifest.finalize = true;
+        PB_Main export_response;
+        mu_check(test_rpc_secure_round_trip(
+            &client_session, session_id, &export_request, &export_response));
+        mu_check(export_response.command_status == PB_CommandStatus_OK);
+        mu_check(export_response.which_content == PB_Main_poison_export_manifest_tag);
+        mu_check(export_response.content.poison_export_manifest.accepted_evidence_ids == 1u);
+        mu_check(strlen(export_response.content.poison_export_manifest.manifest_sha256) == 64u);
+        mu_check(export_response.content.poison_export_manifest.signature[0] == '\0');
+        char manifest_sha256[65u];
+        strcpy(manifest_sha256, export_response.content.poison_export_manifest.manifest_sha256);
+        pb_release(&PB_Main_msg, &export_response);
+
+        export_request.command_id = ++command_id;
+        mu_check(test_rpc_secure_round_trip(
+            &client_session, session_id, &export_request, &export_response));
+        mu_check(export_response.command_status == PB_CommandStatus_OK);
+        mu_check(
+            strcmp(
+                export_response.content.poison_export_manifest.manifest_sha256, manifest_sha256) ==
+            0);
+        pb_release(&PB_Main_msg, &export_response);
+
+        char case_record_path[192u];
+        char annotation_record_path[192u];
+        char export_record_path[192u];
+        snprintf(
+            case_record_path, sizeof(case_record_path), "/ext/evidence/cases/%s.pcase", case_id);
+        snprintf(
+            annotation_record_path,
+            sizeof(annotation_record_path),
+            "/ext/evidence/annotations/%s.pann",
+            annotation_id);
+        snprintf(
+            export_record_path,
+            sizeof(export_record_path),
+            "/ext/evidence/exports/%s.pmanifest",
+            export_id);
+        mu_check(storage_file_exists(transfer_storage, case_record_path));
+        mu_check(storage_file_exists(transfer_storage, annotation_record_path));
+        mu_check(storage_file_exists(transfer_storage, export_record_path));
+        mu_check(storage_common_remove(transfer_storage, annotation_record_path) == FSE_OK);
+        mu_check(storage_common_remove(transfer_storage, export_record_path) == FSE_OK);
+        mu_check(storage_common_remove(transfer_storage, evidence_record_path) == FSE_OK);
+        mu_check(storage_common_remove(transfer_storage, case_record_path) == FSE_OK);
+        if(!evidence_object_preexisting)
+            mu_check(storage_common_remove(transfer_storage, evidence_object_path) == FSE_OK);
+    }
+    mu_check(storage_common_remove(transfer_storage, transfer_path) == FSE_OK);
+    mu_check(storage_common_remove(transfer_storage, transfer_version) == FSE_OK);
+    mu_check(
+        storage_common_remove(transfer_storage, "/int/config/.rpc-workload/versions") == FSE_OK);
+    mu_check(storage_common_remove(transfer_storage, transfer_root) == FSE_OK);
+    furi_record_close(RECORD_STORAGE);
+
+    PB_Main file_list = PB_Main_init_zero;
+    file_list.command_id = ++command_id;
+    file_list.which_content = PB_Main_poison_file_list_request_tag;
+    strcpy(file_list.content.poison_file_list_request.path, "/config");
+    strcpy(file_list.content.poison_file_list_request.cursor, "9999");
+    file_list.content.poison_file_list_request.page_size = 1u;
+    mu_check(
+        test_rpc_secure_round_trip(&client_session, session_id, &file_list, &transfer_response));
+    mu_check(transfer_response.command_status == PB_CommandStatus_OK);
+    mu_check(transfer_response.which_content == PB_Main_poison_file_list_response_tag);
+    mu_check(!transfer_response.has_next);
+    pb_release(&PB_Main_msg, &transfer_response);
+
+    poison_diagnostics_init(poison_diagnostics_get());
+    poison_diagnostics_increment(poison_diagnostics_get(), PoisonDiagnosticUpdateStage);
+    PB_Main diagnostic_snapshot = PB_Main_init_zero;
+    diagnostic_snapshot.command_id = ++command_id;
+    diagnostic_snapshot.which_content = PB_Main_poison_diagnostic_snapshot_request_tag;
+    diagnostic_snapshot.content.poison_diagnostic_snapshot_request.max_events = 0u;
+    PB_Main diagnostic_response;
+    mu_check(test_rpc_secure_round_trip(
+        &client_session, session_id, &diagnostic_snapshot, &diagnostic_response));
+    mu_check(diagnostic_response.command_status == PB_CommandStatus_OK);
+    mu_check(diagnostic_response.which_content == PB_Main_poison_diagnostic_counters_tag);
+    mu_check(diagnostic_response.content.poison_diagnostic_counters.update_stages == 1u);
+    mu_check(!diagnostic_response.has_next);
+
+    PB_Main audit_snapshot = PB_Main_init_zero;
+    audit_snapshot.command_id = ++command_id;
+    audit_snapshot.which_content = PB_Main_poison_audit_snapshot_request_tag;
+    audit_snapshot.content.poison_audit_snapshot_request.after_event_id = UINT64_MAX;
+    audit_snapshot.content.poison_audit_snapshot_request.max_events = POISON_AUDIT_RING_SIZE;
+    PB_Main audit_response;
+    mu_check(
+        test_rpc_secure_round_trip(&client_session, session_id, &audit_snapshot, &audit_response));
+    mu_check(audit_response.command_status == PB_CommandStatus_OK);
+    mu_check(audit_response.which_content == PB_Main_poison_audit_snapshot_end_tag);
+    mu_check(audit_response.content.poison_audit_snapshot_end.next_event_id >= 1u);
+    mu_check(
+        audit_response.content.poison_audit_snapshot_end.last_digest.size ==
+        POISON_AUDIT_DIGEST_BYTES);
+    mu_check(!audit_response.has_next);
+
+    PB_Main resume_issue = PB_Main_init_zero;
+    resume_issue.command_id = ++command_id;
+    resume_issue.which_content = PB_Main_poison_resume_request_tag;
+    resume_issue.content.poison_resume_request.session_id = session_id;
+    PB_Main resume_issue_response;
+    mu_check(test_rpc_secure_round_trip(
+        &client_session, session_id, &resume_issue, &resume_issue_response));
+    mu_check(resume_issue_response.command_status == PB_CommandStatus_OK);
+    mu_check(resume_issue_response.which_content == PB_Main_poison_resume_response_tag);
+    mu_check(resume_issue_response.content.poison_resume_response.accepted);
+    mu_check(
+        resume_issue_response.content.poison_resume_response.resume_token.size ==
+        POISON_SESSION_RESUME_TOKEN_BYTES);
+    uint8_t resume_token[POISON_SESSION_RESUME_TOKEN_BYTES];
+    memcpy(
+        resume_token,
+        resume_issue_response.content.poison_resume_response.resume_token.bytes,
+        sizeof(resume_token));
+    const uint64_t last_received_sequence = client_session.next_rx_sequence - 1u;
+    const uint64_t resumed_next_sequence = client_session.next_rx_sequence;
+    pb_release(&PB_Main_msg, &resume_issue_response);
+
+    test_rpc_teardown();
+    test_rpc_setup();
+    PB_Main resume_request = PB_Main_init_zero;
+    resume_request.command_id = ++command_id;
+    resume_request.which_content = PB_Main_poison_resume_request_tag;
+    resume_request.content.poison_resume_request.session_id = session_id;
+    resume_request.content.poison_resume_request.resume_token.size = sizeof(resume_token);
+    memcpy(
+        resume_request.content.poison_resume_request.resume_token.bytes,
+        resume_token,
+        sizeof(resume_token));
+    resume_request.content.poison_resume_request.last_received_sequence = last_received_sequence;
+    test_rpc_encode_and_feed_one(&resume_request, 0u);
+    PB_Main resume_response = PB_Main_init_zero;
+    mu_check(test_rpc_decode_one(&resume_response, 0u));
+    mu_check(resume_response.command_id == resume_request.command_id);
+    mu_check(resume_response.command_status == PB_CommandStatus_OK);
+    mu_check(resume_response.which_content == PB_Main_poison_resume_response_tag);
+    mu_check(resume_response.content.poison_resume_response.accepted);
+    mu_check(
+        resume_response.content.poison_resume_response.next_sequence == resumed_next_sequence);
+    mu_check(
+        resume_response.content.poison_resume_response.resume_token.size ==
+        POISON_SESSION_RESUME_TOKEN_BYTES);
+    uint8_t rotated_resume_token[POISON_SESSION_RESUME_TOKEN_BYTES];
+    memcpy(
+        rotated_resume_token,
+        resume_response.content.poison_resume_response.resume_token.bytes,
+        sizeof(rotated_resume_token));
+    mu_check(
+        memcmp(
+            resume_response.content.poison_resume_response.resume_token.bytes,
+            resume_token,
+            sizeof(resume_token)) != 0);
+    pb_release(&PB_Main_msg, &resume_response);
+
+    PB_Main resumed_channel_open = PB_Main_init_zero;
+    resumed_channel_open.command_id = ++command_id;
+    resumed_channel_open.which_content = PB_Main_poison_channel_open_tag;
+    strcpy(resumed_channel_open.content.poison_channel_open.channel, "rpc");
+    resumed_channel_open.content.poison_channel_open.initial_credits = 4u;
+    resumed_channel_open.content.poison_channel_open.resume_sequence = 1u;
+    PB_Main resumed_channel_response;
+    mu_check(test_rpc_secure_round_trip(
+        &client_session, session_id, &resumed_channel_open, &resumed_channel_response));
+    mu_check(resumed_channel_response.command_status == PB_CommandStatus_OK);
+    mu_check(resumed_channel_response.which_content == PB_Main_poison_channel_opened_tag);
+    mu_check(resumed_channel_response.content.poison_channel_opened.next_sequence == 1u);
+    pb_release(&PB_Main_msg, &resumed_channel_response);
+
+    PB_Main resumed_ping = PB_Main_init_zero;
+    resumed_ping.command_id = ++command_id;
+    resumed_ping.which_content = PB_Main_system_ping_request_tag;
+    resumed_ping.content.system_ping_request.data->size = 4u;
+    memcpy(resumed_ping.content.system_ping_request.data->bytes, "back", 4u);
+    PB_Main resumed_ping_response;
+    mu_check(test_rpc_secure_round_trip(
+        &client_session, session_id, &resumed_ping, &resumed_ping_response));
+    mu_check(resumed_ping_response.command_status == PB_CommandStatus_OK);
+    mu_check(resumed_ping_response.which_content == PB_Main_system_ping_response_tag);
+    pb_release(&PB_Main_msg, &resumed_ping_response);
+
+    PB_Main stop_session = PB_Main_init_zero;
+    stop_session.command_id = ++command_id;
+    stop_session.which_content = PB_Main_stop_session_tag;
+    PB_Main stop_response;
+    mu_check(
+        test_rpc_secure_round_trip(&client_session, session_id, &stop_session, &stop_response));
+    mu_check(stop_response.command_status == PB_CommandStatus_OK);
+    mu_check(stop_response.which_content == PB_Main_empty_tag);
+    pb_release(&PB_Main_msg, &stop_response);
+    const uint64_t stopped_last_received_sequence = client_session.next_rx_sequence - 1u;
+
+    test_rpc_teardown();
+    test_rpc_setup();
+    PB_Main revoked_resume = PB_Main_init_zero;
+    revoked_resume.command_id = ++command_id;
+    revoked_resume.which_content = PB_Main_poison_resume_request_tag;
+    revoked_resume.content.poison_resume_request.session_id = session_id;
+    revoked_resume.content.poison_resume_request.resume_token.size = sizeof(rotated_resume_token);
+    memcpy(
+        revoked_resume.content.poison_resume_request.resume_token.bytes,
+        rotated_resume_token,
+        sizeof(rotated_resume_token));
+    revoked_resume.content.poison_resume_request.last_received_sequence =
+        stopped_last_received_sequence;
+    test_rpc_encode_and_feed_one(&revoked_resume, 0u);
+    PB_Main revoked_resume_response = PB_Main_init_zero;
+    mu_check(test_rpc_decode_one(&revoked_resume_response, 0u));
+    mu_check(revoked_resume_response.command_id == revoked_resume.command_id);
+    mu_check(revoked_resume_response.which_content == PB_Main_poison_resume_response_tag);
+    mu_check(!revoked_resume_response.content.poison_resume_response.accepted);
+    pb_release(&PB_Main_msg, &revoked_resume_response);
+
+    memset(client_private, 0, sizeof(client_private));
+    memset(shared_secret, 0, sizeof(shared_secret));
+    memset(directional_keys, 0, sizeof(directional_keys));
+    memset(resume_token, 0, sizeof(resume_token));
+    memset(rotated_resume_token, 0, sizeof(rotated_resume_token));
+    pb_release(&PB_Main_msg, &inner_response);
+    pb_release(&PB_Main_msg, &app_response);
+    pb_release(&PB_Main_msg, &update_response);
+    pb_release(&PB_Main_msg, &package_response);
+    pb_release(&PB_Main_msg, &diagnostic_response);
+    pb_release(&PB_Main_msg, &audit_response);
+    pb_release(&PB_Main_msg, &encrypted_response);
+    test_rpc_teardown();
+}
+
 MU_TEST_SUITE(test_rpc_session) {
     MU_RUN_TEST(test_rpc_feed_rubbish);
     MU_RUN_TEST(test_rpc_multisession_ping);
+    MU_RUN_TEST(test_rpc_poison_pairing_and_encrypted_ping_use_real_dispatcher);
 
     Storage* storage = furi_record_open(RECORD_STORAGE);
     if(storage_sd_status(storage) != FSE_OK) {
@@ -1847,6 +2973,38 @@ int run_minunit_test_rpc(void) {
     MU_RUN_SUITE(test_rpc_system);
     MU_RUN_SUITE(test_rpc_app);
     MU_RUN_SUITE(test_rpc_session);
+    poison_session_run_tests();
+    poison_channel_run_tests();
+    poison_crypto_run_tests();
+    poison_session_state_run_tests();
+    poison_policy_run_tests();
+    poison_confirmation_run_tests();
+    poison_diagnostics_run_tests();
+    test_poison_pairing_ui();
+    poison_file_contract_run_tests();
+    poison_vfs_path_run_tests();
+    poison_vfs_journal_run_tests();
+    poison_migration_run_tests();
+    poison_safe_sample_run_tests();
+    poison_js_developer_policy_run_tests();
+    poison_evidence_run_tests();
+    poison_evidence_rpc_run_tests();
+    poison_workspace_run_tests();
+    poison_package_verify_run_tests();
+    poison_package_transaction_run_tests();
+    poison_package_catalog_run_tests();
+    poison_app_protocol_run_tests();
+    poison_profiles_run_tests();
+    poison_tools_catalog_run_tests();
+    poison_tool_gpio_run_tests();
+    poison_rust_api_run_tests();
+    poison_js_capabilities_run_tests();
+    poison_js_limits_run_tests();
+    poison_content_update_run_tests();
+    poison_workload_run_tests();
+    poison_lessons_run_tests();
+    poison_assignments_run_tests();
+    poison_wasm_run_tests();
 
     return MU_EXIT_CODE;
 }

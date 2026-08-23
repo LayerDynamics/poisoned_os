@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "sourceRepository": "justcallmekoko/ESP32Marauder",
+  "sourceCommit": "6e375e377abb70084720484e9b25de485627f688",
+  "version": "v1.15.0",
+  "channel": "stable",
+  "installerBundleUrl": "https://github.com/justcallmekoko/ESP32Marauder/releases/download/v1.15.0/marauder-installer-assets.zip",
+  "installerBundleSha256": "3b09b98e6d11a954647df8664e3d2b17e8e003adca5fdeb79026f345da4cc782",
+  "manifestPath": "firmware-manifest.json"
+}

@@ -1,7 +1,6 @@
 #include "power_off.h"
 #include <furi.h>
 #include <gui/elements.h>
-#include <assets_icons.h>
 
 struct PowerOff {
     View* view;
@@ -17,26 +16,29 @@ static void power_off_draw_callback(Canvas* canvas, void* _model) {
     PowerOffModel* model = _model;
     char buff[32];
 
+    canvas_clear(canvas);
+    canvas_set_color(canvas, ColorBlack);
+    canvas_draw_box(canvas, 0, 0, 128, 13);
+    canvas_set_color(canvas, ColorWhite);
+    canvas_set_font(canvas, FontSecondary);
+    canvas_draw_str(canvas, 4, 10, "POWER / CRITICAL");
+
     canvas_set_color(canvas, ColorBlack);
     canvas_set_font(canvas, FontPrimary);
-    canvas_draw_str_aligned(canvas, 64, 1, AlignCenter, AlignTop, "Battery low!");
-    canvas_draw_icon(canvas, 0, 18, &I_BatteryBody_52x28);
-    canvas_draw_icon(canvas, 16, 25, &I_FaceNopower_29x14);
-    elements_bubble(canvas, 54, 17, 70, 30);
-
+    canvas_draw_str(canvas, 6, 27, "BATTERY LOW");
+    canvas_draw_line(canvas, 6, 31, 122, 31);
     canvas_set_font(canvas, FontSecondary);
     if(model->response == PowerOffResponseDefault) {
-        snprintf(buff, sizeof(buff), "Charge me!\nOff in %lus!", model->time_left_sec);
-        elements_multiline_text_aligned(canvas, 70, 23, AlignLeft, AlignTop, buff);
+        snprintf(buff, sizeof(buff), "%lus TO AUTO SHUTDOWN", model->time_left_sec);
+        canvas_draw_str(canvas, 6, 43, buff);
+        canvas_draw_str(canvas, 6, 51, "CONNECT USB POWER");
 
         elements_button_left(canvas, "Cancel");
         elements_button_center(canvas, "OK");
         elements_button_right(canvas, "Hide");
     } else {
-        snprintf(buff, sizeof(buff), "Charge me!\nDon't forget!");
-        elements_multiline_text_aligned(canvas, 70, 23, AlignLeft, AlignTop, buff);
-
-        canvas_draw_str_aligned(canvas, 64, 60, AlignCenter, AlignBottom, "Hold a second...");
+        canvas_draw_str(canvas, 6, 43, "SHUTDOWN ARMED");
+        canvas_draw_str(canvas, 6, 55, "HOLD A SECOND...");
     }
 }
 
