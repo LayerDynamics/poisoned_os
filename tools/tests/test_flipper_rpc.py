@@ -14,6 +14,7 @@ PROTO_DIR = ROOT / "generated" / "protocol" / "python"
 sys.path.insert(0, str(PROTO_DIR))
 
 import flipper_pb2
+import storage_pb2
 
 
 def load_rpc_module():
@@ -218,6 +219,51 @@ class FlipperRpcTests(unittest.TestCase):
         missing_stream = FragmentedStream(module.encode_delimited(missing))
         self.assertIsNone(
             module.FlipperRpc("fixture", stream=missing_stream).read_file("/ext/status")
+        )
+
+    def test_storage_diagnostics_report_capacity_stat_and_directory_entries(self) -> None:
+        module = load_rpc_module()
+
+        info = flipper_pb2.Main(command_id=1, command_status=flipper_pb2.OK)
+        info.storage_info_response.total_space = 32 * 1024 * 1024
+        info.storage_info_response.free_space = 7 * 1024 * 1024
+        stat = flipper_pb2.Main(command_id=2, command_status=flipper_pb2.OK)
+        stat.storage_stat_response.file.type = storage_pb2.File.FILE
+        stat.storage_stat_response.file.name = "resources.ths"
+        stat.storage_stat_response.file.size = 7_766_813
+        listing = flipper_pb2.Main(command_id=3, command_status=flipper_pb2.OK)
+        entry = listing.storage_list_response.file.add()
+        entry.type = storage_pb2.File.FILE
+        entry.name = "backup.tar"
+        entry.size = 11_264
+        stream = FragmentedStream(
+            module.encode_delimited(info)
+            + module.encode_delimited(stat)
+            + module.encode_delimited(listing)
+        )
+        client = module.FlipperRpc("fixture", stream=stream)
+
+        self.assertEqual(
+            client.storage_info("/ext"),
+            {"total_space": 32 * 1024 * 1024, "free_space": 7 * 1024 * 1024},
+        )
+        self.assertEqual(
+            client.stat("/ext/update/poison-lkg/resources.ths"),
+            {"type": "file", "name": "resources.ths", "size": 7_766_813},
+        )
+        self.assertEqual(
+            client.list_dir("/ext/update/poison-lkg"),
+            [{"type": "file", "name": "backup.tar", "size": 11_264}],
+        )
+
+        requests = [module.decode_delimited(frame) for frame in stream.writes]
+        self.assertEqual(requests[0].storage_info_request.path, "/ext")
+        self.assertEqual(
+            requests[1].storage_stat_request.path,
+            "/ext/update/poison-lkg/resources.ths",
+        )
+        self.assertEqual(
+            requests[2].storage_list_request.path, "/ext/update/poison-lkg"
         )
 
     def test_start_app_uses_real_application_request(self) -> None:

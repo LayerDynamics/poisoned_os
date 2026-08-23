@@ -486,7 +486,7 @@ Found DFU: [0483:df11] alt=0 serial="2075308D4242"
         )
         self.assertEqual(rpc_update.call_count, 2)
 
-    def test_successful_update_is_rejected_when_poisonedos_does_not_boot(self) -> None:
+    def test_successful_update_timeout_recovers_device_without_retrying_update(self) -> None:
         module = load_device_install_module()
         manifest = mock.Mock()
         manifest.is_file.return_value = True
@@ -494,15 +494,22 @@ Found DFU: [0483:df11] alt=0 serial="2075308D4242"
         with mock.patch.object(
             module, "detect_flipper_dfu", return_value=None
         ), mock.patch.object(
-            module, "detect_flipper_runtime", return_value=None
+            module,
+            "detect_flipper_runtime",
+            return_value=("/dev/cu.fixture", "flip_fixture"),
         ), mock.patch.object(
             module, "run_rpc_update", return_value=0
         ), mock.patch.object(
             module, "verify_poisoned_os", return_value=False
-        ):
+        ), mock.patch.object(
+            module,
+            "recover_after_failed_update",
+            return_value="/dev/cu.recovered",
+        ) as recover:
             result = module.install("auto", manifest, [])
 
         self.assertEqual(result, 6)
+        recover.assert_called_once_with("flip_fixture")
 
     def test_post_install_verification_allows_full_update_and_unlock_window(self) -> None:
         module = load_device_install_module()
@@ -571,28 +578,107 @@ Found DFU: [0483:df11] alt=0 serial="2075308D4242"
         self.assertFalse(result)
         self.assertIn("unlock the device", stderr.getvalue())
 
-    def test_failed_identity_check_never_enters_recovery_or_retries(self) -> None:
+    def test_failed_identity_check_enters_diagnosis_but_never_retries_update(self) -> None:
         module = load_device_install_module()
         manifest = mock.Mock()
         manifest.is_file.return_value = True
 
         with mock.patch.object(
-            module,
-            "detect_flipper_dfu",
-            side_effect=[None, "2075308D4242", "2075308D4242"],
+            module, "detect_flipper_dfu", return_value=None
         ), mock.patch.object(
-            module, "run_qflipper_repair", return_value=0
-        ) as repair, mock.patch.object(
+            module,
+            "detect_flipper_runtime",
+            return_value=("/dev/cu.fixture", "flip_fixture"),
+        ), mock.patch.object(
             module, "run_rpc_update", return_value=0
         ) as rpc_update, mock.patch.object(
             module, "verify_poisoned_os", return_value=False
-        ) as verify:
+        ) as verify, mock.patch.object(
+            module,
+            "recover_after_failed_update",
+            return_value="/dev/cu.fixture",
+        ) as recover:
             result = module.install("auto", manifest, [])
 
         self.assertEqual(result, 6)
         rpc_update.assert_called_once_with("auto", manifest, [])
         verify.assert_called_once_with("auto")
-        repair.assert_not_called()
+        recover.assert_called_once_with("flip_fixture")
+
+    def test_doctor_repairs_exact_dfu_then_collects_runtime_diagnostics(self) -> None:
+        module = load_device_install_module()
+        with mock.patch.object(
+            module, "detect_flipper_dfu", return_value="2075308D4242"
+        ), mock.patch.object(
+            module,
+            "recover_flipper_dfu",
+            return_value="/dev/cu.usbmodemflip_Osprit1",
+        ) as recover, mock.patch.object(
+            module, "collect_runtime_diagnostics", return_value=True
+        ) as diagnose:
+            result = module.doctor("auto", recover=True)
+
+        self.assertEqual(result, 0)
+        recover.assert_called_once_with("2075308D4242")
+        diagnose.assert_called_once_with("/dev/cu.usbmodemflip_Osprit1")
+
+    def test_doctor_waits_for_exact_dfu_when_device_is_absent(self) -> None:
+        module = load_device_install_module()
+        with mock.patch.object(
+            module, "detect_flipper_dfu", return_value=None
+        ), mock.patch.object(
+            module, "detect_flipper_runtime", return_value=None
+        ), mock.patch.object(
+            module, "wait_for_recovery_device", return_value=("dfu", "2075308D4242")
+        ) as wait, mock.patch.object(
+            module,
+            "recover_flipper_dfu",
+            return_value="/dev/cu.usbmodemflip_Osprit1",
+        ) as recover, mock.patch.object(
+            module, "collect_runtime_diagnostics", return_value=True
+        ):
+            result = module.doctor("auto", recover=True)
+
+        self.assertEqual(result, 0)
+        wait.assert_called_once_with(None)
+        recover.assert_called_once_with("2075308D4242")
+
+    def test_runtime_diagnostics_report_storage_and_update_milestones(self) -> None:
+        module = load_device_install_module()
+        rpc = mock.MagicMock()
+        rpc.__enter__.return_value = rpc
+        rpc.protobuf_version.return_value = (0, 25)
+        rpc.device_info.return_value = {
+            "hardware_model": "Flipper Zero",
+            "hardware_target": "7",
+            "firmware_version": "1.4.3",
+            "firmware_origin_fork": "PoisonedOS",
+        }
+        rpc.storage_info.return_value = {
+            "total_space": 64 * 1024 * 1024,
+            "free_space": 8 * 1024 * 1024,
+        }
+        rpc.list_dir.return_value = [
+            {"type": "file", "name": "backup.tar", "size": 11_264},
+            {"type": "file", "name": "resources.ths", "size": 7_766_813},
+        ]
+        rpc.stat.side_effect = lambda path: (
+            {"type": "file", "name": Path(path).name, "size": 1_055_104}
+            if path.endswith("esp32_marauder.flipper.bin")
+            else None
+        )
+        output = io.StringIO()
+
+        with mock.patch.object(module, "FlipperRpc", return_value=rpc), mock.patch(
+            "sys.stdout", output
+        ):
+            result = module.collect_runtime_diagnostics("/dev/cu.fixture")
+
+        self.assertTrue(result)
+        self.assertIn("firmware_origin_fork=PoisonedOS", output.getvalue())
+        self.assertIn("free=8388608", output.getvalue())
+        self.assertIn("backup.tar", output.getvalue())
+        self.assertIn("marauder-s2=present", output.getvalue())
 
     def test_preflight_proves_rpc_and_exact_flipper_identity(self) -> None:
         module = load_device_install_module()

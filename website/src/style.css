@@ -242,3 +242,33 @@ body, h1, h2, h3, p, span, small, strong, em, dt, dd, a, .markdown, .markdown p,
 .hero-instrument::before, .hero-instrument::after { background: #000 !important; background-image: none !important; border-color: #fff !important; }.hero-instrument::after { background: #fff !important; }
 .note-rule, .line-one, .line-two, .instrument-line { color: #fff !important; background: #fff !important; }
 .d-pad { background: linear-gradient(#fff, #fff) center/12px 39px no-repeat, linear-gradient(#fff, #fff) center/39px 12px no-repeat !important; }
+
+/* Final composition pass: a compact hardware plate instead of a generic hero card. */
+.topbar, .site-footer { width: min(1240px, calc(100% - 80px)); }
+.topbar { height: 74px; }
+.hero.section-pad { width: min(1240px, calc(100% - 80px)); grid-template-columns: minmax(0, .9fr) minmax(480px, 1.1fr); gap: 72px; min-height: 700px; padding-top: 92px; padding-bottom: 92px; }
+.hero-copy { max-width: 590px; }
+.hero h1 { max-width: 590px; font-size: clamp(58px, 7vw, 98px); line-height: .86; letter-spacing: -.075em; }
+.hero-lede { max-width: 500px; margin: 30px 0 30px; font-size: 15px; line-height: 1.55; }
+.hero-note { margin-top: 24px; }
+.hero-instrument { align-self: center; width: 100%; min-height: 540px; aspect-ratio: 1 / 1; border: 1px solid #fff; }
+.hero-instrument::before { inset: 18px; border: 1px solid #fff; }
+.hero-instrument::after { left: 23%; top: 18px; bottom: 18px; width: 1px; }
+.instrument-label-top { top: 36px; left: 38px; }.instrument-label-bottom { right: 38px; bottom: 34px; }
+.flipper-photo { inset: 96px 10% 86px 19%; }
+.flipper-photo img { width: 100%; max-width: 500px; filter: grayscale(1) contrast(1.8) brightness(1.15); mix-blend-mode: screen; }
+.instrument-line.line-one { top: 198px; right: 0; width: 28%; }.instrument-line.line-two { left: 20%; bottom: 150px; width: 35%; }
+.instrument-readout { right: 8%; bottom: 148px; padding: 10px 0 10px 15px; border-left: 1px solid #fff; background: #000; }
+.instrument-readout strong { font-size: 15px; letter-spacing: .12em; }
+.proof-strip { width: min(1240px, calc(100% - 80px)); margin: 0 auto; border: 1px solid #fff; }
+.proof-strip > div { min-height: 104px; padding: 22px 28px; }
+.capabilities, .manifest, .closing { width: min(1240px, calc(100% - 80px)); }
+.capabilities { padding-top: 108px; padding-bottom: 108px; }.section-intro { grid-template-columns: .7fr 1.4fr .9fr; gap: 44px; margin-bottom: 42px; }.section-intro h2, .manifest h2 { font-size: clamp(40px, 4.5vw, 64px); }
+.capability-grid { border: 1px solid #fff; }.capability-grid article { min-height: 250px; padding: 24px; }.capability-grid h3 { margin-top: 46px; font-size: 25px; }.capability-grid p { min-height: 78px; font-size: 12px; }
+.manifest { grid-template-columns: 150px minmax(0, 1fr) 230px; gap: 64px; padding-top: 62px; padding-bottom: 62px; }.manifest-list { border-left: 1px solid #fff; }
+.closing { padding-top: 110px; padding-bottom: 120px; }.closing h2 { max-width: 680px; font-size: clamp(58px, 8vw, 112px); line-height: .8; }
+.site-footer { min-height: 76px; }
+.docs-layout { width: min(1240px, calc(100% - 80px)); grid-template-columns: 250px minmax(0, 1fr); gap: 84px; padding-top: 70px; }
+.docs-sidebar h1 { font-size: 52px; }.doc-content > h1, .doc-results > h1 { font-size: clamp(54px, 6vw, 86px); }.doc-intro { margin-bottom: 46px; }
+@media (max-width: 900px) { .hero.section-pad { grid-template-columns: 1fr; gap: 54px; }.hero-instrument { max-width: 620px; }.proof-strip, .capabilities, .manifest, .closing, .topbar, .site-footer, .docs-layout { width: calc(100% - 48px); } }
+@media (max-width: 620px) { .hero.section-pad { width: calc(100% - 32px); padding-top: 58px; padding-bottom: 70px; }.hero h1 { font-size: clamp(54px, 16vw, 82px); }.hero-instrument { min-height: 380px; }.flipper-photo { inset: 74px 7% 58px 16%; }.instrument-readout { right: 4%; bottom: 96px; }.proof-strip, .capabilities, .manifest, .closing, .docs-layout { width: calc(100% - 32px); }.topbar, .site-footer { width: calc(100% - 32px); } }

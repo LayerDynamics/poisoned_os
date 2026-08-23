@@ -13,6 +13,16 @@ ARG POISON_SOURCE_REPOSITORY=https://github.com/LayerDynamics/poisoned_os.git
 ARG POISON_SOURCE_REF=main
 RUN git clone --depth 1 --branch "$POISON_SOURCE_REF" "$POISON_SOURCE_REPOSITORY" /repo
 
+# Seed the pinned Marauder bundle with curl so firmware builds do not depend on
+# the toolchain's Python certificate store at runtime.
+RUN marauder_version="$(sed -n 's/.*"version": "\([^"]*\)".*/\1/p' /repo/provenance/marauder.lock.json | head -1)" \
+    && marauder_url="$(sed -n 's/.*"installerBundleUrl": "\([^"]*\)".*/\1/p' /repo/provenance/marauder.lock.json)" \
+    && marauder_sha256="$(sed -n 's/.*"installerBundleSha256": "\([^"]*\)".*/\1/p' /repo/provenance/marauder.lock.json)" \
+    && marauder_path="/repo/dist/marauder/${marauder_version}/marauder-installer-assets.zip" \
+    && mkdir -p "$(dirname "$marauder_path")" \
+    && curl --fail --location --silent --show-error "$marauder_url" --output "$marauder_path" \
+    && printf '%s  %s\n' "$marauder_sha256" "$marauder_path" | sha256sum --check --status
+
 RUN corepack enable \
     && corepack prepare pnpm@10.32.1 --activate \
     && pnpm --dir /repo/dashboard install --frozen-lockfile

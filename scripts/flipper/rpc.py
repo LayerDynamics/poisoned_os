@@ -272,6 +272,60 @@ class FlipperRpc:
             properties[item.key] = item.value
         return properties
 
+    @staticmethod
+    def _storage_file_info(file_info: storage_pb2.File) -> dict[str, int | str]:
+        return {
+            "type": "directory" if file_info.type == storage_pb2.File.DIR else "file",
+            "name": file_info.name,
+            "size": file_info.size,
+        }
+
+    def storage_info(self, remote_path: str) -> dict[str, int]:
+        responses = self._request(
+            flipper_pb2.Main(
+                storage_info_request=storage_pb2.InfoRequest(path=remote_path)
+            )
+        )
+        if len(responses) != 1 or not responses[0].HasField("storage_info_response"):
+            raise RpcError("Flipper RPC returned invalid storage-info content")
+        info = responses[0].storage_info_response
+        return {"total_space": info.total_space, "free_space": info.free_space}
+
+    def stat(self, remote_path: str) -> dict[str, int | str] | None:
+        responses = self._request(
+            flipper_pb2.Main(
+                storage_stat_request=storage_pb2.StatRequest(path=remote_path)
+            ),
+            (flipper_pb2.OK, flipper_pb2.ERROR_STORAGE_NOT_EXIST),
+        )
+        if responses[0].command_status == flipper_pb2.ERROR_STORAGE_NOT_EXIST:
+            return None
+        if len(responses) != 1 or not responses[0].HasField("storage_stat_response"):
+            raise RpcError("Flipper RPC returned invalid storage-stat content")
+        response = responses[0].storage_stat_response
+        if not response.HasField("file"):
+            raise RpcError("Flipper RPC storage-stat response has no file")
+        return self._storage_file_info(response.file)
+
+    def list_dir(self, remote_path: str) -> list[dict[str, int | str]]:
+        responses = self._request(
+            flipper_pb2.Main(
+                storage_list_request=storage_pb2.ListRequest(path=remote_path)
+            ),
+            (flipper_pb2.OK, flipper_pb2.ERROR_STORAGE_NOT_EXIST),
+        )
+        if responses[0].command_status == flipper_pb2.ERROR_STORAGE_NOT_EXIST:
+            return []
+        entries = []
+        for response in responses:
+            if not response.HasField("storage_list_response"):
+                raise RpcError("Flipper RPC returned invalid storage-list content")
+            entries.extend(
+                self._storage_file_info(file_info)
+                for file_info in response.storage_list_response.file
+            )
+        return entries
+
     def delete_tree(self, remote_path: str) -> None:
         self._request(
             flipper_pb2.Main(
